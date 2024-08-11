@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ConstantsService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -39,6 +40,9 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            'appName' => config('app.name'),
+            'flash_message_data' => session('flash_message_data'),
+            'constants' => resolve(ConstantsService::class)->getConstants(),
         ];
     }
 }

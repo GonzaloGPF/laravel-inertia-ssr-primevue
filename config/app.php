@@ -123,4 +123,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'default_password' => 'Secret123**',
+    'default_currency' => 'EUR',
 ];

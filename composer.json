@@ -10,9 +10,11 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "tightenco/ziggy": "^2.0"
+        "tightenco/ziggy": "^2.0",
+        "tucker-eric/eloquentfilter": "^3.4"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.1",
         "fakerphp/faker": "^1.23",
         "laravel/breeze": "^2.1",
         "laravel/pint": "^1.13",
@@ -20,6 +22,7 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
         "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-drift": "^2.6",
         "pestphp/pest-plugin-laravel": "^2.0"
     },
     "autoload": {
@@ -27,7 +30,13 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/globals.php",
+            "app/Helpers/dates.php",
+            "app/Helpers/generators.php",
+            "app/Helpers/translations.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -35,6 +44,8 @@
         }
     },
     "scripts": {
+        "clear": "php artisan clear-compiled && php artisan config:clear && php artisan cache:clear",
+        "helper": "composer clear && php artisan ide-helper:generate && php artisan ide-helper:models -M && php artisan ide-helper:meta",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

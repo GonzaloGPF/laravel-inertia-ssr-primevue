@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\Currencies;
+use App\Enums\Languages;
+use App\Enums\Roles;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +18,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default(Roles::USER->value);
+            $table->string('language')->default(Languages::ES->value);
+            $table->string('currency')->default(Currencies::EURO->value);
+            $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
         });
