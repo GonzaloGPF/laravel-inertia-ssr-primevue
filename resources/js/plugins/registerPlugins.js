@@ -3,6 +3,8 @@ import i18n, { options, optionsSSR } from './i18n.js'
 import { ZiggyVue } from '../../../vendor/tightenco/ziggy/dist'
 import PrimeVue from 'primevue/config'
 import { primeVueConfig } from './primevue.js'
+import Button from 'primevue/button'
+
 
 export function registerPlugins(app, props = {}, isSSR = false) {
   app
@@ -10,6 +12,8 @@ export function registerPlugins(app, props = {}, isSSR = false) {
     .use(createPinia())
     .use(i18n, isSSR ? optionsSSR : options)
     .use(PrimeVue, primeVueConfig)
+
+    app.component('Button', Button)
 
   app.config.globalProperties.$route = route
 }

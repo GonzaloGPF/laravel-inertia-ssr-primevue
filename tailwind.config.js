@@ -1,6 +1,5 @@
 import defaultTheme from 'tailwindcss/defaultTheme'
 import forms from '@tailwindcss/forms'
-import tailwindCss from 'tailwindcss-primeui'
 import colors from './resources/js/config/colors.js'
 
 /** @type {import('tailwindcss').Config} */
@@ -24,5 +23,5 @@ export default {
   safelist: Object.keys(colors)
     .flatMap(className => [`bg-${className}`, className, `text-${className}`]),
 
-  plugins: [forms, tailwindCss],
+  plugins: [forms],
 }

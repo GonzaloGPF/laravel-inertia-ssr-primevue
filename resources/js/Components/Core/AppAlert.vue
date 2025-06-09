@@ -1,26 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import design from '@/config/design.js'
 import Message from 'primevue/message'
 
-defineProps({
-  severity: {
-    type: String,
-    default: 'info',
-    validator: design.validSeverity,
-  },
-  message: {
-    type: String,
-    default: null,
-  },
-  icon: {
-    type: String,
-    default: null,
-  },
-  blink: {
-    type: Boolean,
-    default: false,
-  },
-})
+type Props = {
+  severity?: string
+  message?: string
+  icon?: string
+  blink?: boolean
+}
+
+defineProps<Props>()
 </script>
 <template>
   <Message :severity="severity" :icon="icon" :class="['alert', { blink }]">

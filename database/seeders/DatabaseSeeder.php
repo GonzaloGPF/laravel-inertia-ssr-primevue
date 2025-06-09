@@ -40,11 +40,8 @@ class DatabaseSeeder extends Seeder
         $key = "Tables_in_$dbName";
 
         collect($tables)
-            ->each(function ($table) use ($key) {
-                if ($table->$key !== 'migrations'){
-                    DB::table($table->$key)->truncate();
-                }
-            });
+            ->filter(fn ($table) => $table->$key !== 'migrations')
+            ->each(fn ($table) => DB::table($table->$key)->truncate());
 
         Schema::enableForeignKeyConstraints();
     }

@@ -1,6 +1,6 @@
 <script setup>
-import IText from '@/Components/Inputs/iText.vue'
-import IPassword from '@/Components/Inputs/iPassword.vue'
+import iText from '@/Components/Inputs/iText.vue'
+import iPassword from '@/Components/Inputs/iPassword.vue'
 import useForm from '@/composables/useForm.js'
 import Translator from '@/objects/Translator.js'
 import AppForm from '@/Components/Core/AppForm.vue'
@@ -33,7 +33,7 @@ const secondaryButton = computed(() => ({
     :secondary-button="secondaryButton"
     @submit="submit"
   >
-    <i-text
+    <iText
       v-model="form.email"
       :error="form.errors.email"
       name="email"
@@ -42,7 +42,7 @@ const secondaryButton = computed(() => ({
       autofocus
       autocomplete
     />
-    <i-password
+    <iPassword
       v-model="form.password"
       :error="form.errors.password"
       name="password"
