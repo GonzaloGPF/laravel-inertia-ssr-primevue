@@ -1,13 +1,13 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
 import VerifyEmailForm from '@/Components/Forms/VerifyEmailForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 
-defineProps({
-  status: {
-    type: String,
-  },
-})
+type Props = {
+  status: string
+}
+
+defineProps<Props>()
 </script>
 <template>
   <CardLayout
@@ -16,7 +16,7 @@ defineProps({
     :alert="
       status === 'verification-link-sent'
         ? Translator.t('help.verify_email_sent')
-        : null
+        : undefined
     "
     class="max-w-7xl"
   >

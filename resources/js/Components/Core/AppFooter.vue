@@ -10,5 +10,5 @@ const items = computed(() => [
 ])
 </script>
 <template>
-  <Menubar :model="items" :breakpoint="null" class="flex justify-center" />
+  <Menubar :model="items" class="flex justify-center" />
 </template>

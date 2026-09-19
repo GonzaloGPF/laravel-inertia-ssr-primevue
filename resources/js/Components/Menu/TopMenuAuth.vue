@@ -6,10 +6,10 @@ const { isLogged } = useAuth()
 </script>
 <template>
   <div>
-    <AppNavLink v-if="!isLogged" :href="$route('login')" :label="'Login'" />
+    <AppNavLink v-if="!isLogged" :href="route('login')" :label="'Login'" />
     <AppNavLink
       v-else
-      :href="$route('logout')"
+      :href="route('logout')"
       :label="'Logout'"
       method="post"
     />

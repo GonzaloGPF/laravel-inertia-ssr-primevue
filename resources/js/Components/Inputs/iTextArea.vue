@@ -1,16 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import useInput from '@/composables/useInput'
-import { textProps } from '@/objects/Props'
-import { ref, toRefs, watch } from 'vue'
+import { toRefs, useTemplateRef, watch } from 'vue'
 import Textarea from 'primevue/textarea'
 import InputLayout from '@/Layouts/InputLayout.vue'
+import { TextInputProps } from '@/types/input'
 
-const props = defineProps({
-  ...textProps,
-})
+const props = defineProps<TextInputProps>()
 
-const inputElement = ref(null)
-const { iValue, iName, reset } = useInput(toRefs(props))
+const inputElement = useTemplateRef<HTMLTextAreaElement>('inputElement')
+const { iValue, iName, reset } = useInput<string>(toRefs(props))
 
 const emits = defineEmits([
   'update:modelValue',
@@ -33,7 +31,7 @@ const onClear = () => {
 }
 
 const focus = () => {
-  inputElement.value?.$el.focus()
+  inputElement.value?.focus()
 }
 
 watch(iValue, (value) => emits('update:modelValue', value))

@@ -1,35 +1,21 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts" generic="T extends { id: string | number }">
+import { Translator } from '@/objects/Translator'
 import AppButton from '@/Components/Core/AppButton.vue'
 import { computed } from 'vue'
+import { ButtonProps } from '@/types/buttons'
+
+type Props = {
+  loading?: boolean
+  label?: string
+  secondaryButton?: ButtonProps
+  model?: Partial<T>
+  hideActions?: boolean
+  horizontal?: boolean
+}
 
 defineEmits(['submit', 'secondary'])
-const props = defineProps({
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  label: {
-    type: String,
-    default: null,
-  },
-  secondaryButton: {
-    type: Object,
-    default: null,
-  },
-  model: {
-    type: Object,
-    default: null,
-  },
-  hideActions: {
-    type: Boolean,
-    default: false,
-  },
-  horizontal: {
-    type: Boolean,
-    default: false,
-  },
-})
+
+const props = defineProps<Props>()
 const vLabel = computed(() => {
   if (props.label) {
     return props.label
@@ -63,9 +49,9 @@ const vLabel = computed(() => {
       />
       <AppButton
         v-if="secondaryButton"
-        :label="secondaryButton?.label"
-        :href="secondaryButton?.href"
-        :aspect="secondaryButton?.aspect"
+        v-bind="secondaryButton"
+        :loading="loading"
+        :disabled="loading"
         variant="text"
         size="small"
         @click="$emit('secondary', $event)"

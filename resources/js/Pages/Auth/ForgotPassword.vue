@@ -1,13 +1,13 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
 import ForgotPasswordForm from '@/Components/Forms/ForgotPasswordForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 
-defineProps({
-  status: {
-    type: String,
-  },
-})
+type Props = {
+  status: string
+}
+
+defineProps<Props>()
 </script>
 <template>
   <CardLayout

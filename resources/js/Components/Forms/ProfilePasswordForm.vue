@@ -1,13 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import AppForm from '@/Components/Core/AppForm.vue'
 import useForm from '@/composables/useForm.js'
-import Translator from '@/objects/Translator.js'
-import IPassword from '@/Components/Inputs/iPassword.vue'
-import { ref } from 'vue'
+import { Translator } from '@/objects/Translator'
+import iPassword from '@/Components/Inputs/iPassword.vue'
+import { useTemplateRef } from 'vue'
 import AppField from '@/Components/Core/AppField.vue'
 
-const passwordInput = ref(null)
-const currentPasswordInput = ref(null)
+const passwordInput = useTemplateRef<HTMLInputElement>('passwordInput')
+const currentPasswordInput = useTemplateRef<HTMLInputElement>('currentPasswordInput')
 
 const { form } = useForm({
   current_password: '',
@@ -20,11 +20,11 @@ const submit = () => {
     onError: () => {
       if (form.errors.current_password) {
         form.reset('current_password')
-        currentPasswordInput.value.focus()
+        currentPasswordInput.value?.focus()
       }
       if (form.errors.password) {
         form.reset('password', 'password_confirmation')
-        passwordInput.value.focus()
+        passwordInput.value?.focus()
       }
     },
   })
@@ -40,21 +40,23 @@ const submit = () => {
       :label="Translator.tl('update_password')"
       :model-value="Translator.t('help.update_password')"
     />
-    <i-password
+    <iPassword
+      ref="currentPasswordInput"
       v-model="form.current_password"
       :error="form.errors.current_password"
       :autocomplete="true"
       prepend-icon="$password"
       name="current_password"
     />
-    <i-password
+    <iPassword
+      ref="passwordInput"
       v-model="form.password"
       :error="form.errors.password"
       :label="Translator.tl('new_password')"
       prepend-icon="$password"
       name="password"
     />
-    <i-password
+    <iPassword
       v-model="form.password_confirmation"
       :error="form.errors.password_confirmation"
       prepend-icon="$password"

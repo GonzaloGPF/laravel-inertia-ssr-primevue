@@ -1,18 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import AppForm from '@/Components/Core/AppForm.vue'
-import ISelect from '@/Components/Inputs/iSelect.vue'
-import IText from '@/Components/Inputs/iText.vue'
+import iSelect from '@/Components/Inputs/iSelect.vue'
+import iText from '@/Components/Inputs/iText.vue'
 import useForm from '@/composables/useForm.js'
-import useAuth from '@/composables/useAuth.js'
-import Translator from '@/objects/Translator.js'
+import useAuth from '@/composables/useAuth'
+import { Translator } from '@/objects/Translator'
 import AppField from '@/Components/Core/AppField.vue'
 
-defineProps({
-  mustVerifyEmail: {
-    // TODO: use this
-    type: Boolean,
-  },
-})
+// TODO: use this
+defineProps<{ mustVerifyEmail?: boolean}>()
 const { user } = useAuth()
 
 const { form } = useForm({
@@ -37,7 +33,7 @@ const onSubmit = () => {
       :label="Translator.tl('profile_info')"
       :model-value="Translator.t('help.profile_info')"
     />
-    <i-text
+    <iText
       v-model="form.name"
       :error="form.errors.name"
       name="name"
@@ -45,7 +41,7 @@ const onSubmit = () => {
       autofocus
       autocomplete
     />
-    <i-text
+    <iText
       v-model="form.email"
       :error="form.errors.email"
       name="email"
@@ -54,13 +50,13 @@ const onSubmit = () => {
       autofocus
       autocomplete
     />
-    <i-select
+    <iSelect
       v-model="form.language"
       :error="form.errors.language"
       name="language"
       src="languages"
     />
-    <i-select
+    <iSelect
       v-model="form.currency"
       :error="form.errors.currency"
       name="currency"

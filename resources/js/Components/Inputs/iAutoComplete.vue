@@ -1,53 +1,26 @@
-<script setup>
-import { baseProps } from '@/objects/Props'
+<script setup lang="ts" generic="T extends OptionItem">
 import useAutoComplete from '@/composables/useAutoComplete'
 import AutoComplete from 'primevue/autocomplete'
 import useInput from '@/composables/useInput'
 import { ref, toRefs, watch } from 'vue'
 import InputLayout from '@/Layouts/InputLayout.vue'
+import { AutoCompleteInputProps, OptionItem } from '@/types/input'
 
-const props = defineProps({
-  ...baseProps,
-  model: {
-    type: String,
-    required: true,
-    default: null,
-  },
-  filter: {
-    type: Function,
-    default: () => true,
-  },
-  multiple: {
-    type: Boolean,
-    default: false,
-  },
-  clearable: {
-    type: Boolean,
-    default: true,
-  },
-  options: {
-    type: Array,
-    default: null,
-  },
-  urlAttribute: {
-    type: String,
-    default: 'name',
-  },
-  params: {
-    type: Object,
-    default: null,
-  },
-})
+const props = defineProps<AutoCompleteInputProps<T>>()
 const emits = defineEmits(['update:modelValue', 'update:selected', 'clear'])
-const search = ref(null)
+const search = ref('')
+const { model } = toRefs(props)
 const { iLabel, iName, iValue, reset } = useInput(toRefs(props))
+const options = ref({
+  multiple: props.multiple,
+  params: props.params,
+  urlAttribute: props.urlAttribute,
+})
 const { loading, items, selectedItems } = useAutoComplete(
   iValue,
-  props.model,
-  props.multiple,
+  model,
   search,
-  props.params,
-  props.urlAttribute
+  options
 )
 
 watch(iValue, (value) => {
@@ -63,7 +36,7 @@ defineExpose({
     <AutoComplete
       v-model="iValue"
       :suggestions="items"
-      :option-label="(item) => item[urlAttribute] || item.label || item.name"
+      :option-label="(item) => item[String(urlAttribute)] || item.label || item.name"
       :loading="loading"
       :title="iLabel"
       :placeholder="placeholder"

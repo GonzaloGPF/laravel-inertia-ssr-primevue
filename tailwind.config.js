@@ -1,6 +1,6 @@
 import defaultTheme from 'tailwindcss/defaultTheme'
 import forms from '@tailwindcss/forms'
-import colors from './resources/js/config/colors.js'
+import { colors } from '@/config/colors'
 
 /** @type {import('tailwindcss').Config} */
 export default {

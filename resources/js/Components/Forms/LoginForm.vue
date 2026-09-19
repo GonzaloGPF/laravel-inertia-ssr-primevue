@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import iText from '@/Components/Inputs/iText.vue'
 import iPassword from '@/Components/Inputs/iPassword.vue'
 import useForm from '@/composables/useForm.js'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
 import AppForm from '@/Components/Core/AppForm.vue'
-import useAuth from '@/composables/useAuth.js'
+import useAuth from '@/composables/useAuth'
 import { computed } from 'vue'
 
 const { form } = useForm({

@@ -1,18 +1,14 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
 import ResetPasswordForm from '@/Components/Forms/ResetPasswordForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 
-defineProps({
-  email: {
-    type: String,
-    required: true,
-  },
-  token: {
-    type: String,
-    required: true,
-  },
-})
+type Props = {
+  email: string
+  token: string
+}
+
+defineProps<Props>()
 </script>
 <template>
   <CardLayout :title="Translator.tl('reset_password')" class="max-w-7xl">

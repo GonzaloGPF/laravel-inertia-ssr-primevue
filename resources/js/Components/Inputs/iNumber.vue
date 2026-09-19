@@ -1,12 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import useInput from '@/composables/useInput'
-import { numberProps } from '@/objects/Props'
 import IText from '@/Components/Inputs/iText.vue'
 import { toRefs, watch } from 'vue'
+import { NumberInputProps } from '@/types/input'
 
-const props = defineProps({
-  ...numberProps,
-})
+const props = defineProps<NumberInputProps>()
 const { iValue, reset } = useInput(toRefs(props))
 
 const emits = defineEmits([

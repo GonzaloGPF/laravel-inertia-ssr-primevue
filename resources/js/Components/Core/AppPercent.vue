@@ -1,29 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import Formatter from '@/objects/Formatter'
+import { Formatter } from '@/objects/Formatter'
+import { InputValue } from '@/types/input'
 
-const props = defineProps({
-  modelValue: {
-    type: [Number, String],
-    required: true,
-  },
-  ceil: {
-    type: Boolean,
-    default: false,
-  },
-})
-const value = computed(() => {
-  if (!props.modelValue) {
+const props = defineProps<{ ceil?: boolean, value?: InputValue }>()
+
+const parsedValue = computed(() => {
+  if (!props.value) {
+    return 0
+  }
+
+  const val = Number(props.value);
+
+  if (isNaN(val)) {
     return 0
   }
 
   if (props.ceil) {
-    return Math.ceil(props.modelValue)
+    return Math.ceil(val)
   }
 
-  return Formatter.twoDecimals(props.modelValue) + '%'
+  return Formatter.twoDecimals(val) + '%'
 })
 </script>
 <template>
-  <span v-text="value" />
+  <span v-text="parsedValue" />
 </template>

@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import design from '@/config/design'
+import { Size } from '@/types/design'
 
-defineProps({
-  icon: {
-    type: String,
-    default: null,
-  },
-  size: {
-    type: String,
-    default: undefined,
-    validator: design.validSize,
-  },
-  color: {
-    type: String,
-    default: null,
-  },
-})
+type Props = {
+  icon?: string
+  size?: Size
+  color?: string
+}
+
+defineProps<Props>()
 </script>
 <template>
   <span class="material-symbols-outlined">{{ icon }}</span>

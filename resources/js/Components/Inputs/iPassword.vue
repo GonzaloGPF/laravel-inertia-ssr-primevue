@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import useInput from '@/composables/useInput'
-import { textProps } from '@/objects/Props'
 import IText from '@/Components/Inputs/iText.vue'
 import { ref, toRefs, watch } from 'vue'
+import { TextInputProps } from '@/types/input'
 
 const emits = defineEmits([
   'update:modelValue',
@@ -14,9 +14,7 @@ const emits = defineEmits([
   'append',
   'prepend',
 ])
-const props = defineProps({
-  ...textProps,
-})
+const props = defineProps<TextInputProps>()
 
 const show = ref(false)
 

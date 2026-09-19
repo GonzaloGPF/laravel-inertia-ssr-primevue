@@ -1,102 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
-import { ref } from 'vue'
+import { useTemplateRef } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppModal from '@/Components/Core/AppModal.vue'
-import design from '@/config/design.js'
+import { ButtonProps } from '@/types/buttons'
 
 const emits = defineEmits(['mouseover', 'mouseenter', 'mouseleave', 'click'])
-const props = defineProps({
-  icon: {
-    type: String,
-    default: null,
-  },
-  iconPosition: {
-    type: String,
-    default: null,
-    validator: design.validPosition,
-  },
-  label: {
-    type: [String, Number],
-    default: null,
-  },
-  badge: {
-    type: String,
-    default: null,
-  },
-  badgeSeverity: {
-    type: String,
-    default: null,
-    validator: design.validSeverity,
-  },
-  disabled: {
-    type: Boolean,
-    default: null,
-  },
-  loading: {
-    type: Boolean,
-    default: null,
-  },
-  loadingIcon: {
-    type: String,
-    default: null,
-  },
-  text: {
-    type: Boolean,
-    default: null,
-  },
-  rounded: {
-    type: Boolean,
-    default: null,
-  },
-  raised: {
-    type: Boolean,
-    default: false,
-  },
-  link: {
-    type: Boolean,
-    default: false,
-  },
-  outlined: {
-    type: Boolean,
-    default: false,
-  },
-  plain: {
-    type: Boolean,
-    default: false,
-  },
-  fluid: {
-    type: Boolean,
-    default: false,
-  },
-  size: {
-    type: String,
-    default: undefined,
-    validator: design.validSize,
-  },
-  href: {
-    type: String,
-    default: null,
-  },
-  severity: {
-    type: String,
-    default: null,
-    validator: design.validSeverity,
-  },
-  modal: {
-    type: Object,
-    default: null,
-  },
-  items: {
-    type: Array,
-    default: null,
-  },
-})
-const buttonElement = ref()
-const menuElement = ref()
+const props = defineProps<ButtonProps>()
+const buttonElement = useTemplateRef('buttonElement')
+const menuElement = useTemplateRef('menuElement')
 
-function onClick(event) {
+function onClick(event: Event) {
   if (props.href) {
     return router.visit(props.href)
   }
@@ -119,7 +34,7 @@ defineExpose({
     <Button
       ref="buttonElement"
       v-bind="$attrs"
-      :label="label"
+      :label="String(label)"
       :size="size"
       :severity="severity"
       :icon="icon"
@@ -144,11 +59,11 @@ defineExpose({
       <slot name="modal" />
     </AppModal>
     <Menu
-      v-if="!!items"
+      v-if="!!menuItems"
       ref="menuElement"
       id="overlay_menu"
-      :model="items"
-      :popup="!!items"
+      :model="menuItems"
+      :popup="!!menuItems"
     />
   </div>
 </template>

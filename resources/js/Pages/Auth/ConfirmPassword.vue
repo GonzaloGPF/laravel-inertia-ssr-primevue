@@ -1,5 +1,5 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
 import ConfirmPasswordForm from '@/Components/Forms/ConfirmPasswordForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 </script>

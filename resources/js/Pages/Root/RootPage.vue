@@ -1,5 +1,5 @@
 <script setup>
-import Markup from '@/objects/Markup.js'
+import { Markup } from '@/objects/Markup'
 import AppField from '@/Components/Core/AppField.vue'
 import useAuth from '@/composables/useAuth.js'
 import AppLogo from '@/Components/Core/AppLogo.vue'

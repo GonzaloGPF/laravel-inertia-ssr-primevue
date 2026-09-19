@@ -1,8 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import AppDropdown from '@/Components/Core/AppDropdown.vue'
 import AppButton from '@/Components/Core/AppButton.vue'
 import { computed } from 'vue'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
+import AppImage from '@/Components/Core/AppImage.vue'
 
 const flags = computed(() => [
   {
@@ -28,7 +29,11 @@ const currentFlag = computed(() =>
   <AppDropdown align="right" width="25">
     <template #trigger>
       <AppButton variant="plain">
-        <img :src="currentFlag?.src" :alt="currentFlag?.title" width="25" />
+        <AppImage
+          :src="currentFlag?.src"
+          :alt="currentFlag?.title"
+          width="25"
+        />
       </AppButton>
     </template>
 
@@ -40,7 +45,11 @@ const currentFlag = computed(() =>
         class="w-full"
         @click="Translator.setLocale(flag.locale)"
       >
-        <img :src="flag.src" :alt="flag.title" width="25" />
+        <AppImage
+          :src="flag.src"
+          :alt="flag.title"
+          width="25"
+        />
       </AppButton>
     </template>
   </AppDropdown>

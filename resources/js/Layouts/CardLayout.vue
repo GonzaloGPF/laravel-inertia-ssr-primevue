@@ -1,44 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import AppAlert from '@/Components/Core/AppAlert.vue'
 import AppToolbar from '@/Components/Core/AppToolbar.vue'
 import Card from 'primevue/card'
 import { Head } from '@inertiajs/vue3'
+import { ButtonProps } from '@/types/buttons'
+
+type Props = {
+  title?: string
+  icon?: string
+  description?: string
+  alert?: string
+  alertType?: string
+  withoutHead?: boolean
+  buttons?: ButtonProps[]
+  prependButtons?: ButtonProps[]
+}
 
 defineEmits(['view', 'create', 'edit', 'delete', 'restore', 'download', 'back'])
-defineProps({
-  title: {
-    type: String,
-    default: null,
-  },
-  icon: {
-    type: String,
-    default: null,
-  },
-  description: {
-    type: String,
-    default: null,
-  },
-  alert: {
-    type: String,
-    default: null,
-  },
-  alertType: {
-    type: String,
-    default: 'info',
-  },
-  withoutHead: {
-    type: Boolean,
-    default: false,
-  },
-  buttons: {
-    type: Array,
-    default: null,
-  },
-  prependButtons: {
-    type: Array,
-    default: null,
-  },
-})
+defineProps<Props>()
 </script>
 <template>
   <Card>

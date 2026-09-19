@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue'
 import AppButton from '@/Components/Core/AppButton.vue'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
 import useForm from '@/composables/useForm.js'
 import IPassword from '@/Components/Inputs/iPassword.vue'
 
@@ -53,7 +53,7 @@ const closeModal = () => {
         class="my-3 text-sm"
         v-text="Translator.t('help.delete_account_warning')"
       />
-      <i-password
+      <iPassword
         ref="passwordInput"
         v-model="form.password"
         :error="form.errors.password"

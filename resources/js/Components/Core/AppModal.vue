@@ -1,60 +1,10 @@
-<script setup>
-import { toRef } from 'vue'
+<script setup lang="ts">
 import AppModalActions from '@/Components/Core/AppModalActions.vue'
+import { ModalProps } from '@/types/modal'
 
-const emits = defineEmits(['close', 'ok'])
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-    default: null,
-  },
-  okText: {
-    type: String,
-    default: null,
-  },
-  cancelText: {
-    type: String,
-    default: null,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  closable: {
-    type: Boolean,
-    default: true,
-  },
-  dismissableMask: {
-    type: Boolean,
-    default: true,
-  },
-  modal: {
-    type: Boolean,
-    default: true,
-  },
-  maximizable: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  transition: {
-    type: String,
-    default: undefined,
-  },
-  hideActions: {
-    type: Boolean,
-    default: false,
-  },
-})
-const show = toRef(props, 'modelValue')
-const onClose = () => emits('close')
+defineEmits(['close', 'ok'])
+defineProps<ModalProps>()
+const show = defineModel<boolean>()
 </script>
 <template>
   <Dialog
@@ -74,7 +24,7 @@ const onClose = () => emits('close')
           :cancel="cancelText"
           :ok="okText"
           class="flex space-x-2"
-          @cancel="onClose"
+          @cancel="$emit('close')"
           @ok="$emit('ok')"
         />
       </slot>

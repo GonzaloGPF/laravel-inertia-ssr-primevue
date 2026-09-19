@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import IPassword from '@/Components/Inputs/iPassword.vue'
 import useForm from '@/composables/useForm.js'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
 import AppForm from '@/Components/Core/AppForm.vue'
 
 const { form } = useForm({

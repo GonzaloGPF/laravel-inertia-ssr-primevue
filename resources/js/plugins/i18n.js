@@ -1,8 +1,8 @@
 // import { createI18n } from 'vue-i18n';
-import locales from '@/config/locales'
+import { locales } from '@/config/locales'
 import { i18nVue } from 'laravel-vue-i18n'
-import EventBus from '@/objects/EventBus.js'
-import events from '@/config/events.js'
+import EventBus from '@/objects/EventBus'
+import { Events } from '@/config/events'
 
 /*
  * All i18n resources specified in the plugin `include` option can be loaded
@@ -33,7 +33,7 @@ export const options = {
         return await data[`../../../lang/php_${ lang }.json`]()
     },
     onLoad: () => {
-        EventBus.emit(events.i18n_loaded)
+        EventBus.emit(Events.i18n_loaded)
     }
 }
 export const optionsSSR = {
@@ -44,6 +44,6 @@ export const optionsSSR = {
         return data[`../../../lang/php_${ lang }.json`].default
     },
     onLoad: () => {
-        EventBus.emit(events.i18n_loaded)
+        EventBus.emit(Events.i18n_loaded)
     }
 }

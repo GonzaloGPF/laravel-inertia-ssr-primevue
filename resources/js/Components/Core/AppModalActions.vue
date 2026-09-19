@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import Translator from '@/objects/Translator'
+import { Translator } from '@/objects/Translator'
 import AppButton from '@/Components/Core/AppButton.vue'
 import { computed } from 'vue'
 
+type Props = {
+  cancel?: string
+  ok?: string
+  disabled?: boolean,
+  loading?: boolean
+}
+
 defineEmits(['cancel', 'ok'])
-const props = defineProps({
-  cancel: {
-    type: String,
-    default: null,
-  },
-  ok: {
-    type: String,
-    default: null,
-  },
-})
+const props = defineProps<Props>()
 
 const cancelText = computed(() => {
   return props.cancel || Translator.actionTitle('cancel')

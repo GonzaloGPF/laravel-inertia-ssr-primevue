@@ -1,16 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import useInput from '@/composables/useInput'
-import { textProps } from '@/objects/Props'
-import { ref, toRefs, watch } from 'vue'
+import { toRefs, useTemplateRef, watch } from 'vue'
 import InputText from 'primevue/inputtext'
 import InputLayout from '@/Layouts/InputLayout.vue'
+import { TextInputProps } from '@/types/input'
 
-const props = defineProps({
-  ...textProps,
-})
+const props = defineProps<TextInputProps>()
 
-const inputElement = ref(null)
-const { iValue, iLabel, iName, reset } = useInput(toRefs(props))
+const inputElement = useTemplateRef<HTMLInputElement>('inputElement')
+const { iValue, iLabel, iName, reset } = useInput<string>(toRefs(props))
 
 const emits = defineEmits([
   'update:modelValue',
@@ -33,7 +31,7 @@ const emits = defineEmits([
 // }
 
 const focus = () => {
-  inputElement.value?.$el.focus()
+  inputElement.value?.focus()
 }
 
 watch(iValue, (value) => emits('update:modelValue', value))
@@ -58,7 +56,7 @@ defineExpose({
       :invalid="!!error"
       :fluid="fluid"
       :size="size"
-      :autocomplete="autocomplete ? 'new-password' : null"
+      :autocomplete="autocomplete ? 'new-password' : undefined"
       :required="required"
       :class="{ required }"
       :readonly="readonly"

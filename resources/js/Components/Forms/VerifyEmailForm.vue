@@ -1,15 +1,15 @@
 <script setup>
-import Translator from '@/objects/Translator.js'
-import useForm from '@/composables/useForm.js'
+import { Translator } from '@/objects/Translator'
+import useForm from '@/composables/useForm.ts'
 import AppForm from '@/Components/Core/AppForm.vue'
 import { computed } from 'vue'
 
 const { form } = useForm({})
 
-const secondaryButton = computed({
+const secondaryButton = computed(() => ({
   label: Translator.tl('logout'),
   href: route('verification.send'),
-})
+}))
 </script>
 <template>
   <AppForm

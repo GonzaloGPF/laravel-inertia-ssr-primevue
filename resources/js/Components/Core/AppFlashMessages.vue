@@ -1,14 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import AppAlert from '@/Components/Core/AppAlert.vue'
 import { useFlashMessages } from '@/stores/flashMessages'
 import { storeToRefs } from 'pinia'
 import { usePage } from '@inertiajs/vue3'
 import { computed, ref, toRefs, watch } from 'vue'
+import { FlashMessage } from '@/types/flash-messages'
 
 const { props } = toRefs(usePage())
 const { flashMessages } = storeToRefs(useFlashMessages())
 
-const flashMessageData = computed(() => props.value.flash_message_data)
+const flashMessageData = computed(() => props.value.flash_message_data as FlashMessage)
 const fromBack = ref(false)
 
 const pushFlashMessage = () => {

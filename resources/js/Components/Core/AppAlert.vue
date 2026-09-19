@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import design from '@/config/design.js'
 import Message from 'primevue/message'
 
 type Props = {

@@ -1,18 +1,16 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
 import ProfileForm from '@/Components/Forms/ProfileForm.vue'
 import ProfilePasswordForm from '@/Components/Forms/ProfilePasswordForm.vue'
 import ProfileDeleteForm from '@/Components/Forms/ProfileDeleteForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 
-defineProps({
-  mustVerifyEmail: {
-    type: Boolean,
-  },
-  status: {
-    type: String,
-  },
-})
+type Props = {
+  mustVerifyEmail: boolean
+  status: string
+}
+
+defineProps<Props>()
 </script>
 <template>
   <CardLayout :title="Translator.tl('profile')" icon="$profile">

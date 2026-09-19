@@ -1,5 +1,5 @@
 <script setup>
-import { useLoader } from '@/stores/loader.js'
+import { useLoader } from '@/stores/loader.ts'
 import { storeToRefs } from 'pinia'
 import ProgressBar from 'primevue/progressbar'
 

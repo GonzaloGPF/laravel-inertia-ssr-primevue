@@ -19,3 +19,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+.mcp.json
+CLAUDE.md
+AGENTS.md
+junie/

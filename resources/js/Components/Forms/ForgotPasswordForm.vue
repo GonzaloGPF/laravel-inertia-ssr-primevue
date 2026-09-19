@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import useForm from '@/composables/useForm.js'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
 import AppForm from '@/Components/Core/AppForm.vue'
-import IText from '@/Components/Inputs/iText.vue'
+import iText from '@/Components/Inputs/iText.vue'
 
 const { form } = useForm({
   email: '',
@@ -14,7 +14,7 @@ const { form } = useForm({
     :loading="form.processing"
     @submit="form.post(route('password.email'))"
   >
-    <i-text
+    <iText
       v-model="form.email"
       :error="form.errors.email"
       name="email"
