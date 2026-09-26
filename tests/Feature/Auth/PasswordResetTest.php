@@ -36,6 +36,19 @@ test('reset password screen can be rendered', function () {
     });
 });
 
+test('requesting a reset link does not leak the recipient locale into the response', function () {
+    Notification::fake();
+
+    app()->setLocale('en');
+
+    // The users table defaults `language` to Spanish, while the request itself is in English.
+    $user = User::factory()->create();
+
+    $this->post('/forgot-password', ['email' => $user->email]);
+
+    expect(session('status'))->toBe('We have emailed your password reset link.');
+});
+
 test('password can be reset with valid token', function () {
     Notification::fake();
 

@@ -25,9 +25,7 @@ export default function useInput<T extends InputValue>(
 
   const iValue = ref<T>()
 
-  const iName = computed(
-    () => name.value + '_' + Math.random().toString(36).substring(2)
-  )
+  const iName = computed(() => name.value)
 
   const iLabel = computed<string>(() => {
     const labelValue = label?.value

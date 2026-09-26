@@ -44,7 +44,7 @@ const submit = () => {
       ref="currentPasswordInput"
       v-model="form.current_password"
       :error="form.errors.current_password"
-      :autocomplete="true"
+      autocomplete="current-password"
       prepend-icon="$password"
       name="current_password"
     />
@@ -55,12 +55,14 @@ const submit = () => {
       :label="Translator.tl('new_password')"
       prepend-icon="$password"
       name="password"
+      autocomplete="new-password"
     />
     <iPassword
       v-model="form.password_confirmation"
       :error="form.errors.password_confirmation"
       prepend-icon="$password"
       name="password_confirmation"
+      autocomplete="new-password"
     />
   </AppForm>
 </template>

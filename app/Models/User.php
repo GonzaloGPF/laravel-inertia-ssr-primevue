@@ -10,19 +10,19 @@ use App\Notifications\ResetPassword;
 use App\Traits\IsFilterable;
 use App\Traits\NameFormatter;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
 
 /**
  * @mixin IdeHelperUser
  */
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
 {
     use HasFactory,
         IsFilterable,
@@ -58,9 +58,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendPasswordResetNotification($token): void
     {
-        Lang::setLocale($this->language->value);
-
         $this->notify(new ResetPassword($token));
+    }
+
+    public function preferredLocale(): string
+    {
+        return $this->language?->value ?? Languages::ES->value;
     }
 
     protected function password(): Attribute
