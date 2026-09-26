@@ -23,6 +23,8 @@ class PasswordController extends Controller
             'password' => $validated['password'],
         ]);
 
+        $this->flashMessage(tAction('updated', 'user'));
+
         return back();
     }
 }

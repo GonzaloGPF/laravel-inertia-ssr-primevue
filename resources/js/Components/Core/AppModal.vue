@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppModalActions from '@/Components/Core/AppModalActions.vue'
+import Dialog from 'primevue/dialog'
 import { ModalProps } from '@/types/modal'
 
 defineEmits(['close', 'ok'])

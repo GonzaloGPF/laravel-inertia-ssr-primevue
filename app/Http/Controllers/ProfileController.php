@@ -60,6 +60,8 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        $this->flashMessage(tAction('deleted', 'user'));
+
         return Redirect::to('/login');
     }
 }
