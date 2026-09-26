@@ -13,6 +13,7 @@ defineProps<Props>()
   <CardLayout
     :title="Translator.tl('forgot_password')"
     :description="Translator.t('help.forgot_password')"
+    :alert="status || undefined"
     class="max-w-7xl"
   >
     <ForgotPasswordForm />

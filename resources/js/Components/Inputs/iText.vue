@@ -56,7 +56,13 @@ defineExpose({
       :invalid="!!error"
       :fluid="fluid"
       :size="size"
-      :autocomplete="autocomplete ? 'new-password' : undefined"
+      :autocomplete="
+        typeof autocomplete === 'string'
+          ? autocomplete
+          : autocomplete
+            ? 'new-password'
+            : undefined
+      "
       :required="required"
       :class="{ required }"
       :readonly="readonly"

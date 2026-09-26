@@ -57,7 +57,7 @@ const closeModal = () => {
         ref="passwordInput"
         v-model="form.password"
         :error="form.errors.password"
-        :autocomplete="true"
+        autocomplete="current-password"
         :autofocus="true"
         required
         prepend-icon="$password"

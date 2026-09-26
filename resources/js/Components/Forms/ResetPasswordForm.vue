@@ -40,19 +40,21 @@ const submit = () => {
       type="email"
       required
       autofocus
-      autocomplete
+      autocomplete="username"
     />
     <iPassword
       v-model="form.password"
       :error="form.errors.password"
       name="new_password"
       required
+      autocomplete="new-password"
     />
     <iPassword
       v-model="form.password_confirmation"
       :error="form.errors.password_confirmation"
       name="new_password_confirmation"
       required
+      autocomplete="new-password"
     />
   </AppForm>
 </template>

@@ -19,7 +19,7 @@ const { form } = useForm({
       :error="form.errors.email"
       name="email"
       required
-      autocomplete
+      autocomplete="username"
     />
   </AppForm>
 </template>

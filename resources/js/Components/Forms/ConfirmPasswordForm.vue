@@ -19,7 +19,7 @@ const { form } = useForm({
       :error="form.errors.password"
       name="password"
       required
-      autocomplete
+      autocomplete="current-password"
     />
   </AppForm>
 </template>

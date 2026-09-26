@@ -50,7 +50,7 @@ export type InputProps = {
   prependIcon?: string
   appendIcon?: string
   rules?: string
-  autocomplete?: boolean
+  autocomplete?: boolean | string
   hideLabel?: boolean
   readonly?: boolean
   hideDetails?: boolean

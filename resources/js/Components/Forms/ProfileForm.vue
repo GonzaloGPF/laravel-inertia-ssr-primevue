@@ -39,7 +39,7 @@ const onSubmit = () => {
       name="name"
       required
       autofocus
-      autocomplete
+      autocomplete="name"
     />
     <iText
       v-model="form.email"
@@ -48,7 +48,7 @@ const onSubmit = () => {
       type="email"
       required
       autofocus
-      autocomplete
+      autocomplete="email"
     />
     <iSelect
       v-model="form.language"

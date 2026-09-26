@@ -7,6 +7,7 @@ import AppForm from '@/Components/Core/AppForm.vue'
 import { computed } from 'vue'
 
 const { form } = useForm({
+  name: '',
   email: '',
   password: '',
   password_confirmation: '',
@@ -31,25 +32,34 @@ const secondaryButton = computed(() => ({
     @submit="submit"
   >
     <iText
+      v-model="form.name"
+      :error="form.errors.name"
+      name="name"
+      required
+      autofocus
+      autocomplete="name"
+    />
+    <iText
       v-model="form.email"
       :error="form.errors.email"
       name="email"
       prepend-icon="$email"
       required
-      autofocus
-      autocomplete
+      autocomplete="username"
     />
     <iPassword
       v-model="form.password"
       :error="form.errors.password"
       name="password"
       required
+      autocomplete="new-password"
     />
     <iPassword
       v-model="form.password_confirmation"
       :error="form.errors.password_confirmation"
       name="password_confirmation"
       required
+      autocomplete="new-password"
     />
   </AppForm>
 </template>

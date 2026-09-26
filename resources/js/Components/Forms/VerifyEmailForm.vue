@@ -1,4 +1,5 @@
 <script setup>
+import { router } from '@inertiajs/vue3'
 import { Translator } from '@/objects/Translator'
 import useForm from '@/composables/useForm.ts'
 import AppForm from '@/Components/Core/AppForm.vue'
@@ -8,8 +9,11 @@ const { form } = useForm({})
 
 const secondaryButton = computed(() => ({
   label: Translator.tl('logout'),
-  href: route('verification.send'),
 }))
+
+const logout = () => {
+  router.post(route('logout'))
+}
 </script>
 <template>
   <AppForm
@@ -17,5 +21,6 @@ const secondaryButton = computed(() => ({
     :loading="form.processing"
     :secondary-button="secondaryButton"
     @submit="form.post(route('verification.send'))"
+    @secondary="logout"
   />
 </template>
