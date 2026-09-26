@@ -1,6 +1,8 @@
 /.phpunit.cache
 /bootstrap/ssr
+/tests/Browser/Screenshots
 /node_modules
+/package-lock.json
 /public/build
 /public/hot
 /public/storage
@@ -22,4 +24,4 @@ yarn-error.log
 .mcp.json
 CLAUDE.md
 AGENTS.md
-junie/
+.junie/mcp/mcp.json

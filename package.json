@@ -7,7 +7,8 @@
     "php-lint": "./vendor/bin/pint --preset laravel ./**/*.php",
     "dev": "vite",
     "build": "vue-tsc && vite build && vite build --ssr",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "playwright install chromium"
   },
   "lint-staged": {
     "*.php": "./vendor/bin/pint",
@@ -42,6 +43,7 @@
     "husky": "^9.1.7",
     "laravel-vite-plugin": "^3.2.0",
     "lint-staged": "^17.5.1",
+    "playwright": "^1.63.0",
     "prettier": "^3.9.8",
     "stylelint": "^17.15.0",
     "stylelint-config-standard": "^40.0.0",

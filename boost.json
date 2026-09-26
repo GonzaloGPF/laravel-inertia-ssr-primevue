@@ -13,7 +13,7 @@
         "deploying-to-cloud",
         "laravel-best-practices",
         "testing-best-practices",
-        "tailwindcss-development",
-        "inertia-vue-development"
+        "inertia-vue-development",
+        "tailwindcss-development"
     ]
 }
