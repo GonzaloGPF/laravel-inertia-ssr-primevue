@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Languages;
 use App\Services\ConstantsService;
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -15,6 +17,19 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
+
+    /**
+     * Apply the authenticated user's preferred language before the request is handled,
+     * so validation messages, flash messages, and the rendered `<html lang>` all match it.
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        if ($request->user()) {
+            app()->setLocale($request->user()->language?->value ?? Languages::ES->value);
+        }
+
+        return parent::handle($request, $next);
+    }
 
     /**
      * Determine the current asset version.

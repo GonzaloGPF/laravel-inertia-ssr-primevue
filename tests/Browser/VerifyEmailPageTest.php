@@ -3,6 +3,7 @@
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 
 test('the verify email page loads without javascript errors', function () {
     $user = User::factory()->unverified()->create();
@@ -28,7 +29,7 @@ test('an already verified user is redirected away from the verify email page', f
 test('resending the verification email shows a visible confirmation and sends the notification', function () {
     Notification::fake();
 
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->unverified()->create(['language' => 'en']);
 
     $this->actingAs($user);
 
@@ -41,8 +42,26 @@ test('resending the verification email shows a visible confirmation and sends th
     Notification::assertSentTo($user, VerifyEmailNotification::class);
 });
 
+test('clicking a valid verification link shows a visible success message', function () {
+    $user = User::factory()->unverified()->create(['language' => 'en']);
+
+    $verificationUrl = URL::temporarySignedRoute(
+        'verification.verify',
+        now()->addMinutes(60),
+        ['id' => $user->id, 'hash' => sha1($user->email)]
+    );
+
+    $this->actingAs($user);
+
+    $page = visit($verificationUrl);
+
+    $page->assertRoute('dashboard.show')
+        ->assertSee('Email verified')
+        ->assertNoJavaScriptErrors();
+});
+
 test('the logout button on the verify email page logs the user out', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->unverified()->create(['language' => 'en']);
 
     $this->actingAs($user);
 

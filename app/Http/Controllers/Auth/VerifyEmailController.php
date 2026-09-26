@@ -20,6 +20,8 @@ class VerifyEmailController extends Controller
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
+
+            $this->flashMessage(tl('email_verified'));
         }
 
         return redirect()->intended(route('dashboard.show', absolute: false).'?verified=1');

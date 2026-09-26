@@ -3,7 +3,7 @@
 use App\Models\User;
 
 test('the confirm password page loads without javascript errors', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->create(['language' => 'en']);
 
     $this->actingAs($user);
 
@@ -27,7 +27,7 @@ test('a user can confirm their password through the browser and reach the dashbo
 });
 
 test('the confirm password form shows a visible error for an incorrect password', function () {
-    $user = User::factory()->create(['password' => 'Secret123**']);
+    $user = User::factory()->create(['password' => 'Secret123**', 'language' => 'en']);
 
     $this->actingAs($user);
 

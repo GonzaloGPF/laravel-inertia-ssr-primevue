@@ -14,7 +14,7 @@ test('email verification screen can be rendered', function () {
 });
 
 test('email can be verified', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->unverified()->create(['language' => 'en']);
 
     Event::fake();
 
@@ -29,6 +29,21 @@ test('email can be verified', function () {
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     $response->assertRedirect(route('dashboard.show', absolute: false).'?verified=1');
+    expect(session('flash_message_data'))->toBe(['message' => 'Email verified', 'type' => 'success']);
+});
+
+test('verifying an already verified email does not flash a message again', function () {
+    $user = User::factory()->create();
+
+    $verificationUrl = URL::temporarySignedRoute(
+        'verification.verify',
+        now()->addMinutes(60),
+        ['id' => $user->id, 'hash' => sha1($user->email)]
+    );
+
+    $this->actingAs($user)->get($verificationUrl);
+
+    expect(session('flash_message_data'))->toBeNull();
 });
 
 test('email is not verified with invalid hash', function () {

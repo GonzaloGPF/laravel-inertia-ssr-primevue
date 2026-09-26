@@ -19,7 +19,10 @@ const { form } = useForm({
 })
 const onSubmit = () => {
   form.put(route('profile.update'), {
-    onSuccess: ({ props }) => form.defaults(props.auth.user),
+    onSuccess: ({ props }) => {
+      form.defaults(props.auth.user)
+      Translator.setLocale(props.auth.user.language)
+    },
   })
 }
 </script>

@@ -20,6 +20,7 @@ return [
     'no_account' => "Don't have an account?",
     'create_account_here' => 'Create an account here',
     'logout' => 'Logout',
+    'email_verified' => 'Email verified',
     'empty' => 'Without data',
     'actions' => 'Actions',
     'warning' => 'Warning',

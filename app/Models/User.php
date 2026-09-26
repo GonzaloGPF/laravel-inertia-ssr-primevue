@@ -45,6 +45,17 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'remember_token',
     ];
 
+    /**
+     * Mirrors the column defaults declared in the users table migration, so a
+     * freshly-instantiated model (before any database round-trip) reflects the
+     * same values it would have once persisted.
+     */
+    protected $attributes = [
+        'role' => Roles::USER->value,
+        'language' => Languages::ES->value,
+        'currency' => Currencies::EURO->value,
+    ];
+
     public function casts(): array
     {
         return [
