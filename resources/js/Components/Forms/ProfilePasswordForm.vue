@@ -38,7 +38,7 @@ const submit = () => {
   >
     <AppField
       :label="Translator.tl('update_password')"
-      :model-value="Translator.t('help.update_password')"
+      :value="Translator.t('help.update_password')"
     />
     <iPassword
       ref="currentPasswordInput"

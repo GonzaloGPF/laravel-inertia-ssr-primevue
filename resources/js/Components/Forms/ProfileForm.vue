@@ -31,7 +31,7 @@ const onSubmit = () => {
   >
     <AppField
       :label="Translator.tl('profile_info')"
-      :model-value="Translator.t('help.profile_info')"
+      :value="Translator.t('help.profile_info')"
     />
     <iText
       v-model="form.name"

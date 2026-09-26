@@ -8,7 +8,7 @@ const { user } = useAuth()
 </script>
 <template>
   <div>
-    <AppField v-if="user" :model-value="Markup.role(user?.role)" type="html" />
+    <AppField v-if="user" :value="Markup.role(user?.role)" type="html" />
     <div class="flex flex-col justify-center items-center mx-auto">
       <AppLogo class="mx-auto" />
       This is the root page
