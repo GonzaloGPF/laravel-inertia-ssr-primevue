@@ -1,5 +1,3 @@
-import { MetaHTMLAttributes } from 'vue'
-
 export const app = {
   /**
    *  Application environment data from Laravel Mix (.env file)
@@ -32,10 +30,12 @@ export const app = {
    * The app name given by Laravel in .env (APP_NAME)
    */
   getAppName() {
-    const metaTag = document.head.querySelector('meta[name="app_name"]')
+    const metaTag = document.head.querySelector<HTMLMetaElement>(
+      'meta[name="app_name"]'
+    )
     // const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-    return (metaTag as MetaHTMLAttributes)?.content
+    return metaTag?.content
   },
 
   /**
@@ -52,12 +52,14 @@ export const app = {
   },
 
   /**
-   * Company name is defined in mobius.php
+   * The company name given by Laravel in .env (APP_NAME)
    */
   getCompanyName() {
-    const metaTag = document.head.querySelector('meta[name="company_name"]')
+    const metaTag = document.head.querySelector<HTMLMetaElement>(
+      'meta[name="company_name"]'
+    )
 
-    return (metaTag as MetaHTMLAttributes)?.content
+    return metaTag?.content
   },
 
   /**

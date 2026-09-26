@@ -4,7 +4,7 @@ import { Utils } from '@/objects/Utils'
 import { Translator } from '@/objects/Translator'
 import { router } from '@inertiajs/vue3'
 import { QueryString } from '@/objects/QueryString'
-import lodash from 'lodash'
+import { chain } from 'lodash-es'
 import type { FilterField } from '@/types/filter'
 import { FormDataConvertible } from '@inertiajs/core'
 import useForm from '@/composables/useForm'
@@ -71,8 +71,7 @@ function buildFormData(inputs: FilterInput[]): FilterForm {
 }
 
 function getFilterText(form: FilterForm, inputs: FilterInput[]): string {
-  return lodash
-    .chain(form)
+  return chain(form)
     .keys()
     .filter((key) => !Utils.isEmptyValue(form[key]) && key !== 'page')
     .map((key) => getInputLabel(inputs.find((input) => input.name === key)))

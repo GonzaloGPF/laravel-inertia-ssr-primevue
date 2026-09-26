@@ -1,5 +1,5 @@
 import pluralize from 'pluralize'
-import lodash from 'lodash'
+import { camelCase, capitalize as lodashCapitalize, snakeCase, upperFirst } from 'lodash-es'
 import { locales } from '@/config/locales'
 import { Time } from '@/objects/Time'
 import { Translator } from '@/objects/Translator'
@@ -19,17 +19,17 @@ export const Formatter = {
 
   singular: (value?: string): string => pluralize(value ?? '', 1),
 
-  snakeCase: (value?: string): string => lodash.snakeCase(value ?? ''),
+  snakeCase: (value?: string): string => snakeCase(value ?? ''),
 
-  camelCase: (value?: string): string => lodash.camelCase(value ?? ''),
+  camelCase: (value?: string): string => camelCase(value ?? ''),
 
   studly: (value?: string): string =>
-    lodash.upperFirst(lodash.camelCase(value ?? '')),
+    upperFirst(camelCase(value ?? '')),
 
   title: (value?: string): string =>
     (value ?? '')
       .split(' ')
-      .map((word) => lodash.capitalize(word))
+      .map((word) => lodashCapitalize(word))
       .join(' '), // lodash.startCase
 
   model(value?: string): string {

@@ -1,7 +1,7 @@
 import { computed, ref, watch, type ComputedRef, type Ref } from 'vue'
 import { Translator } from '@/objects/Translator'
 import { Formatter } from '@/objects/Formatter'
-import lodash from 'lodash'
+import { isEqual } from 'lodash-es'
 import type { InputValue } from '@/types/input'
 
 type MaybeRef<T> = Ref<T> | ComputedRef<T>
@@ -63,7 +63,7 @@ export default function useInput<T extends InputValue>(
       newValue = getValue(value) as InputValue
     }
 
-    if (!force && lodash.isEqual(newValue, modelValue.value)) {
+    if (!force && isEqual(newValue, modelValue.value)) {
       return
     }
 

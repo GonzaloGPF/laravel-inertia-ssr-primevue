@@ -1,4 +1,4 @@
-import lodash from 'lodash'
+import { isEqual } from 'lodash-es'
 import { Time } from '@/objects/Time'
 import { app } from '@/config/app'
 import { QueryString } from '@/objects/QueryString'
@@ -53,7 +53,7 @@ export const Utils = {
   },
 
   isEquals<T>(obj1?: T, obj2?: T): boolean {
-    return lodash.isEqual(Utils.removeEmpty(obj1), Utils.removeEmpty(obj2))
+    return isEqual(Utils.removeEmpty(obj1), Utils.removeEmpty(obj2))
   },
 
   /**

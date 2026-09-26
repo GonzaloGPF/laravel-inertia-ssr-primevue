@@ -1,4 +1,4 @@
-import lo from 'lodash'
+import { chain, filter, find, orderBy } from 'lodash-es'
 import { Utils } from '@/objects/Utils'
 import { Translator } from '@/objects/Translator'
 import { OptionItem } from '@/types/input'
@@ -13,10 +13,10 @@ export const Dropdown = {
       return multiple ? [] : undefined
     }
     return multiple
-      ? lo.filter(items, (item) =>
+      ? filter(items, (item) =>
           String(selected).includes(String(item.value))
         )
-      : (lo.find(items, { id: selected }) as OptionItem)
+      : (find(items, { id: selected }) as OptionItem)
   },
 
   selectionIcon(items: OptionItem[], selectedValue: SelectedT, multiple = false): string {
@@ -36,15 +36,14 @@ export const Dropdown = {
   },
 
   filterAndOrder(items: OptionItem[], search: string, customFilter?: Filterer) {
-    return lo
-      .chain(items)
+    return chain(items)
       .filter((item) => Dropdown.filterItem(item, search, customFilter))
       .orderBy(['label', 'name'])
       .value()
   },
 
   orderItems(items: OptionItem[]) {
-    return lo.orderBy(items, ['label', 'name'])
+    return orderBy(items, ['label', 'name'])
   },
 
   filterItem(item: OptionItem, search: string, customFilter?: Filterer) {

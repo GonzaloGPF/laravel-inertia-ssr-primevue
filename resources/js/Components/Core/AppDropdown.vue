@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DropdownProps } from 'primevue'
 
-defineProps<DropdownProps>()
+defineProps<Omit<DropdownProps, 'modelValue'>>()
 
 const value = defineModel<string>()
 </script>

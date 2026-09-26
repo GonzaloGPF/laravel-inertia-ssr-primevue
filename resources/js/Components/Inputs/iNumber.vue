@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import useInput from '@/composables/useInput'
 import IText from '@/Components/Inputs/iText.vue'
-import { toRefs, watch } from 'vue'
+import { computed, toRefs, watch } from 'vue'
+import { omit } from 'lodash-es'
 import { NumberInputProps } from '@/types/input'
 
 const props = defineProps<NumberInputProps>()
+const boundProps = computed(() => omit(props, 'modelValue'))
 const { iValue, reset } = useInput(toRefs(props))
 
 const emits = defineEmits([
@@ -28,7 +30,7 @@ defineExpose({
   <i-text
     ref="v-input"
     v-model="iValue"
-    v-bind="$props"
+    v-bind="boundProps"
     :min="min"
     :max="max"
     type="number"

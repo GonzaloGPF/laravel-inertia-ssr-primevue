@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import useInput from '@/composables/useInput'
 import IText from '@/Components/Inputs/iText.vue'
-import { ref, toRefs, watch } from 'vue'
+import { computed, ref, toRefs, watch } from 'vue'
+import { omit } from 'lodash-es'
 import { TextInputProps } from '@/types/input'
 
 const emits = defineEmits([
@@ -15,6 +16,7 @@ const emits = defineEmits([
   'prepend',
 ])
 const props = defineProps<TextInputProps>()
+const boundProps = computed(() => omit(props, 'modelValue'))
 
 const show = ref(false)
 
@@ -29,7 +31,7 @@ defineExpose({
 <template>
   <i-text
     v-model="iValue"
-    v-bind="$props"
+    v-bind="boundProps"
     :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
     :type="show ? 'text' : 'password'"
     @append="show = !show"

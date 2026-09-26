@@ -1,4 +1,4 @@
-import lodash from 'lodash'
+import { chain } from 'lodash-es'
 import { Translator } from '@/objects/Translator'
 import { InputValue, OptionItem, QueryParams } from '@/types/input'
 import type { FilterField } from '@/types/filter'
@@ -30,8 +30,7 @@ export const Filter = {
   ): FilterInput[] {
     fields = Filter.addCommonFields(fields, isInternal, withTrash)
 
-    return lodash
-      .chain(fields)
+    return chain(fields)
       .filter(Filter.isVisible)
       .transform(Filter.addRanges)
       .map((field) => Filter.toInput(field, queryValues))
