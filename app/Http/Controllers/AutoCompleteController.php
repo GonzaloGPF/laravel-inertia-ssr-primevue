@@ -8,9 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class AutoCompleteController extends Controller
 {
-    public function __construct(private readonly SimpleResponse $response)
-    {
-    }
+    public function __construct(private readonly SimpleResponse $response) {}
 
     public function index(string $model): JsonResponse
     {

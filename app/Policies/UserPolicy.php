@@ -10,7 +10,7 @@ class UserPolicy
     /**
      * Perform pre-authorization checks.
      */
-    public function before(User $user, string $ability): bool|null
+    public function before(User $user, string $ability): ?bool
     {
         if (hasRole(Roles::ADMIN, $user)) {
             return true;
@@ -18,6 +18,7 @@ class UserPolicy
 
         return null;
     }
+
     /**
      * Determine whether the user can view any models.
      */

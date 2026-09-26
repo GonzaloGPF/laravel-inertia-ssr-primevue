@@ -24,7 +24,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function logout(?string $guard = null): void
     {
-//        User::flushEventListeners();
+        //        User::flushEventListeners();
 
         auth($guard)->logout();
     }

@@ -23,4 +23,4 @@ Route::prefix('admin')
         Route::resource('users', UserController::class);
     });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

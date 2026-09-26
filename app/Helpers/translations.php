@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
 
-
 /**
  * Translate a Model
  */

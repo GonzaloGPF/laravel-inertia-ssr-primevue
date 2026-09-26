@@ -11,7 +11,6 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
-
     public function show(User $user): Response
     {
         return Inertia::render('Users/UserShow', ['user' => $user]);
@@ -42,7 +41,7 @@ class UserController extends Controller
     public function edit(User $user): Response
     {
         return Inertia::render('Users/UserEdit', [
-            'user' => fn() => $user,
+            'user' => fn () => $user,
         ]);
     }
 

@@ -70,7 +70,6 @@ function associateTo(string $modelClass, array $attributes = [], bool $create = 
         ?? create($modelClass, $attributes)->id; // call to Factory
 }
 
-
 /**
  * Creates a file and returns the path where it has been saved.
  */
