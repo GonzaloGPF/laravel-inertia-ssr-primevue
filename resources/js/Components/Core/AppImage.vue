@@ -1,25 +1,20 @@
-<script lang="ts" setup="">
+<script lang="ts" setup>
 import Image from 'primevue/image'
 
-defineProps({
-  src: {
-    type: String,
-    default: null,
-  },
-  alt: {
-    type: String,
-    default: null,
-  },
-  width: {
-    type: [String, Number],
-    default: null,
-  },
-  height: {
-    type: [String, Number],
-    default: null,
-  },
-})
+type Props = {
+  src?: string
+  alt?: string
+  width?: string | number
+  height?: string | number
+}
+
+defineProps<Props>()
 </script>
 <template>
-  <Image :src="src" :alt="alt" :width="width" :height="height" />
+  <Image
+    :src="src"
+    :alt="alt"
+    :width="width"
+    :height="height"
+  />
 </template>

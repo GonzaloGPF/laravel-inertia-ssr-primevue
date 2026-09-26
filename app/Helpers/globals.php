@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 
 function morphedModel(?string $type, ?int $id): ?Model
 {
@@ -60,7 +61,7 @@ function toSnake(string $className, ?bool $plural = false): string
     return Str::of($className)
         ->classBasename()
         ->snake()
-        ->when($plural, fn (\Illuminate\Support\Stringable $value) => $value->plural())
+        ->when($plural, fn (Stringable $value) => $value->plural())
         ->value();
 }
 

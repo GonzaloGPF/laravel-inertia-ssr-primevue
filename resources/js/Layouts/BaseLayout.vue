@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TopMenu from '@/Components/Menu/TopMenu.vue'
 import EventBus from '@/objects/EventBus'
-import events from '@/config/events'
+import { Events } from '@/config/events'
 import { useFlashMessages } from '@/stores/flashMessages'
 import AppFooter from '@/Components/Core/AppFooter.vue'
 import AppFlashMessages from '@/Components/Core/AppFlashMessages.vue'
@@ -9,12 +9,13 @@ import AppConfirm from '@/Components/Core/AppConfirm.vue'
 import AppGlobalLoader from '@/Components/Core/AppGlobalLoader.vue'
 import { storeToRefs } from 'pinia'
 import { useLoader } from '@/stores/loader.js'
+import { Handler } from 'mitt'
 
 const { pushFlashMessage } = useFlashMessages()
 const { i18nLoaded } = storeToRefs(useLoader())
 
-EventBus.on(events.flash_message, pushFlashMessage)
-EventBus.on(events.i18n_loaded, () => {
+EventBus.on(Events.flash_message, pushFlashMessage as Handler)
+EventBus.on(Events.i18n_loaded, () => {
   i18nLoaded.value = true
 })
 </script>

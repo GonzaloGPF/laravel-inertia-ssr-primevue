@@ -6,12 +6,10 @@ import { primeVueConfig } from './primevue.js'
 
 export function registerPlugins(app, props = {}, isSSR = false) {
   app
-    .use(ZiggyVue, isSSR ? getSSRZiggyOptions(props) : {})
+    .use(ZiggyVue, isSSR ? getSSRZiggyOptions(props) : undefined)
     .use(createPinia())
     .use(i18n, isSSR ? optionsSSR : options)
     .use(PrimeVue, primeVueConfig)
-
-  app.config.globalProperties.$route = route
 }
 
 function getSSRZiggyOptions(props = {}) {

@@ -1,77 +1,34 @@
-<script setup>
+<script setup lang="ts">
 import AppFieldValue from '@/Components/Core/AppFieldValue.vue'
 import { computed } from 'vue'
 import AppIcon from '@/Components/Core/AppIcon.vue'
-import design from '@/config/design.js'
+import { FieldType, InputValue } from '@/types/input'
+import { Severity, Size } from '@/types/design'
+
+type Props = {
+  label?: string
+  value?: InputValue
+  icon?: string
+  inline?: boolean
+  tooltip?: string
+  type?: FieldType
+  href?: string
+  disabled?: boolean
+  closable?: boolean
+  clean?: boolean
+  severity?: Severity
+  color?: string
+  format?: string
+  constant?: string
+  size?: Size
+  humanize?: boolean
+}
 
 defineEmits(['click', 'close'])
-const props = defineProps({
-  label: {
-    type: String,
-    default: null,
-  },
-  modelValue: {
-    type: [String, Number, Boolean, Array, Object],
-    default: null,
-  },
-  icon: {
-    type: String,
-    default: null,
-  },
-  inline: {
-    type: Boolean,
-    default: false,
-  },
-  tooltip: {
-    type: String,
-    default: null,
-  },
-  type: {
-    type: String,
-    default: 'text',
-  },
-  href: {
-    type: String,
-    default: null,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  closable: {
-    type: Boolean,
-    default: false,
-  },
-  clean: {
-    type: Boolean,
-    default: false,
-  },
-  severity: {
-    type: String,
-    default: 'info',
-    validator: design.validSeverity,
-  },
-  color: {
-    type: String,
-    default: null,
-  },
-  format: {
-    type: String,
-    default: null,
-  },
-  constant: {
-    type: String,
-    default: null,
-  },
-  size: {
-    type: String,
-    default: 'medium',
-    validator: design.validSize,
-  },
-  humanize: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<Props>(), {
+  type: 'text',
+  severity: 'info',
+  size: 'medium',
 })
 const classes = computed(() => ({
   'inline-block': props.inline,
@@ -102,7 +59,7 @@ const style = computed(() => ({
 
     <slot>
       <AppFieldValue
-        :model-value="modelValue"
+        :value="value"
         :type="type"
         :href="href"
         :disabled="disabled"

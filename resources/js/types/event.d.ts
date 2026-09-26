@@ -1,0 +1,5 @@
+export type EventName = 'new_notification'
+ | 'confirmed'
+ | 'flash_message'
+ | 'errors'
+ | 'i18n_loaded'

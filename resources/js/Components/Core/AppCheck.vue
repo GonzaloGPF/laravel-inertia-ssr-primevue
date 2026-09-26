@@ -1,15 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import AppIcon from '@/Components/Core/AppIcon.vue'
-import Translator from '@/objects/Translator'
+import { Translator } from '@/objects/Translator'
 
-defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false,
-  },
-})
+defineProps<{ value?: boolean }>()
 </script>
 <template>
-  <AppIcon v-if="modelValue" icon="mdi-check" />
+  <AppIcon v-if="value" icon="mdi-check" />
   <span v-else v-text="Translator.tl('no')" />
 </template>

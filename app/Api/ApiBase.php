@@ -132,9 +132,6 @@ abstract class ApiBase
         return $this;
     }
 
-    /**
-     * @return ?Response
-     */
     public function getResponse(): ?Response
     {
         return $this->response;
@@ -186,6 +183,7 @@ abstract class ApiBase
     {
         if ($this->shouldQueue) {
             HttpRequestJob::dispatch($this->getConfig(), $verb, $url, $data);
+
             return [];
         }
         try {
@@ -218,7 +216,7 @@ abstract class ApiBase
     public function prepareRequest(): ApiBase
     {
         $this->request = Http::withOptions($this->options);
-        //->withHeaders($this->headers);
+        // ->withHeaders($this->headers);
 
         if (! empty($this->basicAuth)) {
             $this->request->withBasicAuth($this->basicAuth[0], $this->basicAuth[1]);

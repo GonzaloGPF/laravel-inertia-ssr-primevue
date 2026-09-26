@@ -1,40 +1,31 @@
-<script setup>
+<script setup lang="ts">
 import INumber from '@/Components/Inputs/iNumber.vue'
 import useInput from '@/composables/useInput'
-import Translator from '@/objects/Translator'
-import { numberProps } from '@/objects/Props'
-import { onMounted, ref, toRefs } from 'vue'
+import { Translator } from '@/objects/Translator'
+import { onMounted, ref, toRefs, useTemplateRef } from 'vue'
+import { NumberInputProps } from '@/types/input'
 
 const emit = defineEmits(['update:modelValue', 'focus', 'blur'])
-const props = defineProps({ ...numberProps })
+const props = defineProps<NumberInputProps>()
 const { iLabel } = useInput(toRefs(props))
 
 const hasFocus = ref(false)
-const iMin = ref(null)
-const iMax = ref(null)
-const minElement = ref(null)
-const maxElement = ref(null)
+const iMin = ref<number>()
+const iMax = ref<number>()
+const minElement = useTemplateRef('minElement')
+const maxElement = useTemplateRef('maxElement')
 
 const onModelValue = () => {
-  let minValue = parseInt(iMin.value)
-  let maxValue = parseInt(iMax.value)
-
-  if (isNaN(minValue)) {
-    minValue = null
-  }
-
-  if (isNaN(maxValue)) {
-    maxValue = null
-  }
-
-  emit('update:modelValue', [minValue, maxValue])
+  emit('update:modelValue', [iMin.value, iMax.value])
 }
 
 const initValues = () => {
   if (!Array.isArray(props.modelValue)) return
 
-  minElement.value.setValue(props.modelValue[0])
-  maxElement.value.setValue(props.modelValue[1])
+  // minElement.value.setValue(props.modelValue[0])
+  // maxElement.value.setValue(props.modelValue[1])
+  iMin.value = props.modelValue[0];
+  iMax.value = props.modelValue[1];
 }
 
 const reset = () => {

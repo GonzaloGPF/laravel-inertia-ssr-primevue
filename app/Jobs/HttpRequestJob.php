@@ -15,17 +15,15 @@ class HttpRequestJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private array $options;
+
     private string $verb;
+
     private string $url;
+
     private array $data;
 
     /**
      * Create a new job instance.
-     *
-     * @param array $options
-     * @param string $verb
-     * @param string $url
-     * @param array $data
      */
     public function __construct(array $options, string $verb, string $url, array $data = []) // TODO: test it
     {
@@ -38,8 +36,6 @@ class HttpRequestJob implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param ApiBase $service
-     * @return void
      * @throws BindingResolutionException
      */
     public function handle(ApiBase $service): void

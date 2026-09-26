@@ -1,9 +1,9 @@
 import '../css/app.css'
 
-import { createSSRApp, DefineComponent, h } from 'vue'
+import { createSSRApp, h, type DefineComponent } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
-import app from '@/config/app'
+import { app } from '@/config/app'
 import BaseLayout from '@/Layouts/BaseLayout.vue'
 import { registerDirectives } from '@/directives/primevue'
 import { registerPlugins } from '@/plugins/registerPlugins'

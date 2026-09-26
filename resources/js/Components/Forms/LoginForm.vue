@@ -1,10 +1,10 @@
-<script setup>
-import IText from '@/Components/Inputs/iText.vue'
-import IPassword from '@/Components/Inputs/iPassword.vue'
+<script setup lang="ts">
+import iText from '@/Components/Inputs/iText.vue'
+import iPassword from '@/Components/Inputs/iPassword.vue'
 import useForm from '@/composables/useForm.js'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
 import AppForm from '@/Components/Core/AppForm.vue'
-import useAuth from '@/composables/useAuth.js'
+import useAuth from '@/composables/useAuth'
 import { computed } from 'vue'
 
 const { form } = useForm({
@@ -33,7 +33,7 @@ const secondaryButton = computed(() => ({
     :secondary-button="secondaryButton"
     @submit="submit"
   >
-    <i-text
+    <iText
       v-model="form.email"
       :error="form.errors.email"
       name="email"
@@ -42,7 +42,7 @@ const secondaryButton = computed(() => ({
       autofocus
       autocomplete
     />
-    <i-password
+    <iPassword
       v-model="form.password"
       :error="form.errors.password"
       name="password"

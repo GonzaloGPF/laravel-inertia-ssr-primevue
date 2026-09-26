@@ -1,52 +1,32 @@
-<script setup>
+<script setup lang="ts">
 import AppButtons from '@/Components/Core/AppButtons.vue'
+import { ActionName } from '@/types/actions'
+
+type Props = {
+  title?: string
+  color?: string
+  elevation?: string
+  actions?: ActionName[]
+  prependActions?: ActionName[]
+  loading?: boolean
+  disabled?: boolean
+}
 
 defineEmits(['click'])
-defineProps({
-  title: {
-    type: String,
-    default: null,
-  },
-  color: {
-    type: String,
-    default: null,
-  },
-  elevation: {
-    type: String,
-    default: null,
-  },
-  buttons: {
-    type: Array,
-    default: null,
-  },
-  prependButtons: {
-    type: Array,
-    default: null,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-})
+defineProps<Props>()
 </script>
 <template>
   <div density="compact" :color="color" :elevation="elevation" flat>
     <AppButtons
-      :buttons="prependButtons"
+      :actions="prependActions"
       :loading="loading"
       :disabled="disabled"
       @click="$emit('click', $event)"
     />
-    <div>
-      {{ title }}
-    </div>
+    <div v-text="title" />
     <slot />
     <AppButtons
-      :buttons="buttons"
+      :actions="actions"
       :loading="loading"
       :disabled="disabled"
       @click="$emit('click', $event)"

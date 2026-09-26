@@ -1,17 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
-import Translator from '@/objects/Translator'
+import { Translator } from '@/objects/Translator'
 
-const props = defineProps({
-  label: {
-    type: String,
-    default: null,
-  },
-  model: {
-    type: String,
-    default: null,
-  },
-})
+type Props = {
+  label?: string
+  model?: string
+}
+
+const props = defineProps<Props>()
 const text = computed(() => {
   if (props.model) {
     return Translator.t('exceptions.without_data', {

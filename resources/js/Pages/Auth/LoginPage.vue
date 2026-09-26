@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import AppLogo from '@/Components/Core/AppLogo.vue'
 import LoginForm from '@/Components/Forms/LoginForm.vue'
-import Translator from '@/objects/Translator.js'
+import { Translator } from '@/objects/Translator'
 import CardLayout from '@/Layouts/CardLayout.vue'
 </script>
 <template>

@@ -1,21 +1,17 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
-import useForm from '@/composables/useForm.js'
-import IPassword from '@/Components/Inputs/iPassword.vue'
-import IText from '@/Components/Inputs/iText.vue'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
+import useForm from '@/composables/useForm'
+import iPassword from '@/Components/Inputs/iPassword.vue'
+import iText from '@/Components/Inputs/iText.vue'
 import AppForm from '@/Components/Core/AppForm.vue'
 import { toRefs } from 'vue'
 
-const props = defineProps({
-  email: {
-    type: String,
-    required: true,
-  },
-  token: {
-    type: String,
-    required: true,
-  },
-})
+type Props = {
+  email: string
+  token: string
+}
+
+const props = defineProps<Props>()
 const { token, email } = toRefs(props)
 const { form } = useForm({
   token: token.value,
@@ -36,7 +32,7 @@ const submit = () => {
     :loading="form.processing"
     @submit="submit"
   >
-    <i-text
+    <iText
       v-model="form.email"
       :error="form.errors.email"
       disabled
@@ -46,13 +42,13 @@ const submit = () => {
       autofocus
       autocomplete
     />
-    <i-password
+    <iPassword
       v-model="form.password"
       :error="form.errors.password"
       name="new_password"
       required
     />
-    <i-password
+    <iPassword
       v-model="form.password_confirmation"
       :error="form.errors.password_confirmation"
       name="new_password_confirmation"

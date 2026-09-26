@@ -10,7 +10,7 @@ it('let auto complete users', function () {
 
     $data = $this->getJson(route('autocomplete.index', [
         'model' => 'user',
-        'name' => 'Test'
+        'name' => 'Test',
     ]))->assertSuccessful()
         ->json('data');
 

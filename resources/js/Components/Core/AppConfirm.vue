@@ -1,29 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import EventBus from '@/objects/EventBus.js'
-import events from '@/config/events.js'
 import { useConfirm } from '@/stores/confirm'
 import { storeToRefs } from 'pinia'
-import { markRaw, watch } from 'vue'
+import { markRaw, watch, type Component } from 'vue'
 import AppModal from '@/Components/Core/AppModal.vue'
 
 const { show, title, message, okText, cancelText, component } =
   storeToRefs(useConfirm())
 
-let rawComponent = null
+let rawComponent: Component | undefined = undefined
 
 watch(component, (value) => {
   if (!value) return
   rawComponent = markRaw(value)
 })
 
-function onClick(value) {
+function onClick(value: boolean) {
   if (value && component.value) {
-    value = component.value.validate()
+    // value = component.value.validate()
 
     if (!value) return
   }
 
-  EventBus.emit(events.confirmed, value)
+  EventBus.emit('confirmed', value)
 }
 </script>
 <template>

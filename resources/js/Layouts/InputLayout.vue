@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { baseProps } from '@/objects/Props'
 import { computed, toRefs } from 'vue'
 import useInput from '@/composables/useInput'
+import { InputProps } from '@/types/input'
+
+type Props = InputProps & {
+  isCheckbox?: boolean
+}
 
 defineOptions({ inheritAttrs: false })
-const props = defineProps({
-  ...baseProps,
-  isCheckbox: {
-    type: Boolean,
-    default: false,
-  },
-})
+const props = defineProps<Props>()
 
 const { iLabel } = useInput(toRefs(props))
 
@@ -29,7 +27,7 @@ const innerContainerClasses = computed(() => ({
 <template>
   <div class="flex flex-col">
     <div :class="innerContainerClasses">
-      <label v-if="!hideLabel" :for="id" v-text="iLabel" />
+      <label v-if="!hideLabel" :for="String(id)" v-text="iLabel" />
       <slot />
     </div>
     <div class="h-5">

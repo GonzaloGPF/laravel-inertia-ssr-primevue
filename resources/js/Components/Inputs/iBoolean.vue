@@ -1,24 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import useInput from '@/composables/useInput'
 import { computed, toRefs, watch } from 'vue'
-import Translator from '@/objects/Translator'
+import { Translator } from '@/objects/Translator'
 import Select from 'primevue/select'
-import { baseProps } from '@/objects/Props'
 import InputLayout from '@/Layouts/InputLayout.vue'
+import { BooleanInputProps } from '@/types/input'
 
-const props = defineProps({
-  ...baseProps,
-  checkmark: {
-    type: Boolean,
-    default: false,
-  },
-  clearable: {
-    type: Boolean,
-    default: false,
-  },
-})
+const props = defineProps<BooleanInputProps>()
 const { iLabel, iName, iValue, reset } = useInput(toRefs(props), (value) => {
-  return value === null ? null : value ? 1 : 0
+  return value === null ? undefined : value ? 1 : 0
 })
 const items = computed(() => [
   {

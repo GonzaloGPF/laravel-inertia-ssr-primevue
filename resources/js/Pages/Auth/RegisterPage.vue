@@ -1,5 +1,5 @@
-<script setup>
-import Translator from '@/objects/Translator.js'
+<script setup lang="ts">
+import { Translator } from '@/objects/Translator'
 import RegisterForm from '@/Components/Forms/RegisterForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 import AppLogo from '@/Components/Core/AppLogo.vue'

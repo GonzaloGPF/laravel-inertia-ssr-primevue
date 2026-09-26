@@ -1,5 +1,5 @@
-<script setup>
-import app from '@/config/app.js'
+<script setup lang="ts">
+import { app } from '@/config/app'
 import AppImage from '@/Components/Core/AppImage.vue'
 </script>
 <template>

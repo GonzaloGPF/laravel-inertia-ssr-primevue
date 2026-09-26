@@ -1,22 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import Checkbox from 'primevue/checkbox'
 import useInput from '@/composables/useInput'
-import { baseProps } from '@/objects/Props'
 import { toRefs } from 'vue'
 import InputLayout from '@/Layouts/InputLayout.vue'
+import { CheckInputProps } from '@/types/input.js'
 
-const props = defineProps({
-  ...baseProps,
-  indeterminate: {
-    type: Boolean,
-    default: false,
-  },
-  binary: {
-    type: Boolean,
-    default: true,
-  },
-})
+const props = defineProps<CheckInputProps>()
 const { iLabel, iName, iValue, reset } = useInput(toRefs(props))
+
 defineExpose({
   reset,
 })
