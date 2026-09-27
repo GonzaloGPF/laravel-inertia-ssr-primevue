@@ -6,7 +6,7 @@ import { computed } from 'vue'
 type Props = {
   cancel?: string
   ok?: string
-  disabled?: boolean,
+  disabled?: boolean
   loading?: boolean
 }
 

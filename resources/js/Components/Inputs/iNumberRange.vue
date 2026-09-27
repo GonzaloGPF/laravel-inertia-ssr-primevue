@@ -24,8 +24,8 @@ const initValues = () => {
 
   // minElement.value.setValue(props.modelValue[0])
   // maxElement.value.setValue(props.modelValue[1])
-  iMin.value = props.modelValue[0];
-  iMax.value = props.modelValue[1];
+  iMin.value = props.modelValue[0]
+  iMax.value = props.modelValue[1]
 }
 
 const reset = () => {

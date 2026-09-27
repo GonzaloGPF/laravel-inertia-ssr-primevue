@@ -5,10 +5,7 @@ import useSelect from '@/composables/useSelect'
 import { Utils } from '@/objects/Utils'
 import Select from 'primevue/select'
 import InputLayout from '@/Layouts/InputLayout.vue'
-import {
-  OptionItem,
-  SelectInputProps,
-} from '@/types/input'
+import { OptionItem, SelectInputProps } from '@/types/input'
 
 const props = defineProps<SelectInputProps<T>>()
 const search = ref('')

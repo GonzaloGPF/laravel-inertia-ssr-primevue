@@ -45,11 +45,7 @@ const currentFlag = computed(() =>
         class="w-full"
         @click="Translator.setLocale(flag.locale)"
       >
-        <AppImage
-          :src="flag.src"
-          :alt="flag.title"
-          width="25"
-        />
+        <AppImage :src="flag.src" :alt="flag.title" width="25" />
       </AppButton>
     </template>
   </AppDropdown>

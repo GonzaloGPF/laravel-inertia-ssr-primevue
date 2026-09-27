@@ -130,7 +130,12 @@ export const Translator = {
   /**
    * Translation for a specific action and model
    */
-  actionTitle: (action: string, model: string = '', female = false, plural = false) => {
+  actionTitle: (
+    action: string,
+    model: string = '',
+    female = false,
+    plural = false
+  ) => {
     let translatedAction
 
     if (model) {

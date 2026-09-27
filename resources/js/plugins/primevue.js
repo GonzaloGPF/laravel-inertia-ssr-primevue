@@ -6,7 +6,7 @@ export const primeVueConfig = {
     options: {
       cssLayer: {
         name: 'primevue',
-        order: 'theme, base, primevue'
+        order: 'theme, base, primevue',
       },
     },
   },

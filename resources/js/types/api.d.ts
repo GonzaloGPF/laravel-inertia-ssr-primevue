@@ -7,7 +7,7 @@ type PaginationLink = {
 }
 
 type PaginationData<T = BaseModel> = {
-  data?: T,
+  data?: T
   current_page?: number
   first_page_url?: string
   from?: number
@@ -23,7 +23,7 @@ type PaginationData<T = BaseModel> = {
 }
 
 export type ApiResponse<T> = {
-  data?: T,
+  data?: T
   message?: string
 }
 

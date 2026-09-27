@@ -18,7 +18,7 @@ const buttons = computed(() => {
 <template>
   <ButtonGroup>
     <AppButton
-      v-for="(button, i) in (buttons || [])"
+      v-for="(button, i) in buttons || []"
       :key="i"
       v-bind="button"
       @click="$emit('click', button.action)"

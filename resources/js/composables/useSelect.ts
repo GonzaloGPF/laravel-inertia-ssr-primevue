@@ -8,7 +8,7 @@ type MaybeRef<T> = T | Ref<T> | ComputedRef<T>
 
 type UseSelectReturn = {
   items: ComputedRef<OptionItem[]>
-  selectedItems: ComputedRef<OptionItem|OptionItem[]|undefined>
+  selectedItems: ComputedRef<OptionItem | OptionItem[] | undefined>
   selectionIcon: ComputedRef<string>
   getItemTitle: (item: OptionItem) => string
 }

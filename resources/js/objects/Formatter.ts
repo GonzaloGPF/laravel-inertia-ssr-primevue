@@ -1,5 +1,10 @@
 import pluralize from 'pluralize'
-import { camelCase, capitalize as lodashCapitalize, snakeCase, upperFirst } from 'lodash-es'
+import {
+  camelCase,
+  capitalize as lodashCapitalize,
+  snakeCase,
+  upperFirst,
+} from 'lodash-es'
 import { locales } from '@/config/locales'
 import { Time } from '@/objects/Time'
 import { Translator } from '@/objects/Translator'
@@ -23,8 +28,7 @@ export const Formatter = {
 
   camelCase: (value?: string): string => camelCase(value ?? ''),
 
-  studly: (value?: string): string =>
-    upperFirst(camelCase(value ?? '')),
+  studly: (value?: string): string => upperFirst(camelCase(value ?? '')),
 
   title: (value?: string): string =>
     (value ?? '')

@@ -1,0 +1,63 @@
+name: Code Check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: code-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  php-lint:
+    name: PHP (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run Pint
+        run: vendor/bin/pint --test
+
+  js-lint:
+    name: Frontend (ESLint, Prettier, Stylelint, vue-tsc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-scripts
+
+      - name: ESLint
+        run: yarn eslint resources/js --max-warnings=0
+
+      - name: Prettier
+        run: yarn prettier --check resources/js
+
+      - name: Stylelint
+        run: yarn stylelint 'resources/css/**/*'
+
+      - name: Type check (vue-tsc)
+        run: yarn vue-tsc --noEmit

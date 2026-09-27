@@ -26,24 +26,24 @@ import { Events } from '@/config/events'
 export default i18nVue
 
 export const options = {
-    lang: locales.getLocale(),
-    fallbackLocale: 'en',
-    resolve: async lang => {
-        const data = import.meta.glob('../../../lang/*.json')
-        return await data[`../../../lang/php_${ lang }.json`]()
-    },
-    onLoad: () => {
-        EventBus.emit(Events.i18n_loaded)
-    }
+  lang: locales.getLocale(),
+  fallbackLocale: 'en',
+  resolve: async (lang) => {
+    const data = import.meta.glob('../../../lang/*.json')
+    return await data[`../../../lang/php_${lang}.json`]()
+  },
+  onLoad: () => {
+    EventBus.emit(Events.i18n_loaded)
+  },
 }
 export const optionsSSR = {
-    lang: locales.getLocale(),
-    fallbackLocale: 'en',
-    resolve: lang => {
-        const data = import.meta.glob('../../../lang/*.json', { eager: true })
-        return data[`../../../lang/php_${ lang }.json`].default
-    },
-    onLoad: () => {
-        EventBus.emit(Events.i18n_loaded)
-    }
+  lang: locales.getLocale(),
+  fallbackLocale: 'en',
+  resolve: (lang) => {
+    const data = import.meta.glob('../../../lang/*.json', { eager: true })
+    return data[`../../../lang/php_${lang}.json`].default
+  },
+  onLoad: () => {
+    EventBus.emit(Events.i18n_loaded)
+  },
 }

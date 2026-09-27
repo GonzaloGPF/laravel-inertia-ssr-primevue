@@ -9,7 +9,9 @@ import { FlashMessage } from '@/types/flash-messages'
 const { props } = toRefs(usePage())
 const { flashMessages } = storeToRefs(useFlashMessages())
 
-const flashMessageData = computed(() => props.value.flash_message_data as FlashMessage)
+const flashMessageData = computed(
+  () => props.value.flash_message_data as FlashMessage
+)
 const fromBack = ref(false)
 
 const pushFlashMessage = () => {

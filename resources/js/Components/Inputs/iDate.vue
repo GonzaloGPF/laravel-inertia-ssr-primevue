@@ -11,7 +11,7 @@ const emits = defineEmits(['update:model-value'])
 const props = withDefaults(defineProps<DateInputProps>(), {
   type: 'date',
 })
-const { iLabel, iName, iValue } = useInput<Date|Date[]>(toRefs(props))
+const { iLabel, iName, iValue } = useInput<Date | Date[]>(toRefs(props))
 
 const selectionMode = computed(() => {
   if (props.range) {

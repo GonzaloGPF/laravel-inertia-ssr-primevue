@@ -5,8 +5,5 @@ defineEmits(['close'])
 defineProps<ChipProps>()
 </script>
 <template>
-  <Chip
-    v-bind="$props"
-    @remove="$emit('close')"
-  />
+  <Chip v-bind="$props" @remove="$emit('close')" />
 </template>

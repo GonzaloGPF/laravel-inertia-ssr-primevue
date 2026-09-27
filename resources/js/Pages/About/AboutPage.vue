@@ -1,8 +1,4 @@
-<script  lang="ts" setup="">
-
-</script>
+<script lang="ts" setup=""></script>
 <template>
-  <div>
-    This is AboutPage
-  </div>
+  <div>This is AboutPage</div>
 </template>

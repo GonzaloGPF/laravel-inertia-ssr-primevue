@@ -41,7 +41,8 @@ export default function useAuth() {
       )
     }
   }
-  const createdByMe = (model?: BaseModel) => model?.created_by === user.value?.id
+  const createdByMe = (model?: BaseModel) =>
+    model?.created_by === user.value?.id
 
   return {
     isLogged,

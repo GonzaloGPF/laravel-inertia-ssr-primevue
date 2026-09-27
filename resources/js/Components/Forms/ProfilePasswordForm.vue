@@ -7,7 +7,9 @@ import { useTemplateRef } from 'vue'
 import AppField from '@/Components/Core/AppField.vue'
 
 const passwordInput = useTemplateRef<HTMLInputElement>('passwordInput')
-const currentPasswordInput = useTemplateRef<HTMLInputElement>('currentPasswordInput')
+const currentPasswordInput = useTemplateRef<HTMLInputElement>(
+  'currentPasswordInput'
+)
 
 const { form } = useForm({
   current_password: '',

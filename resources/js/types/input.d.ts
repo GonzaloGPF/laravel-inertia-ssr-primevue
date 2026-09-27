@@ -1,15 +1,13 @@
 import { CustomFilter } from '@/types/filter'
 
 export type QueryParamValue =
-  | string
-  | number
-  | boolean
-  | Array<string | number | boolean>
+  string | number | boolean | Array<string | number | boolean>
 export type QueryParams = Record<string, QueryParamValue>
 export type InputValueType = undefined | string | number | boolean | object
 export type InputValue = InputValueType | Array<InputValueType>
 
-export type FieldType = null
+export type FieldType =
+  | null
   | 'chip'
   | 'text'
   | 'html'
@@ -24,9 +22,11 @@ export type FieldType = null
 
 export type DatePickerType = 'date' | 'month' | 'year'
 
-export type FileType = {
-  id: string
-} | number
+export type FileType =
+  | {
+      id: string
+    }
+  | number
 
 export type OptionItem = {
   id?: string
@@ -77,7 +77,9 @@ export interface SelectInputProps<T extends OptionItem> extends InputProps {
   variant?: 'solo' | 'underlined'
 }
 
-export interface AutoCompleteInputProps<T extends OptionItem> extends SelectInputProps<T> {
+export interface AutoCompleteInputProps<
+  T extends OptionItem,
+> extends SelectInputProps<T> {
   model?: string
   urlAttribute?: string
   params?: QueryParams

@@ -65,7 +65,10 @@ export const useFlashMessages = defineStore('flashMessages', () => {
     )
   }
 
-  const parseFlashMessage = (message: string | FlashMessage, params: FlashMessage = {}) => {
+  const parseFlashMessage = (
+    message: string | FlashMessage,
+    params: FlashMessage = {}
+  ) => {
     if (typeof message === 'string') {
       params.message = message
     } else {

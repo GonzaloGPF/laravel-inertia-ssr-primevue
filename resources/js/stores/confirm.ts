@@ -62,7 +62,10 @@ export const useConfirm = defineStore('confirm', () => {
   }
 })
 
-function parseParams(message: string | ConfirmParams = '', params: ConfirmParams = {}) {
+function parseParams(
+  message: string | ConfirmParams = '',
+  params: ConfirmParams = {}
+) {
   if (typeof message === 'string') {
     params.message = message
   } else {

@@ -1,4 +1,8 @@
-import axios, { type AxiosError, type AxiosResponse, type AxiosStatic } from 'axios'
+import axios, {
+  type AxiosError,
+  type AxiosResponse,
+  type AxiosStatic,
+} from 'axios'
 import { app } from '@/config/app'
 import { Translator } from '@/objects/Translator'
 import EventBus from '@/objects/EventBus'
@@ -57,7 +61,8 @@ const Http = {
   postJson: (url: string, data = {}, config = {}) =>
     Http.getInstance().post(url, data, config),
 
-  deleteJson: (url: string, config = {}) => Http.getInstance().delete(url, config),
+  deleteJson: (url: string, config = {}) =>
+    Http.getInstance().delete(url, config),
 
   download: (url: string, params = {}) => {
     return Http.getInstance()
@@ -154,7 +159,10 @@ const responseInterceptor = (response: AxiosResponse) => {
   return response
 }
 
-const errorInterceptor = (error: AxiosError<ApiErrorResponse>, axiosInstance: AxiosStatic) => {
+const errorInterceptor = (
+  error: AxiosError<ApiErrorResponse>,
+  axiosInstance: AxiosStatic
+) => {
   if (!error.response) throw new Error(error.message)
 
   const { status, data, config } = error.response

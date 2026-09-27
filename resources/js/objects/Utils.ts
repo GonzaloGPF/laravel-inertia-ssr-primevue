@@ -20,9 +20,7 @@ export const Utils = {
   /**
    * Returns the given object, removing all keys with empty values
    */
-  removeEmpty<T>(
-    obj?: T
-  ): Partial<T> | Record<string, never> {
+  removeEmpty<T>(obj?: T): Partial<T> | Record<string, never> {
     if (!obj) return {}
 
     const cloned = JSON.parse(JSON.stringify(obj)) as Record<string, unknown>

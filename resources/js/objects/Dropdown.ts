@@ -7,19 +7,24 @@ type SelectedT = string | number
 type Filterer = (item: OptionItem, search?: string) => boolean
 
 export const Dropdown = {
-  selectedItems(items: OptionItem[], selected: SelectedT, multiple = false
+  selectedItems(
+    items: OptionItem[],
+    selected: SelectedT,
+    multiple = false
   ): OptionItem | undefined | Array<OptionItem> {
     if (Utils.isEmptyValue(selected)) {
       return multiple ? [] : undefined
     }
     return multiple
-      ? filter(items, (item) =>
-          String(selected).includes(String(item.value))
-        )
+      ? filter(items, (item) => String(selected).includes(String(item.value)))
       : (find(items, { id: selected }) as OptionItem)
   },
 
-  selectionIcon(items: OptionItem[], selectedValue: SelectedT, multiple = false): string {
+  selectionIcon(
+    items: OptionItem[],
+    selectedValue: SelectedT,
+    multiple = false
+  ): string {
     if (!multiple || !Array.isArray(selectedValue)) {
       return ''
     }

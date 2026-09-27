@@ -15,7 +15,8 @@ export function useConstants() {
     }))
   }
 
-  const existsConstant = (constantName?: string) => !!getConstants(constantName)[0]
+  const existsConstant = (constantName?: string) =>
+    !!getConstants(constantName)[0]
 
   return {
     getConstants,

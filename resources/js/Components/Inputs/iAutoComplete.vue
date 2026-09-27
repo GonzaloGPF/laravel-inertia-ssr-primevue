@@ -36,7 +36,9 @@ defineExpose({
     <AutoComplete
       v-model="iValue"
       :suggestions="items"
-      :option-label="(item) => item[String(urlAttribute)] || item.label || item.name"
+      :option-label="
+        (item) => item[String(urlAttribute)] || item.label || item.name
+      "
       :loading="loading"
       :title="iLabel"
       :placeholder="placeholder"

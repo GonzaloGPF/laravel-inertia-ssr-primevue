@@ -15,7 +15,7 @@ export default (
   userInput: Ref<InputValue>,
   model: Ref<string | undefined>,
   search: Ref<string>,
-  options: Ref<Options> = ref({}),
+  options: Ref<Options> = ref({})
 ) => {
   const { getJson, loading } = useHttp()
   const { existsConstant } = useConstants()
@@ -92,7 +92,7 @@ export default (
 
   async function makeRequest(model?: string, params = {}, force = false) {
     if (!model) {
-      return;
+      return
     }
     const stringParams = QueryString.stringify(params)
 
@@ -118,7 +118,12 @@ export default (
 /**
  * Prepare params when prefilled
  */
-function getPreParams(value: string, multiple: boolean, urlAttribute: string, isConstant: boolean) {
+function getPreParams(
+  value: string,
+  multiple: boolean,
+  urlAttribute: string,
+  isConstant: boolean
+) {
   const urlValue = multiple ? Object.values(value) : value
 
   if (!isConstant) {

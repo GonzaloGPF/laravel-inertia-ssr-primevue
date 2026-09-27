@@ -30,7 +30,9 @@ export const Filter = {
     fields = Filter.addCommonFields(fields, isInternal, withTrash)
 
     const expandedFields: FilterField[] = []
-    fields.filter(Filter.isVisible).forEach((field) => Filter.addRanges(expandedFields, field))
+    fields
+      .filter(Filter.isVisible)
+      .forEach((field) => Filter.addRanges(expandedFields, field))
 
     return expandedFields.map((field) => Filter.toInput(field, queryValues))
   },

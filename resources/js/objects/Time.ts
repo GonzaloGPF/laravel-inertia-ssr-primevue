@@ -78,10 +78,7 @@ export const Time = {
     })
   },
 
-  formatDuration(
-    duration: Duration,
-    options?: FormatDurationOptions
-  ): string {
+  formatDuration(duration: Duration, options?: FormatDurationOptions): string {
     return formatDuration(duration, options)
   },
 

@@ -3,14 +3,14 @@ import { computed } from 'vue'
 import { Formatter } from '@/objects/Formatter'
 import { InputValue } from '@/types/input'
 
-const props = defineProps<{ ceil?: boolean, value?: InputValue }>()
+const props = defineProps<{ ceil?: boolean; value?: InputValue }>()
 
 const parsedValue = computed(() => {
   if (!props.value) {
     return 0
   }
 
-  const val = Number(props.value);
+  const val = Number(props.value)
 
   if (isNaN(val)) {
     return 0

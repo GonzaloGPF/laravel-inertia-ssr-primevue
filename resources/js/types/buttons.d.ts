@@ -31,6 +31,6 @@ export type ButtonProps = {
 }
 
 export type ButtonsProps = {
-  buttons?: ButtonProps[],
+  buttons?: ButtonProps[]
   actions?: ActionName[]
 }

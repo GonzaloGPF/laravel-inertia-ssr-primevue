@@ -24,7 +24,7 @@ export default () => {
   const download = (url: string, params = {}) => Http.download(url, params)
 
   const downloadFile = (file?: FileType, params = {}) => {
-    if(!file) return
+    if (!file) return
     Http.downloadFile(file, params)
   }
 

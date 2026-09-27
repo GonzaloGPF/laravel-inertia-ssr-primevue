@@ -1,6 +1,5 @@
 <script setup>
 import AppLogo from '@/Components/Core/AppLogo.vue'
-
 </script>
 <template>
   <div>

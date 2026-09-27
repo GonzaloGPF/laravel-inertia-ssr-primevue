@@ -11,10 +11,5 @@ type Props = {
 defineProps<Props>()
 </script>
 <template>
-  <Image
-    :src="src"
-    :alt="alt"
-    :width="width"
-    :height="height"
-  />
+  <Image :src="src" :alt="alt" :width="width" :height="height" />
 </template>

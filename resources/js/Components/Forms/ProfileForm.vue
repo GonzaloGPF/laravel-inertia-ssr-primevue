@@ -8,7 +8,7 @@ import { Translator } from '@/objects/Translator'
 import AppField from '@/Components/Core/AppField.vue'
 
 // TODO: use this
-defineProps<{ mustVerifyEmail?: boolean}>()
+defineProps<{ mustVerifyEmail?: boolean }>()
 const { user } = useAuth()
 
 const { form } = useForm({

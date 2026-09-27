@@ -2,7 +2,7 @@
 import { Formatter } from '@/objects/Formatter'
 import { InputValue } from '@/types/input'
 
-defineProps<{ clean: boolean, value: InputValue }>()
+defineProps<{ clean: boolean; value: InputValue }>()
 </script>
 <template>
   <span
