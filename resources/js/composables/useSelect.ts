@@ -23,9 +23,10 @@ export default function useSelect(
 ): UseSelectReturn {
   const searchRef = ref(search)
   const customOptionsRef = ref(customOptions)
+  const { getConstants } = useConstants()
 
   const items = computed<OptionItem[]>(() => {
-    const items = customOptionsRef.value || useConstants().getConstants(src)
+    const items = customOptionsRef.value || getConstants(src)
 
     return Dropdown.filterAndOrder(items, searchRef.value ?? '', customFilter)
   })

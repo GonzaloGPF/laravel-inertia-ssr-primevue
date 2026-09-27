@@ -17,8 +17,10 @@ export default (
   search = ref(''),
   options: Ref<Options> = ref({})
 ) => {
+  const { getConstants } = useConstants()
+
   const items = computed(() => {
-    const items = options.value.customItems || useConstants().getConstants(src)
+    const items = options.value.customItems || getConstants(src)
 
     return Dropdown.filterAndOrder(
       items,

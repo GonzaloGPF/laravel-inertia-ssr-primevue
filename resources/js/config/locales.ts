@@ -29,7 +29,7 @@ export const locales = {
      * The app locale is given by Laravel (it's placed in config/app.php as 'locale')
      */
     getLocale (): string {
-        return document.documentElement.getAttribute('lang') || ''
+        return typeof document !== 'undefined' ? document.documentElement.getAttribute('lang') || '' : ''
     },
 
     getTimezone () {

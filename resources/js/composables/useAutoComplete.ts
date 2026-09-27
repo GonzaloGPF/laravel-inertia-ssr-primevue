@@ -18,6 +18,7 @@ export default (
   options: Ref<Options> = ref({}),
 ) => {
   const { getJson, loading } = useHttp()
+  const { existsConstant } = useConstants()
 
   const items = ref<OptionItem[]>([])
   const selectedItems = ref<OptionItem[] | OptionItem | undefined>([])
@@ -51,7 +52,7 @@ export default (
           String(userInput.value),
           optionsValue.multiple || false,
           optionsValue.urlAttribute || '',
-          model.value
+          existsConstant(model.value)
         )
 
         paramsValue[String(paramsData.urlAttribute)] = paramsData.urlValue
@@ -117,10 +118,8 @@ export default (
 /**
  * Prepare params when prefilled
  */
-function getPreParams(value: string, multiple: boolean, urlAttribute: string, model?: string) {
+function getPreParams(value: string, multiple: boolean, urlAttribute: string, isConstant: boolean) {
   const urlValue = multiple ? Object.values(value) : value
-
-  const isConstant = useConstants().existsConstant(model)
 
   if (!isConstant) {
     urlAttribute = multiple ? 'ids' : 'id'

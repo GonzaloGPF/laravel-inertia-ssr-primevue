@@ -1,4 +1,4 @@
-import { chain, filter, find, orderBy } from 'lodash-es'
+import { filter, find, orderBy } from 'lodash-es'
 import { Utils } from '@/objects/Utils'
 import { Translator } from '@/objects/Translator'
 import { OptionItem } from '@/types/input'
@@ -36,10 +36,10 @@ export const Dropdown = {
   },
 
   filterAndOrder(items: OptionItem[], search: string, customFilter?: Filterer) {
-    return chain(items)
-      .filter((item) => Dropdown.filterItem(item, search, customFilter))
-      .orderBy(['label', 'name'])
-      .value()
+    return orderBy(
+      filter(items, (item) => Dropdown.filterItem(item, search, customFilter)),
+      ['label', 'name']
+    )
   },
 
   orderItems(items: OptionItem[]) {
