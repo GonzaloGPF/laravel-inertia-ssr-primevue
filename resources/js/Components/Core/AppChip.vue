@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChipProps } from 'primevue'
+import Chip, { type ChipProps } from 'primevue/chip'
 
 defineEmits(['close'])
 defineProps<ChipProps>()

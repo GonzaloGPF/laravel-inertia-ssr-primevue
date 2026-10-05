@@ -1,4 +1,13 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import AppDataTable from '@/Components/Core/AppDataTable.vue'
+import { userColumns } from '@/config/columns'
+import { Translator } from '@/objects/Translator'
+</script>
 <template>
-  <div>This is the Users index page</div>
+  <AppDataTable
+    :src="route('users.index')"
+    :columns="userColumns"
+    :header-actions="['create']"
+    :title="Translator.modelTitle('user', true)"
+  />
 </template>

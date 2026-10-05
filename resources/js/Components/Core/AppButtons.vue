@@ -9,10 +9,17 @@ defineEmits(['click'])
 const props = defineProps<ButtonsProps>()
 
 const buttons = computed(() => {
-  if (props.buttons) {
-    return props.buttons
-  }
-  return useButtons().getButtons(props.actions || [])
+  const list = props.buttons ?? useButtons().getButtons(props.actions || [])
+
+  return list.map((button) => ({
+    ...button,
+    size: props.size ?? button.size,
+    severity: props.severity ?? button.severity,
+    text: props.text || button.text,
+    ...(props.iconOnly
+      ? { label: undefined, title: button.title ?? String(button.label ?? '') }
+      : {}),
+  }))
 })
 </script>
 <template>

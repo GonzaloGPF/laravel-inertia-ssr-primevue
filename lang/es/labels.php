@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'id' => 'ID',
     'yes' => 'Si',
     'no' => 'No',
     'with' => 'Con',

@@ -126,4 +126,5 @@ return [
 
     'default_password' => 'Secret123**',
     'default_currency' => 'EUR',
+    'default_items_by_page' => 25,
 ];

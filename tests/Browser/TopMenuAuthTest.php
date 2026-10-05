@@ -109,7 +109,7 @@ test('an admin sees the admin and personal area submenus', function () {
 });
 
 test('an admin can navigate to the users index from the admin submenu', function () {
-    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'en']);
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'email' => 'jane@example.com', 'language' => 'en']);
 
     $this->actingAs($user);
 
@@ -118,7 +118,7 @@ test('an admin can navigate to the users index from the admin submenu', function
     $page->click('Jane Doe')
         ->click('li[aria-label="Users"]')
         ->assertRoute('users.index')
-        ->assertSee('This is the Users index page')
+        ->assertSee('jane@example.com')
         ->assertNoJavaScriptErrors();
 });
 

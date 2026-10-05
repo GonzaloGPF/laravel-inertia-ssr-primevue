@@ -19,6 +19,10 @@ abstract class Controller
         ]);
     }
 
+    /**
+     * Renders a page whose `data` prop (the filtered and paginated models) is only
+     * resolved when requested through an Inertia partial reload, as async tables do.
+     */
     protected function renderCollection(string $pageComponent, string $modelClass, array $extraFilters = []): Response
     {
         $model = resolve($modelClass);
@@ -27,7 +31,7 @@ abstract class Controller
             ->all();
 
         return Inertia::render($pageComponent, [
-            'data' => fn () => $model::filter($filters)->getOrPaginate(),
+            'data' => Inertia::optional(fn () => $model::filter($filters)->getOrPaginate()),
         ]);
     }
 }

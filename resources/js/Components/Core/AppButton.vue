@@ -34,11 +34,10 @@ defineExpose({
   <div>
     <Button
       ref="buttonElement"
-      v-bind="$attrs"
-      :label="String(label)"
+      v-bind="{ ...$attrs, ...(title ? { title, 'aria-label': title } : {}) }"
+      :label="label != null ? String(label) : undefined"
       :size="size"
       :severity="severity"
-      :icon="icon"
       :icon-pos="iconPosition"
       :badge="badge"
       :badge-severity="badgeSeverity"
@@ -51,7 +50,11 @@ defineExpose({
       :plain="plain"
       :fluid="fluid"
       @click="onClick"
-    />
+    >
+      <template v-if="icon" #icon="{ class: iconClass }">
+        <AppIcon :icon="icon" :class="iconClass" />
+      </template>
+    </Button>
     <AppModal
       v-if="modal"
       v-bind="modal.data || {}"

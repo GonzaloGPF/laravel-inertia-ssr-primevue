@@ -4,116 +4,116 @@ import { ButtonProps } from '@/types/buttons'
 export const buttons: Record<ActionName, ButtonProps> = {
   send: {
     title: 'send',
-    icon: 'mdi-send',
+    icon: 'send',
   },
   search: {
     title: 'search',
-    icon: 'mdi-magnify',
+    icon: 'search',
   },
   filter: {
     title: 'filter',
-    icon: 'mdi-filter',
+    icon: 'filter_alt',
   },
   view: {
     title: 'view',
-    icon: 'mdi-eye',
+    icon: 'visibility',
   },
   create: {
     title: 'create',
-    icon: 'mdi-plus',
+    icon: 'add',
   },
   edit: {
     title: 'edit',
-    icon: 'mdi-pencil',
+    icon: 'edit',
   },
   delete: {
     title: 'delete',
     severity: 'danger',
-    icon: 'mdi-delete',
+    icon: 'delete',
   },
   restore: {
     title: 'restore',
-    icon: 'mdi-delete-restore',
+    icon: 'restore_from_trash',
   },
   attach: {
     title: 'attach',
-    icon: 'mdi-link',
+    icon: 'link',
   },
   detach: {
     title: 'detach',
     severity: 'danger',
-    icon: 'mdi-link-off',
+    icon: 'link_off',
   },
   save: {
     title: 'save',
-    icon: 'mdi-content-save',
+    icon: 'save',
   },
   close: {
     title: 'close',
-    icon: 'mdi-close',
+    icon: 'close',
   },
   cancel: {
     title: 'close',
-    icon: 'mdi-close',
+    icon: 'close',
   },
   download: {
     title: 'download',
-    icon: 'mdi-download',
+    icon: 'download',
   },
   options: {
     title: 'options',
-    icon: 'mdi-cog',
+    icon: 'settings',
   },
   select: {
     title: 'select',
-    icon: 'mdi-hand-pointer',
+    icon: 'touch_app',
   },
   remove: {
     title: 'remove',
-    icon: 'mdi-cancel',
+    icon: 'block',
   },
   plus: {
     title: 'plus',
-    icon: 'mdi-plus',
+    icon: 'add',
   },
   minus: {
     title: 'minus',
-    icon: 'mdi-minus',
+    icon: 'remove',
   },
   erase: {
     title: 'erase',
-    icon: 'mdi-eraser',
+    icon: 'ink_eraser',
   },
   refresh: {
     title: 'refresh',
-    icon: 'mdi-refresh',
+    icon: 'refresh',
   },
   solve: {
     title: 'solve',
-    icon: 'mdi-check',
+    icon: 'check',
   },
   help: {
     title: 'help',
-    icon: '$help',
+    icon: 'help',
   },
   web: {
     title: 'web',
-    icon: 'mdi-web',
+    icon: 'language',
   },
   info: {
     title: 'info',
-    icon: 'mdi-information',
+    icon: 'info',
   },
   back: {
     title: 'back',
-    icon: 'mdi-arrow-left',
+    icon: 'arrow_back',
   },
   sort: {
     title: 'sort',
-    icon: 'mdi-sort',
+    icon: 'sort',
   },
   copy: {
     title: 'copy',
-    icon: 'mdi-content-copy',
+    icon: 'content_copy',
   },
 }

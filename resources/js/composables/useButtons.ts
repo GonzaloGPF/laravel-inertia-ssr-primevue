@@ -25,12 +25,15 @@ export function useButtons() {
       const overwriteData =
         typeof overwrites === 'function' ? overwrites(action) : staticOverwrite
 
+      const label = getLabel((overwriteData ?? buttonData).label, action)
+
       return [
         {
           ...buttonData,
           action,
           ...(overwriteData ?? {}),
-          label: getLabel((overwriteData ?? buttonData).label, action),
+          label,
+          title: overwriteData?.title ?? label,
         },
       ]
     })

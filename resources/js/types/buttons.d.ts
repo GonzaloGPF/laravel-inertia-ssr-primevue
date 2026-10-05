@@ -34,4 +34,8 @@ export type ButtonProps = {
 export type ButtonsProps = {
   buttons?: ButtonProps[]
   actions?: ActionName[]
+  iconOnly?: boolean
+  size?: string
+  text?: boolean
+  severity?: Severity
 }
