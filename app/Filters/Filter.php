@@ -188,7 +188,7 @@ class Filter extends ModelFilter
      * Orders by a 'sort' string if it's present in request
      * This sort string must be with the format 'attribute|orderDirection'
      * for example: a string 'name|asc' means: ordering by 'name' in 'ascending' order.
-     * By default, it will order by created_at
+     * By default, it will order by id and updated_at, both descending
      */
     private function applySorting(): void
     {
@@ -204,7 +204,9 @@ class Filter extends ModelFilter
 
             $this->query->orderBy("$table.$attribute", $direction);
         } else {
-            $this->query->latest("$table.created_at"); // default ordering
+            $this->query
+                ->orderByDesc("$table.id")
+                ->orderByDesc("$table.updated_at"); // default ordering
         }
     }
 
