@@ -1,18 +1,20 @@
-const severities = [
+export const severities = [
+  'secondary',
   'success',
   'info',
-  'warning',
-  'error',
-  'secondary',
+  'warn',
+  'help',
+  'danger',
   'contrast',
-]
+] as const
 const positions = ['left', 'right', 'top', 'bottom']
 const sizes = ['small', 'medium', 'large']
 
 export const design = {
   getSeverities: () => severities,
 
-  validSeverity: (value: string) => severities.includes(value),
+  validSeverity: (value: string) =>
+    (severities as readonly string[]).includes(value),
 
   getPositions: () => positions,
 

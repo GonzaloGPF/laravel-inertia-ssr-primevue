@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Roles;
 use App\Models\User;
 
 test('a guest sees an Enter trigger that opens Login and Register options', function () {
@@ -70,4 +71,81 @@ test('a logged in user can log out from the menu', function () {
         ->assertNoJavaScriptErrors();
 
     $this->assertGuest();
+});
+
+test('a regular user does not see the admin submenu', function () {
+    $user = User::factory()->create([
+        'name' => 'Jane Doe',
+        'language' => 'en',
+        'role' => Roles::USER,
+    ]);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->assertSee('Profile')
+        ->assertDontSee('Admin')
+        ->assertDontSee('Personal Area')
+        ->assertDontSee('Users')
+        ->assertNoJavaScriptErrors();
+});
+
+test('an admin sees the admin and personal area submenus', function () {
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'en']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->assertSee('Admin')
+        ->assertSee('Users')
+        ->assertSee('Personal Area')
+        ->assertSee('Profile')
+        ->assertSee('Logout')
+        ->assertNoJavaScriptErrors();
+});
+
+test('an admin can navigate to the users index from the admin submenu', function () {
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'en']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->click('li[aria-label="Users"]')
+        ->assertRoute('users.index')
+        ->assertSee('This is the Users index page')
+        ->assertNoJavaScriptErrors();
+});
+
+test('an admin can still reach their profile from the personal area submenu', function () {
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'en']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->click('li[aria-label="Profile"]')
+        ->assertRoute('profile.edit');
+});
+
+test('the admin and personal area submenus are translated', function () {
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'es']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->assertSee('Admin')
+        ->assertSee('Usuarios')
+        ->assertSee('Área personal')
+        ->assertSee('Perfil')
+        ->assertSee('Cerrar sesión')
+        ->assertNoJavaScriptErrors();
 });

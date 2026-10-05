@@ -3,6 +3,7 @@ import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 import { useTemplateRef } from 'vue'
 import { router } from '@inertiajs/vue3'
+import AppIcon from '@/Components/Core/AppIcon.vue'
 import AppModal from '@/Components/Core/AppModal.vue'
 import { ButtonProps } from '@/types/buttons'
 
@@ -64,6 +65,10 @@ defineExpose({
       id="overlay_menu"
       :model="menuItems"
       :popup="!!menuItems"
-    />
+    >
+      <template #itemicon="{ item }">
+        <AppIcon v-if="item.icon" :icon="item.icon" class="mr-2" />
+      </template>
+    </Menu>
   </div>
 </template>

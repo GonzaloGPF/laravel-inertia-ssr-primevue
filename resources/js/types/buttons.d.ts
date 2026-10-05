@@ -1,6 +1,7 @@
 import { ModalProps } from '@/types/modal'
 import { MenuItem } from 'primevue/menuitem'
 import { ActionName } from '@/types/actions'
+import { Severity } from '@/types/design'
 
 export type ButtonProps = {
   title?: string
@@ -12,7 +13,7 @@ export type ButtonProps = {
   loadingIcon?: string
   size?: string
   href?: string
-  severity?: string
+  severity?: Severity
   label?: string | number | ((action?: string) => string)
   disabled?: boolean
   loading?: boolean

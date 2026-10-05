@@ -30,5 +30,7 @@ return [
     'not_assigned' => 'Sin Asignar',
     'theme' => 'Tema',
     'editing' => 'Editando',
+    'admin' => 'Admin',
+    'personal_area' => 'Área personal',
     'having' => 'Teniendo',
 ];

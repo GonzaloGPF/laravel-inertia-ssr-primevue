@@ -6,18 +6,41 @@ import AppButton from '@/Components/Core/AppButton.vue'
 import useAuth from '@/composables/useAuth'
 import { Translator } from '@/objects/Translator'
 
-const { isLogged, user } = useAuth()
+const { isLogged, isAdmin, user } = useAuth()
 
-const loggedMenu = computed<MenuItem[]>(() => [
+const personalItems = computed<MenuItem[]>(() => [
   {
     label: Translator.tl('profile'),
+    icon: 'person',
     command: () => router.visit(route('profile.edit')),
   },
   {
     label: Translator.tl('logout'),
+    icon: 'logout',
     command: () => router.post(route('logout')),
   },
 ])
+
+const adminItems = computed<MenuItem[]>(() => [
+  {
+    label: Translator.modelTitle('user', true),
+    icon: 'group',
+    command: () => router.visit(route('users.index')),
+  },
+])
+
+const loggedMenu = computed<MenuItem[]>(() => {
+  if (!isAdmin.value) {
+    return personalItems.value
+  }
+
+  return [
+    { label: Translator.tl('admin'), items: adminItems.value },
+    { separator: true },
+    { label: Translator.tl('personal_area'), items: personalItems.value },
+  ]
+})
+
 const unloggedMenu = computed<MenuItem[]>(() => [
   {
     label: Translator.actionTitle('login'),

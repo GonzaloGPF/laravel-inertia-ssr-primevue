@@ -32,8 +32,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const classes = computed(() => ({
   'inline-block': props.inline,
-  'text-red': props.severity === 'error',
-  'text-yellow': props.severity === 'warning',
+  'text-red': props.severity === 'danger',
+  'text-yellow': props.severity === 'warn',
   'text-green': props.severity === 'success',
 }))
 const style = computed(() => ({
