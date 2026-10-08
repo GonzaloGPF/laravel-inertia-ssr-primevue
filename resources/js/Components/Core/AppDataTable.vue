@@ -24,9 +24,9 @@ const DEFAULT_PER_PAGE = 25
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100]
 
 const props = defineProps<Props>()
-const { items, total, loading, currentPage, perPage, goTo } = useDataTable<T>(
-  toRef(props, 'src')
-)
+const emit = defineEmits<{ action: [action: ActionName] }>()
+const { items, total, loading, currentPage, perPage, goTo, refresh } =
+  useDataTable<T>(toRef(props, 'src'))
 const expandedRows = ref({})
 
 const rows = computed(() => perPage.value ?? DEFAULT_PER_PAGE)
@@ -74,6 +74,8 @@ const getActions = (item: T): ActionName[] => {
 }
 
 const onPage = (event: DataTablePageEvent) => goTo(event.page + 1, event.rows)
+
+defineExpose({ refresh })
 </script>
 <template>
   <DataTable
@@ -95,7 +97,11 @@ const onPage = (event: DataTablePageEvent) => goTo(event.page + 1, event.rows)
           <h2 v-if="title" class="text-xl font-semibold" v-text="title" />
           <p v-if="description" class="text-sm" v-text="description" />
         </div>
-        <AppButtons v-if="headerActions?.length" :actions="headerActions" />
+        <AppButtons
+          v-if="headerActions?.length"
+          :actions="headerActions"
+          @click="emit('action', $event)"
+        />
       </div>
     </template>
 

@@ -177,3 +177,15 @@ test('the row actions are squared, separated and neutral icon only buttons', fun
         ->and($metrics['backgrounds'])->each->toBe('rgba(0, 0, 0, 0)')
         ->and($metrics['createRatio'])->toBeGreaterThan(1.5); // The labelled button keeps its natural width
 });
+
+test('a user without language does not render an empty language chip', function () {
+    User::factory()->create(['language' => null]);
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 2);
+
+    $chips = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.querySelectorAll('.p-chip').length).sort().join(',')");
+
+    expect($chips)->toBe('1,2'); // Role chip only, and role and language chips
+});

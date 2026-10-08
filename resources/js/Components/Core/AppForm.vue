@@ -45,6 +45,7 @@ const vLabel = computed(() => {
         :loading="loading"
         :disabled="loading"
         color="primary"
+        class="w-full m-auto"
         type="submit"
       />
       <AppButton
@@ -54,6 +55,7 @@ const vLabel = computed(() => {
         :disabled="loading"
         variant="text"
         size="small"
+        class="w-full m-auto mt-1"
         @click="$emit('secondary', $event)"
       />
     </div>

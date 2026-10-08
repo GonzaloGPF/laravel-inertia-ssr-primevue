@@ -28,14 +28,13 @@ class UserController extends Controller
 
     public function store(UserRequest $request): RedirectResponse
     {
-        /** @var User $user */
-        $user = User::create(array_merge($request->validated(), [
+        User::create(array_merge($request->validated(), [
             'password' => config('app.default_password'),
         ]));
 
         $this->flashMessage(tAction('created', 'user'));
 
-        return Redirect::route('users.edit', $user);
+        return Redirect::back();
     }
 
     public function edit(User $user): Response

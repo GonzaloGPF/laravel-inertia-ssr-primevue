@@ -109,5 +109,13 @@ export default function useDataTable<T extends object>(
     () => void fetchItems()
   )
 
-  return { items, total, loading, currentPage, perPage, goTo }
+  return {
+    items,
+    total,
+    loading,
+    currentPage,
+    perPage,
+    goTo,
+    refresh: fetchItems,
+  }
 }

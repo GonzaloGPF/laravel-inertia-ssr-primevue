@@ -1,82 +1,42 @@
-import { computed, onMounted, ref, toRefs } from 'vue'
-import useHttp from '@/composables/useHttp'
+import { computed, ref } from 'vue'
 import { Translator } from '@/objects/Translator'
-import { useConfirm } from '@/stores/confirm'
-import { Formatter } from '@/objects/Formatter'
-import { router, usePage } from '@inertiajs/vue3'
-import { PaginationData } from '@/types/api'
-import { BaseModel, WithFile } from '@/types/base-model'
+import { ActionName } from '@/types/actions'
 
-export default <T extends BaseModel = BaseModel>(modelName: string) => {
-  const { props } = toRefs(usePage())
-  const { showConfirm } = useConfirm()
-  const { downloadFile, loading } = useHttp()
-  const paginatedData = props.value?.data as PaginationData
-  const total = Number(paginatedData.total || 0)
-  const perPage = Number(paginatedData.per_page || 25)
-  const baseUrl = Formatter.plural(Formatter.snakeCase(modelName))
+type TableInstance = { refresh: () => void }
 
-  const currentPage = ref(paginatedData.current_page || 1)
-  const totalPages = ref(Math.ceil(total / perPage))
+/**
+ * Common logic of the admin views: an `AppDataTable` of models, and a modal
+ * to create them. `table` must be bound to the table with `ref="table"`.
+ *
+ * The table `src` is not resolved here, as `route()` is only globally
+ * available in the browser, so each view gives it to the table in its template.
+ */
+export default function useCrud(modelName: string) {
+  const table = ref<TableInstance | null>(null)
+  const showCreateModal = ref(false)
 
-  const title = computed(
-    () => `${Translator.modelTitle(modelName, true)} [${paginatedData.total}]`
+  const title = computed(() => Translator.modelTitle(modelName, true))
+  const createTitle = computed(() =>
+    Translator.actionTitle('create', modelName)
   )
-  const items = computed(() => paginatedData?.data || [])
 
-  function onCreate() {
-    router.visit(`${baseUrl}/create`)
-  }
-
-  function onEdit(item: T) {
-    router.visit(`${baseUrl}/${item.id}/edit`)
-  }
-
-  function onDownload(item: WithFile) {
-    downloadFile(item.file)
-  }
-
-  function onView(item: T) {
-    return router.visit(`${baseUrl}/${item.id}`)
-  }
-
-  async function onDelete(item: T) {
-    if (loading.value) {
-      return
+  const onAction = (action: ActionName) => {
+    if (action === 'create') {
+      showCreateModal.value = true
     }
-
-    // if (item.deleted_at) return onRestore(item) // TODO: ask about force delete
-
-    if (!(await showConfirm(Translator.t('help.delete_text')))) {
-      return
-    }
-
-    return router.delete(`${baseUrl}/${item.id}`)
   }
 
-  function onImpersonate(item: T) {
-    router.visit(`${baseUrl}/impersonate/take/${item.id}`)
+  const onCreated = () => {
+    showCreateModal.value = false
+    table.value?.refresh()
   }
-
-  function refresh() {
-    router.reload({ only: ['data'] })
-  }
-
-  onMounted(() => refresh())
 
   return {
+    table,
     title,
-    loading,
-    items,
-    currentPage,
-    totalPages,
-    perPage,
-    refresh,
-    onView,
-    onCreate,
-    onEdit,
-    onDelete,
-    onImpersonate,
-    onDownload,
+    createTitle,
+    showCreateModal,
+    onAction,
+    onCreated,
   }
 }
