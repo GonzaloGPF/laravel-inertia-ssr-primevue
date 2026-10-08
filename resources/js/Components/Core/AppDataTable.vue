@@ -24,7 +24,7 @@ const DEFAULT_PER_PAGE = 25
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100]
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ action: [action: ActionName] }>()
+const emit = defineEmits<{ action: [action: ActionName, item?: T] }>()
 const { items, total, loading, currentPage, perPage, goTo, refresh } =
   useDataTable<T>(toRef(props, 'src'))
 const expandedRows = ref({})
@@ -132,6 +132,7 @@ defineExpose({ refresh })
           size="small"
           severity="secondary"
           text
+          @click="emit('action', $event, data)"
         />
       </template>
     </Column>

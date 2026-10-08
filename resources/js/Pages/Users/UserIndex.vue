@@ -4,9 +4,10 @@ import AppModal from '@/Components/Core/AppModal.vue'
 import UserForm from '@/Components/Forms/UserForm.vue'
 import { userColumns } from '@/config/columns'
 import useCrud from '@/composables/useCrud'
+import { User } from '@/types'
 
-const { table, title, createTitle, showCreateModal, onAction, onCreated } =
-  useCrud('user')
+const { table, item, title, modalTitle, showModal, onAction, onSaved } =
+  useCrud<User>('user')
 </script>
 <template>
   <div>
@@ -19,14 +20,14 @@ const { table, title, createTitle, showCreateModal, onAction, onCreated } =
       @action="onAction"
     />
     <AppModal
-      v-model="showCreateModal"
-      :title="createTitle"
-      class="w-[28rem] md:w-[50%] max-w-[95vw]"
+      v-model="showModal"
+      :title="modalTitle"
+      class="w-[28rem] max-w-[95vw]"
       modal
       closable
       hide-actions
     >
-      <UserForm @success="onCreated" @cancel="showCreateModal = false" />
+      <UserForm :user="item" @success="onSaved" @cancel="showModal = false" />
     </AppModal>
   </div>
 </template>

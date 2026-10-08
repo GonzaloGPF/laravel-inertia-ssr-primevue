@@ -43,8 +43,8 @@ class UserRequest extends FormRequest
                 'email' => ['email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('user')->id)],
                 'role' => [new Enum(Roles::class)],
                 'phone' => 'nullable|string|max:255',
-                'language' => [new Enum(Languages::class)],
-                'currency' => [new Enum(Currencies::class)],
+                'language' => ['nullable', new Enum(Languages::class)],
+                'currency' => ['nullable', new Enum(Currencies::class)],
             ];
         }
     }

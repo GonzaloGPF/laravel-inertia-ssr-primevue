@@ -50,7 +50,7 @@ class UserController extends Controller
 
         $this->flashMessage(tAction('updated', 'user'));
 
-        return Redirect::route('users.edit', $user);
+        return Redirect::back();
     }
 
     public function destroy(User $user): RedirectResponse
