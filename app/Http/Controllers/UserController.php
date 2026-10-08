@@ -59,6 +59,6 @@ class UserController extends Controller
 
         $this->flashMessage(tAction('deleted', 'user'));
 
-        return Redirect::route('users.index');
+        return Redirect::back();
     }
 }

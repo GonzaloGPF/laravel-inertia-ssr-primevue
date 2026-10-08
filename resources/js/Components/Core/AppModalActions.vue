@@ -26,7 +26,7 @@ const okText = computed(() => {
       :label="cancelText"
       :title="cancelText"
       size="small"
-      variant="tonal"
+      variant="text"
       class="brand-font"
       @click="$emit('cancel')"
     />
@@ -36,7 +36,6 @@ const okText = computed(() => {
       :loading="loading"
       :title="okText"
       size="small"
-      variant="tonal"
       class="brand-font"
       @click="$emit('ok')"
     />

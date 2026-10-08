@@ -4,26 +4,6 @@ use App\Enums\Languages;
 use App\Enums\Roles;
 use App\Models\User;
 
-/**
- * Waits for the table to render the given amount of rows, as it loads asynchronously.
- */
-function expectRows($page, int $expected): void
-{
-    $count = 0;
-
-    for ($attempt = 0; $attempt < 50; $attempt++) {
-        $count = (int) $page->script("document.querySelectorAll('.p-datatable-tbody > tr').length");
-
-        if ($count === $expected) {
-            break;
-        }
-
-        usleep(100_000);
-    }
-
-    expect($count)->toBe($expected);
-}
-
 beforeEach(function () {
     $this->admin = User::factory()->admin()->create([
         'name' => 'Ada Admin',

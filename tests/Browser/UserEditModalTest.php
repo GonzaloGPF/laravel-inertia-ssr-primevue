@@ -7,14 +7,6 @@ use App\Models\User;
 
 const EDIT_DIALOG = '[data-pc-name="dialog"]';
 
-/**
- * Selector of the row action button. Users are listed from the newest to the oldest.
- */
-function rowAction(int $row, string $action): string
-{
-    return ".p-datatable-tbody > tr:nth-child($row) button[aria-label=\"$action\"]";
-}
-
 beforeEach(function () {
     $this->admin = User::factory()->admin()->create([
         'name' => 'Ada Admin',

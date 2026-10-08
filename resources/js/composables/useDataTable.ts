@@ -11,6 +11,7 @@ import useHttp from '@/composables/useHttp'
 import { PaginationData } from '@/types/api'
 
 const PAGE = 'page'
+const DEFAULT_PER_PAGE = 25
 const PER_PAGE = 'perPage' // Query string name, the backend expects `per_page`
 
 /**
@@ -32,7 +33,10 @@ export default function useDataTable<T extends object>(
 
   const currentPage = computed(() => Number(query.value.get(PAGE)) || 1)
   const perPage = computed(
-    () => Number(query.value.get(PER_PAGE)) || responsePerPage.value
+    () =>
+      Number(query.value.get(PER_PAGE)) ||
+      responsePerPage.value ||
+      DEFAULT_PER_PAGE
   )
 
   let lastRequest = 0
@@ -41,22 +45,27 @@ export default function useDataTable<T extends object>(
   const fetchItems = async () => {
     const request = ++lastRequest
 
-    try {
-      const { data } = await getJson(toValue(src), {
-        params: requestParams(),
-        headers: partialReloadHeaders(),
-      })
+    // On failure, Http already notifies the error to the user
+    const response = await getJson(toValue(src), {
+      params: requestParams(),
+      headers: partialReloadHeaders(),
+    }).catch(() => null)
 
-      if (request !== lastRequest) {
-        return // A newer request is already in charge
-      }
+    if (!response || request !== lastRequest) {
+      return // Failed, or a newer request is already in charge
+    }
 
-      const paginated = (data.props?.data ?? data) as PaginationData<T[]>
-      items.value = paginated.data ?? []
-      total.value = paginated.total ?? 0
-      responsePerPage.value = Number(paginated.per_page) || undefined
-    } catch {
-      // Http already notifies the error to the user
+    const { data } = response
+    const paginated = (data.props?.data ?? data) as PaginationData<T[]>
+    items.value = paginated.data ?? []
+    total.value = paginated.total ?? 0
+    responsePerPage.value = Number(paginated.per_page) || undefined
+
+    // The current page no longer exists, i.e. its last item was deleted
+    const lastPage = paginated.last_page ?? 1
+
+    if (!items.value.length && currentPage.value > lastPage) {
+      goTo(lastPage, perPage.value, true)
     }
   }
 
@@ -77,16 +86,22 @@ export default function useDataTable<T extends object>(
     'X-Inertia-Partial-Data': 'data',
   })
 
-  const goTo = (pageNumber: number, rows: number) => {
+  const goTo = (pageNumber: number, rows: number, replace = false) => {
     const params = new URLSearchParams(query.value)
     params.set(PAGE, String(pageNumber))
     params.set(PER_PAGE, String(rows))
 
-    router.push({
+    const visitOptions = {
       url: `${path.value}?${params}`,
       preserveState: true,
       preserveScroll: true,
-    })
+    }
+
+    if (replace) {
+      router.replace(visitOptions)
+    } else {
+      router.push(visitOptions)
+    }
   }
 
   onMounted(() => {

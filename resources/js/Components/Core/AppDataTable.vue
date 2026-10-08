@@ -20,7 +20,6 @@ type Props = {
   detail?: Component
 }
 
-const DEFAULT_PER_PAGE = 25
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100]
 
 const props = defineProps<Props>()
@@ -29,8 +28,7 @@ const { items, total, loading, currentPage, perPage, goTo, refresh } =
   useDataTable<T>(toRef(props, 'src'))
 const expandedRows = ref({})
 
-const rows = computed(() => perPage.value ?? DEFAULT_PER_PAGE)
-const first = computed(() => (currentPage.value - 1) * rows.value)
+const first = computed(() => (currentPage.value - 1) * perPage.value)
 
 const idColumn: TableColumn<T> = { field: 'id' }
 const tableColumns = computed(() => [
@@ -83,7 +81,7 @@ defineExpose({ refresh })
     :value="items"
     :loading="loading"
     :first="first"
-    :rows="rows"
+    :rows="perPage"
     :total-records="total"
     :rows-per-page-options="ROWS_PER_PAGE_OPTIONS"
     data-key="id"

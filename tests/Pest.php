@@ -42,3 +42,31 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+/**
+ * Waits for the table to render the given amount of rows, as it loads asynchronously.
+ */
+function expectRows($page, int $expected): void
+{
+    $count = 0;
+
+    for ($attempt = 0; $attempt < 50; $attempt++) {
+        $count = (int) $page->script("document.querySelectorAll('.p-datatable-tbody > tr').length");
+
+        if ($count === $expected) {
+            break;
+        }
+
+        usleep(100_000);
+    }
+
+    expect($count)->toBe($expected);
+}
+
+/**
+ * Selector of the row action button. Users are listed from the newest to the oldest.
+ */
+function rowAction(int $row, string $action): string
+{
+    return ".p-datatable-tbody > tr:nth-child($row) button[aria-label=\"$action\"]";
+}

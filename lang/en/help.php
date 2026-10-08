@@ -2,7 +2,7 @@
 
 return [
     'whoops' => 'Something went wrong...',
-    'delete_text' => 'Are you sure you want delete?',
+    'delete_text' => 'Are you sure you want to delete?',
     'delete_account' => 'Are you sure you want to delete your account?',
     'delete_account_warning' => 'Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
     'forgot_password' => 'Let us know your email address and we will email you a password reset link that will allow you to choose a new one.',

@@ -36,10 +36,13 @@ export const useConfirm = defineStore('confirm', () => {
       show.value = true
 
       // Subscribe to EventBus.confirmed to detect when to close dialog
-      EventBus.on(Events.confirmed, (confirmed: unknown) => {
+      const onConfirmed = (confirmed: unknown) => {
+        EventBus.off(Events.confirmed, onConfirmed)
         show.value = false
         resolve(confirmed)
-      })
+      }
+
+      EventBus.on(Events.confirmed, onConfirmed)
     })
     // .finally(() => show.value = false);
   }

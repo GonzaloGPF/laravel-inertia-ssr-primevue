@@ -30,6 +30,7 @@ function onClick(value: boolean) {
     v-if="show"
     :model-value="show"
     :title="title"
+    modal
     :persistent="false"
     :ok-text="okText"
     :cancel-text="cancelText"
