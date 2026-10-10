@@ -127,3 +127,33 @@ test('deleting the only user of the last page goes back to the previous page', f
         ->assertQueryStringHas('perPage', '3')
         ->assertNoJavaScriptErrors();
 });
+
+test('an admin cannot delete themself from the list', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->assertSee('Ada Admin')
+        ->click(rowAction(3, 'Delete'))
+        ->assertSee('You cannot delete yourself')
+        ->assertDontSee('Are you sure you want to delete?')
+        ->assertNoJavaScriptErrors();
+
+    expectRows($page, 3);
+
+    expect($this->admin->fresh()->deleted_at)->toBeNull();
+});
+
+test('the admin can still delete other users after trying to delete themself', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->assertSee('Ada Admin')
+        ->click(rowAction(3, 'Delete'))
+        ->assertSee('You cannot delete yourself')
+        ->click(rowAction(1, 'Delete'))
+        ->assertSee('Are you sure you want to delete?')
+        ->click(CONFIRM_DIALOG.' button[aria-label="Delete"]')
+        ->assertDontSee('Cara Regular')
+        ->assertSee('Ada Admin');
+
+    expect($this->cara->fresh()->deleted_at)->not->toBeNull()
+        ->and($this->admin->fresh()->deleted_at)->toBeNull();
+});

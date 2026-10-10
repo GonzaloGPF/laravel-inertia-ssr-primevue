@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -55,6 +56,8 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
+        Gate::authorize('delete', $user);
+
         $user->delete();
 
         $this->flashMessage(tAction('deleted', 'user'));

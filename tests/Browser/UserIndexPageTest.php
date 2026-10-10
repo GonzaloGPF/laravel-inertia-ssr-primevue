@@ -54,7 +54,9 @@ test('the users table headers are translated to the language of the user', funct
 test('the id is the first column and actions are rendered as icon only buttons', function () {
     $page = visit(route('users.index', absolute: false));
 
-    $page->assertSee('Ada Admin');
+    expectRows($page, 1);
+
+    $page->assertSee('Actions'); // The headers are translated once the language is loaded
 
     $headers = $page->script("[...document.querySelectorAll('.p-datatable-column-title')].map(e => e.textContent.trim()).join(',')");
     $buttons = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr:first-child button')].map(e => e.getAttribute('aria-label') + '|' + e.textContent.trim()).join(',')");

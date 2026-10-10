@@ -11,6 +11,7 @@ return [
     'already_authenticated' => 'Already Authenticated',
     'authentication' => 'Unauthenticated',
     'unauthorized' => 'Unauthorized',
+    'cannot_delete_yourself' => 'You cannot delete yourself',
     'could_not_delete' => 'Could not Delete',
     'filter' => 'Filters Errors',
     'wrong_format' => ':value has wrong format',

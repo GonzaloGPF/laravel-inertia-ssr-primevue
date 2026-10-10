@@ -4,21 +4,10 @@ namespace App\Policies;
 
 use App\Enums\Roles;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
-    /**
-     * Perform pre-authorization checks.
-     */
-    public function before(User $user, string $ability): ?bool
-    {
-        if (hasRole(Roles::ADMIN, $user)) {
-            return true;
-        }
-
-        return null;
-    }
-
     /**
      * Determine whether the user can view any models.
      */
@@ -40,7 +29,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return hasRole(Roles::ADMIN, $user);
     }
 
     /**
@@ -48,15 +37,20 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->id === $model->id;
+        return hasRole(Roles::ADMIN, $user) || $user->is($model);
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Determine whether the user can delete the model. Nobody can delete themselves from here,
+     * as the profile has its own, password protected, account deletion.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, User $model): Response|bool
     {
-        return false;
+        if ($user->is($model)) {
+            return Response::deny(trans('exceptions.cannot_delete_yourself'));
+        }
+
+        return hasRole(Roles::ADMIN, $user);
     }
 
     /**
@@ -64,7 +58,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return false;
+        return hasRole(Roles::ADMIN, $user);
     }
 
     /**
@@ -72,6 +66,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return false;
+        return hasRole(Roles::ADMIN, $user);
     }
 }

@@ -3,11 +3,20 @@ import AppDataTable from '@/Components/Core/AppDataTable.vue'
 import AppModal from '@/Components/Core/AppModal.vue'
 import UserForm from '@/Components/Forms/UserForm.vue'
 import { userColumns } from '@/config/columns'
+import useAuth from '@/composables/useAuth'
 import useCrud from '@/composables/useCrud'
+import { Translator } from '@/objects/Translator'
 import { User } from '@/types'
 
+const { user: authUser } = useAuth()
+
 const { table, item, title, modalTitle, showModal, onAction, onSaved } =
-  useCrud<User>('user')
+  useCrud<User>('user', {
+    deleteGuard: (user) =>
+      user.id === authUser.value?.id
+        ? Translator.t('exceptions.cannot_delete_yourself')
+        : undefined,
+  })
 </script>
 <template>
   <div>

@@ -58,3 +58,28 @@ it('does not list the deleted users', function () {
     expect($ids)->not->toContain($user->id)
         ->and($ids)->toContain($this->user->id);
 });
+
+it('wont let an admin delete themself', function () {
+    $this->deleteJson(route('users.destroy', $this->user))
+        ->assertForbidden()
+        ->assertJsonPath('message', trans('exceptions.cannot_delete_yourself'));
+
+    expect($this->user->fresh()->deleted_at)->toBeNull();
+});
+
+it('does not flash a deletion message when an admin tries to delete themself', function () {
+    $this->delete(route('users.destroy', $this->user))
+        ->assertForbidden()
+        ->assertSessionMissing('flash_message_data');
+});
+
+it('let an admin delete other admins', function () {
+    /** @var User $otherAdmin */
+    $otherAdmin = User::factory()->admin()->create();
+
+    $this->delete(route('users.destroy', $otherAdmin))
+        ->assertSessionHasNoErrors();
+
+    expect($otherAdmin->fresh()->deleted_at)->not->toBeNull()
+        ->and($this->user->fresh()->deleted_at)->toBeNull();
+});
