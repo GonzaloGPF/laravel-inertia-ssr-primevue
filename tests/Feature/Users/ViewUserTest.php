@@ -95,3 +95,17 @@ it('wont let a user list the users data', function () {
 
     usersData()->assertRedirect();
 });
+
+it('searches the users with the global search of the table', function () {
+    User::factory()->create(['name' => 'Zelda Unique', 'email' => 'zelda@hyrule.com']);
+    User::factory()->create(['name' => 'Link Hero', 'email' => 'link@hyrule.com']);
+
+    usersData(['search' => 'hyrule'])
+        ->assertSuccessful()
+        ->assertJsonCount(2, 'props.data.data')
+        ->assertJsonPath('props.data.total', 2);
+
+    usersData(['search' => 'hyrule zelda'])
+        ->assertJsonCount(1, 'props.data.data')
+        ->assertJsonPath('props.data.data.0.name', 'Zelda Unique');
+});

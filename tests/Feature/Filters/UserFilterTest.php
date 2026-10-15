@@ -115,3 +115,75 @@ it('can filter users by ranges of their id and creation date', function () {
         ->and(User::filter(['max_created_at' => now()->subMonths(6)->toDateString()])->get()->pluck('id')->all())->toBe([$oldest->id])
         ->and(User::filter(['min_created_at' => now()->subMonths(6)->toDateString()])->get())->toHaveCount(4);
 });
+
+describe('global search', function () {
+    beforeEach(function () {
+        $this->ada = create(User::class, ['name' => 'Zyxel Lovelace', 'email' => 'zyxel@analytical.org', 'phone' => '600111222']);
+        $this->grace = create(User::class, ['name' => 'Grace Hopper', 'email' => 'grace@navy.mil', 'phone' => '600333444']);
+    });
+
+    it('searches in the name, the email and the phone', function (string $search, string $expected) {
+        $data = User::filter(['search' => $search])->get();
+
+        expect($data)->toHaveCount(1)
+            ->and($data->first()->name)->toBe($expected);
+    })->with([
+        'by name' => ['lovelace', 'Zyxel Lovelace'],
+        'by email' => ['navy.mil', 'Grace Hopper'],
+        'by phone' => ['333444', 'Grace Hopper'],
+        'by a part of a word' => ['ovela', 'Zyxel Lovelace'],
+        'ignoring the case' => ['HOPPER', 'Grace Hopper'],
+    ]);
+
+    it('needs every word to be in some of the columns', function () {
+        expect(User::filter(['search' => 'grace navy'])->get())->toHaveCount(1) // name and email
+            ->and(User::filter(['search' => 'zyxel 600111'])->get())->toHaveCount(1) // name and phone
+            ->and(User::filter(['search' => 'zyxel hopper'])->get())->toHaveCount(0);
+    });
+
+    it('ignores the spaces around and between the words', function () {
+        expect(User::filter(['search' => "  zyxel \t  lovelace  "])->get())->toHaveCount(1);
+    });
+
+    it('does not filter with an empty search', function (mixed $search) {
+        expect(User::filter(['search' => $search])->get())->toHaveCount(5); // 3 extra users and the 2 above
+    })->with(['empty' => [''], 'spaces' => ['   ']]);
+
+    it('searches the wildcards of a like as plain characters', function () {
+        create(User::class, ['name' => '100% Real']);
+        create(User::class, ['name' => 'Snake_case Person']);
+
+        expect(User::filter(['search' => '%'])->get())->toHaveCount(1)
+            ->and(User::filter(['search' => '100%'])->get())->toHaveCount(1)
+            ->and(User::filter(['search' => 'e_c'])->get())->toHaveCount(1)
+            ->and(User::filter(['search' => 'snake\\'])->get())->toHaveCount(0);
+    });
+
+    it('ignores a search that is not a text', function () {
+        expect(User::filter(['search' => ['zyxel']])->get())->toHaveCount(5);
+    });
+
+    it('combines with the other filters', function () {
+        $this->grace->update(['role' => Roles::ADMIN]);
+        $this->ada->update(['role' => Roles::USER]);
+
+        $data = User::filter(['search' => '600', 'role' => [Roles::ADMIN->value]])->get();
+
+        expect($data)->toHaveCount(1)
+            ->and($data->first()->name)->toBe('Grace Hopper');
+    });
+
+    it('does not find the deleted users', function () {
+        $this->ada->delete();
+
+        expect(User::filter(['search' => 'zyxel'])->get())->toHaveCount(0);
+    });
+
+    it('keeps the default order and the pagination', function () {
+        create(User::class, ['name' => 'Zyxel Third']);
+
+        $users = User::filter(['search' => 'zyxel'])->get();
+
+        expect($users->pluck('name')->all())->toBe(['Zyxel Third', 'Zyxel Lovelace']);
+    });
+});

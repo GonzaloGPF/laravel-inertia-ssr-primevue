@@ -84,7 +84,7 @@ test('changing the page requests the new page and reflects it in the url', funct
 
     expectRows($page, 25);
 
-    $page->click('.p-paginator-next')
+    $page->click('.p-datatable-paginator-bottom .p-paginator-next')
         ->assertQueryStringHas('page', '2')
         ->assertQueryStringHas('perPage', '25')
         ->assertNoJavaScriptErrors();
@@ -110,7 +110,7 @@ test('the browser back button goes back to the previous table page', function ()
 
     expectRows($page, 25);
 
-    $page->click('.p-paginator-next')
+    $page->click('.p-datatable-paginator-bottom .p-paginator-next')
         ->assertQueryStringHas('page', '2');
 
     expectRows($page, 6);
@@ -180,12 +180,12 @@ test('the table shows which items of the total are in the page', function () {
     expectRows($page, 25);
 
     $page->assertSee('Showing [1-25] of 55 items')
-        ->click('.p-paginator-next');
+        ->click('.p-datatable-paginator-bottom .p-paginator-next');
 
     expectRows($page, 25);
 
     $page->assertSee('Showing [26-50] of 55 items')
-        ->click('.p-paginator-next');
+        ->click('.p-datatable-paginator-bottom .p-paginator-next');
 
     expectRows($page, 5);
 

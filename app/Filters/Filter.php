@@ -32,6 +32,13 @@ class Filter extends ModelFilter
 
     private const LIMIT = 'limit'; // Limit results
 
+    /**
+     * Columns the global `search` input looks into. Each filter declares its own.
+     *
+     * @var array<int, string>
+     */
+    protected array $searchable = [];
+
     private array $errors;
 
     private array $enumColumns;
@@ -322,6 +329,24 @@ class Filter extends ModelFilter
     {
         collect($name)
             ->each(fn ($value) => $this->where('name', 'like', "%$value%"));
+
+        return $this->query;
+    }
+
+    /**
+     * Global search: every word typed has to be found in any of the searchable columns.
+     */
+    public function search($value): Builder
+    {
+        $words = is_string($value) ? preg_split('/\s+/', trim($value), -1, PREG_SPLIT_NO_EMPTY) : [];
+        $table = $this->query->getModel()->getTable();
+
+        foreach ($words as $word) {
+            $like = '%'.addcslashes($word, '\\%_').'%'; // The wildcards typed are searched as plain characters
+
+            $this->where(fn (Builder $query) => collect($this->searchable)
+                ->each(fn (string $column) => $query->orWhere("$table.$column", 'like', $like)));
+        }
 
         return $this->query;
     }

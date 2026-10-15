@@ -231,7 +231,7 @@ test('the filters follow the url when going back in the browser', function () {
 
     expectRows($page, 25);
 
-    $page->click('.p-paginator-next')
+    $page->click('.p-datatable-paginator-bottom .p-paginator-next')
         ->assertQueryStringHas('page', '2');
 
     expectRows($page, 5);

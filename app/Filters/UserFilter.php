@@ -8,6 +8,8 @@ class UserFilter extends Filter
 {
     public $relations = [];
 
+    protected array $searchable = ['name', 'email', 'phone'];
+
     public function email($value): Builder
     {
         $this->where('email', 'like', "%$value%");
