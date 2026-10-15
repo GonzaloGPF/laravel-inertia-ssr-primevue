@@ -5,6 +5,7 @@ import iCheck from '@/Components/Inputs/iCheck.vue'
 import iDate from '@/Components/Inputs/iDate.vue'
 import iNumber from '@/Components/Inputs/iNumber.vue'
 import iNumberRange from '@/Components/Inputs/iNumberRange.vue'
+import iSearch from '@/Components/Inputs/iSearch.vue'
 import iSelect from '@/Components/Inputs/iSelect.vue'
 import iText from '@/Components/Inputs/iText.vue'
 import type { FilterFieldInput } from '@/types/filter'
@@ -12,6 +13,7 @@ import type { FilterFieldInput } from '@/types/filter'
 /** Input components, by the name used to ask for them (i.e. in the filters). */
 export const inputs: Record<FilterFieldInput, Component> = {
   text: iText,
+  search: iSearch,
   select: iSelect,
   auto: iAutoComplete,
   boolean: iBoolean,

@@ -22,6 +22,14 @@ function urlSearch($page): string
     return (string) $page->script('decodeURIComponent(location.search.slice(1))');
 }
 
+/**
+ * Shows the advanced filters, which are hidden by default.
+ */
+function openAdvanced($page): void
+{
+    $page->click(FILTERS.' button[aria-label="Advanced"]');
+}
+
 beforeEach(function () {
     $this->admin = User::factory()->admin()->create([
         'name' => 'Ada Admin',
@@ -36,22 +44,44 @@ beforeEach(function () {
     $this->actingAs($this->admin);
 });
 
-test('the table renders the filters', function () {
+test('the table shows just the global search by default', function () {
     $page = visit(route('users.index', absolute: false));
 
-    $page->assertSee('Filters')
+    $page->assertPresent(FILTERS.' input[name="search"]')
+        ->assertPresent(FILTERS.' button[aria-label="Advanced"]')
+        ->assertPresent(FILTERS.' button[aria-label="Refresh"]')
+        ->assertPresent(FILTERS.' button[aria-label="Erase"]')
+        ->assertMissing(FILTERS.' input[name="name"]')
+        ->assertMissing(FILTERS.' input[name="email"]')
+        ->assertMissing(FILTERS.' input[name="phone"]')
+        ->assertMissing(FILTERS.' .p-multiselect')
+        ->assertNoJavaScriptErrors();
+
+    expectRows($page, 3);
+});
+
+test('the advanced toggle shows and hides the rest of the filters, keeping the search', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    openAdvanced($page);
+
+    $page->assertPresent(FILTERS.' input[name="search"]')
         ->assertPresent(FILTERS.' input[name="name"]')
         ->assertPresent(FILTERS.' input[name="email"]')
         ->assertPresent(FILTERS.' input[name="phone"]')
         ->assertPresent(FILTERS.' [name="language"]')
         ->assertPresent(FILTERS.' [name="currency"]')
         ->assertPresent(FILTERS.' [name="verified"]')
-        ->assertPresent(FILTERS.' .p-multiselect')
-        ->assertPresent(FILTERS.' button[aria-label="Refresh"]')
-        ->assertPresent(FILTERS.' button[aria-label="Erase"]')
-        ->assertNoJavaScriptErrors();
+        ->assertPresent(FILTERS.' .p-multiselect');
 
-    expectRows($page, 3);
+    openAdvanced($page);
+
+    $page->assertPresent(FILTERS.' input[name="search"]')
+        ->assertMissing(FILTERS.' input[name="name"]')
+        ->assertMissing(FILTERS.' .p-multiselect')
+        ->assertNoJavaScriptErrors();
 });
 
 test('the filters are empty by default, without any boolean filter selected', function () {
@@ -69,6 +99,8 @@ test('typing in a filter filters the users and writes it in the url', function (
 
     expectRows($page, 3);
 
+    openAdvanced($page);
+
     $page->type(FILTERS.' input[name="name"]', 'Cara')
         ->assertQueryStringHas('name', 'Cara')
         ->assertSee('Filtering by Name')
@@ -84,6 +116,8 @@ test('typing fast in a filter makes just one request', function () {
     $page = visit(route('users.index', absolute: false));
 
     expectRows($page, 3);
+
+    openAdvanced($page);
 
     $page->typeSlowly(FILTERS.' input[name="name"]', 'Regular', 40)
         ->assertQueryStringHas('name', 'Regular');
@@ -114,6 +148,8 @@ test('a multiple filter sends all the selected values', function () {
 
     expectRows($page, 3);
 
+    openAdvanced($page);
+
     $page->click(FILTERS.' .p-multiselect')
         ->click('li[aria-label="Admin"]')
         ->assertQueryStringHas('role');
@@ -136,6 +172,8 @@ test('a multiple filter offers just its options, without a select all', function
 
     expectRows($page, 3);
 
+    openAdvanced($page);
+
     $page->click(FILTERS.' .p-multiselect');
 
     $options = $page->script("[...document.querySelectorAll('li[role=option]')].map(e => e.getAttribute('aria-label')).join(',')");
@@ -149,6 +187,8 @@ test('the boolean filter distinguishes yes from no', function () {
     $page = visit(route('users.index', absolute: false));
 
     expectRows($page, 3);
+
+    openAdvanced($page);
 
     $page->click(FILTERS.' [name="verified"]')
         ->click('li[aria-label="No"]')
@@ -167,6 +207,8 @@ test('the select filters filter by their value', function () {
 
     expectRows($page, 3);
 
+    openAdvanced($page);
+
     $page->click(FILTERS.' [name="language"]')
         ->click('li[aria-label="Spanish"]')
         ->assertQueryStringHas('language', 'es');
@@ -182,6 +224,8 @@ test('changing a filter goes back to the first page and keeps the page size', fu
     $page = visit(route('users.index', ['page' => 2, 'perPage' => 10], false));
 
     expectRows($page, 10);
+
+    openAdvanced($page);
 
     $page->type(FILTERS.' input[name="name"]', 'Extra')
         ->assertQueryStringHas('name', 'Extra')
@@ -226,6 +270,8 @@ test('the filters follow the url when going back in the browser', function () {
 
     expectRows($page, 25);
 
+    openAdvanced($page);
+
     $page->type(FILTERS.' input[name="name"]', 'Extra')
         ->assertQueryStringHas('name', 'Extra');
 
@@ -256,9 +302,188 @@ test('the filters are translated', function () {
 
     $page = visit(route('users.index', ['name' => 'Cara'], false));
 
-    $page->assertSee('Filtros')
+    $page->assertPresent(FILTERS.' input[name="search"][placeholder="Buscar"]')
+        ->assertPresent(FILTERS.' button[aria-label="Avanzado"]')
         ->assertSee('Filtrando por Nombre')
         ->assertPresent(FILTERS.' button[aria-label="Borrar"]')
         ->assertPresent(FILTERS.' button[aria-label="Refrescar"]')
+        ->assertNoJavaScriptErrors();
+});
+
+test('the global search filters by several columns and writes it in the url', function () {
+    $this->cara->forceFill(['email' => 'cara@searchable.test', 'phone' => '655443322'])->saveQuietly();
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    $page->type(FILTERS.' input[name="search"]', 'searchable')
+        ->assertQueryStringHas('search', 'searchable');
+
+    expectRows($page, 1);
+
+    $page->assertSee('Cara Regular')
+        ->assertDontSee('Bob Regular')
+        ->fill(FILTERS.' input[name="search"]', '655443')
+        ->assertQueryStringHas('search', '655443');
+
+    expectRows($page, 1);
+
+    $page->fill(FILTERS.' input[name="search"]', 'bob')
+        ->assertQueryStringHas('search', 'bob');
+
+    expectRows($page, 1);
+
+    $page->assertSee('Bob Regular')
+        ->assertNoJavaScriptErrors();
+});
+
+test('typing fast in the global search makes just one request', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    $page->typeSlowly(FILTERS.' input[name="search"]', 'Regular', 40)
+        ->assertQueryStringHas('search', 'Regular');
+
+    expectRows($page, 2);
+
+    expect(filteredRequests($page, 'search'))->toBe(1);
+});
+
+test('the global search is initialised from the url query', function () {
+    $page = visit(route('users.index', ['search' => 'cara'], false));
+
+    expectRows($page, 1);
+
+    $page->assertValue(FILTERS.' input[name="search"]', 'cara')
+        ->assertSee('Cara Regular')
+        ->assertMissing(FILTERS.' input[name="name"]') // The advanced filters stay hidden
+        ->assertNoJavaScriptErrors();
+});
+
+test('the global search keeps its value when the advanced filters are toggled', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    $page->type(FILTERS.' input[name="search"]', 'Regular')
+        ->assertQueryStringHas('search', 'Regular');
+
+    openAdvanced($page);
+
+    $page->assertValue(FILTERS.' input[name="search"]', 'Regular');
+
+    openAdvanced($page);
+
+    $page->assertValue(FILTERS.' input[name="search"]', 'Regular')
+        ->assertQueryStringHas('search', 'Regular');
+
+    expectRows($page, 2);
+});
+
+test('the global search combines with the advanced filters', function () {
+    $this->bob->forceFill(['role' => Roles::ADMIN])->saveQuietly();
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    $page->type(FILTERS.' input[name="search"]', 'Regular')
+        ->assertQueryStringHas('search', 'Regular');
+
+    expectRows($page, 2);
+
+    openAdvanced($page);
+
+    $page->click(FILTERS.' .p-multiselect')
+        ->click('li[aria-label="Admin"]');
+
+    expectRows($page, 1);
+
+    $page->assertSee('Bob Regular')
+        ->assertQueryStringHas('search', 'Regular')
+        ->assertNoJavaScriptErrors();
+
+    expect(urlSearch($page))->toBe('search=Regular&role[]=admin');
+});
+
+test('the advanced filters are open when the url has some of them', function () {
+    $page = visit(route('users.index', ['role' => ['user']], false));
+
+    expectRows($page, 2);
+
+    $page->assertPresent(FILTERS.' input[name="name"]')
+        ->assertPresent(FILTERS.' .p-multiselect');
+});
+
+test('the filters in use are listed while the advanced filters are hidden', function () {
+    $page = visit(route('users.index', ['search' => 'bob', 'role' => ['user']], false));
+
+    expectRows($page, 1);
+
+    openAdvanced($page); // Hidden again
+
+    $page->assertMissing(FILTERS.' input[name="name"]')
+        ->assertSee('Filtering by Role') // The search is not listed: it is there to be seen
+        ->assertDontSee('Filtering by Search')
+        ->assertNoJavaScriptErrors();
+});
+
+test('changing the global search goes back to the first page', function () {
+    User::factory(30)->create(['name' => 'Extra Person']);
+
+    $page = visit(route('users.index', ['page' => 2, 'perPage' => 10], false));
+
+    expectRows($page, 10);
+
+    $page->type(FILTERS.' input[name="search"]', 'Extra')
+        ->assertQueryStringHas('search', 'Extra')
+        ->assertQueryStringMissing('page')
+        ->assertQueryStringHas('perPage', '10');
+
+    expectRows($page, 10);
+});
+
+test('the erase button also clears the global search', function () {
+    $page = visit(route('users.index', ['search' => 'cara'], false));
+
+    expectRows($page, 1);
+
+    $page->click(FILTERS.' button[aria-label="Erase"]')
+        ->assertQueryStringMissing('search')
+        ->assertValue(FILTERS.' input[name="search"]', '')
+        ->assertNoJavaScriptErrors();
+
+    expectRows($page, 3);
+});
+
+test('the global search follows the url when going back in the browser', function () {
+    User::factory(30)->create(['name' => 'Extra Person']);
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 25);
+
+    $page->type(FILTERS.' input[name="search"]', 'Extra')
+        ->assertQueryStringHas('search', 'Extra');
+
+    expectRows($page, 25);
+
+    $page->click('.p-datatable-paginator-bottom .p-paginator-next')
+        ->assertQueryStringHas('page', '2');
+
+    expectRows($page, 5);
+
+    $page->fill(FILTERS.' input[name="search"]', 'Cara')
+        ->assertQueryStringHas('search', 'Cara');
+
+    expectRows($page, 1);
+
+    $page->script('window.history.back()');
+
+    expectRows($page, 25);
+
+    $page->assertValue(FILTERS.' input[name="search"]', 'Extra')
         ->assertNoJavaScriptErrors();
 });

@@ -16,6 +16,9 @@ import type { FilterField, FilterFormValues, FilterValue } from '@/types/filter'
 
 const DEBOUNCE_MS = 400
 
+// The global search is always there, apart from the advanced filters
+const searchInput = Filter.toInput({ name: 'search', input: 'search' })
+
 /**
  * State of a filters form. The url query is the source of truth: the form is
  * initialised from it, and every change in the form (debounced) is written back
@@ -33,10 +36,21 @@ export default function useFilterForm(
   const search = computed(() => QueryString.parseSearch(page.url.split('?')[1]))
 
   const inputs = computed(() => Filter.processFields(toValue(fields)))
-  const ownedKeys = computed(() => inputs.value.flatMap(Filter.keys))
+  const allInputs = computed(() => [searchInput, ...inputs.value])
+  const ownedKeys = computed(() => allInputs.value.flatMap(Filter.keys))
 
-  const form = ref<FilterFormValues>(Filter.toForm(inputs.value, search.value))
-  const values = computed(() => Filter.serialize(inputs.value, form.value))
+  const form = ref<FilterFormValues>(
+    Filter.toForm(allInputs.value, search.value)
+  )
+  const values = computed(() => Filter.serialize(allInputs.value, form.value))
+
+  const hasAdvancedValues = () =>
+    inputs.value.some((input) =>
+      Filter.keys(input).some((key) => key in values.value)
+    )
+
+  // The advanced filters are open when there are some of them in use
+  const showAdvanced = ref(hasAdvancedValues())
 
   const filterText = computed(() =>
     inputs.value
@@ -91,10 +105,11 @@ export default function useFilterForm(
         return
       }
 
-      const fromUrl = Filter.toForm(inputs.value, search.value, false)
+      const fromUrl = Filter.toForm(allInputs.value, search.value, false)
 
-      if (!isEqual(Filter.serialize(inputs.value, fromUrl), values.value)) {
+      if (!isEqual(Filter.serialize(allInputs.value, fromUrl), values.value)) {
         form.value = fromUrl
+        showAdvanced.value ||= hasAdvancedValues()
       }
     }
   )
@@ -106,7 +121,15 @@ export default function useFilterForm(
 
   onBeforeUnmount(() => debouncedUpdateQuery.cancel())
 
-  return { inputs, form, filterText, setValue, reset }
+  return {
+    searchInput,
+    inputs,
+    form,
+    filterText,
+    showAdvanced,
+    setValue,
+    reset,
+  }
 }
 
 function getLabel(input: FilterInput): string {

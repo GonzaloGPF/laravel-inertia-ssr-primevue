@@ -2,6 +2,7 @@ import { OptionItem, QueryParams } from '@/types/input'
 
 export type FilterFieldInput =
   | 'text'
+  | 'search'
   | 'select'
   | 'auto'
   | 'boolean'

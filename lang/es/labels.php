@@ -25,6 +25,7 @@ return [
     'empty' => 'Sin datos',
     'actions' => 'Acciones',
     'warning' => 'Advertencia',
+    'advanced' => 'Avanzado',
     'filters' => 'Filtros',
     'showing_items' => 'Mostrando [:first-:last] de :total elementos',
     'filtering_by' => 'Filtrando por :value',
