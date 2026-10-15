@@ -2,7 +2,7 @@ import useHttp from '@/composables/useHttp'
 import { ref, watch, type Ref } from 'vue'
 import { Dropdown } from '@/objects/Dropdown'
 import { useConstants } from '@/composables/useConstants'
-import { QueryString } from '@/objects/QueryString'
+import { QueryString, type SearchValues } from '@/objects/QueryString'
 import { InputValue, OptionItem, QueryParams } from '@/types/input'
 
 type Options = {
@@ -94,7 +94,7 @@ export default (
     if (!model) {
       return
     }
-    const stringParams = QueryString.stringify(params)
+    const stringParams = QueryString.toSearch(toSearchValues(params))
 
     if (!force && lastStringParams === stringParams) {
       return Promise.resolve(items.value)
@@ -134,4 +134,16 @@ function getPreParams(
     urlAttribute,
     urlValue,
   }
+}
+
+/**
+ * Params of a request, as the values of a url search.
+ */
+function toSearchValues(params: QueryParams): SearchValues {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      key,
+      Array.isArray(value) ? value.map(String) : String(value),
+    ])
+  )
 }

@@ -225,6 +225,7 @@ return [
         'year' => 'year',
         'language' => 'language',
         'currency' => 'currency',
+        'verified' => 'verified',
         'email_verified_at' => 'verified',
         'appraisal_state' => 'state',
         'serial_number' => 'serial number',

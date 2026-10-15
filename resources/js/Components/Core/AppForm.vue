@@ -28,7 +28,7 @@ const vLabel = computed(() => {
 </script>
 <template>
   <form
-    class="flex flex-col space-y-3"
+    class="flex flex-col gap-2"
     @keyup.enter.prevent
     @submit.prevent="$emit('submit', $event)"
   >

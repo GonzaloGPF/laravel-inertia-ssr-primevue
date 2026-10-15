@@ -8,6 +8,7 @@ import {
 } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import useHttp from '@/composables/useHttp'
+import { QueryString } from '@/objects/QueryString'
 import { PaginationData } from '@/types/api'
 
 const PAGE = 'page'
@@ -29,14 +30,12 @@ export default function useDataTable<T extends object>(
   const total = ref(0)
   const responsePerPage = ref<number>()
   const path = computed(() => page.url.split('?')[0])
-  const query = computed(() => new URLSearchParams(page.url.split('?')[1]))
+  const query = computed(() => QueryString.parseSearch(page.url.split('?')[1]))
 
-  const currentPage = computed(() => Number(query.value.get(PAGE)) || 1)
+  const currentPage = computed(() => Number(query.value[PAGE]) || 1)
   const perPage = computed(
     () =>
-      Number(query.value.get(PER_PAGE)) ||
-      responsePerPage.value ||
-      DEFAULT_PER_PAGE
+      Number(query.value[PER_PAGE]) || responsePerPage.value || DEFAULT_PER_PAGE
   )
 
   let lastRequest = 0
@@ -70,14 +69,9 @@ export default function useDataTable<T extends object>(
   }
 
   const requestParams = () => {
-    const params = Object.fromEntries(query.value)
+    const { [PER_PAGE]: perPage, ...params } = query.value
 
-    if (PER_PAGE in params) {
-      params.per_page = params[PER_PAGE]
-      delete params[PER_PAGE]
-    }
-
-    return params
+    return perPage === undefined ? params : { ...params, per_page: perPage }
   }
 
   // Asks an Inertia page only for its `data` prop. Plain json endpoints ignore it.
@@ -87,12 +81,14 @@ export default function useDataTable<T extends object>(
   })
 
   const goTo = (pageNumber: number, rows: number, replace = false) => {
-    const params = new URLSearchParams(query.value)
-    params.set(PAGE, String(pageNumber))
-    params.set(PER_PAGE, String(rows))
+    const search = QueryString.toSearch({
+      ...query.value,
+      [PAGE]: String(pageNumber),
+      [PER_PAGE]: String(rows),
+    })
 
     const visitOptions = {
-      url: `${path.value}?${params}`,
+      url: `${path.value}?${search}`,
       preserveState: true,
       preserveScroll: true,
     }

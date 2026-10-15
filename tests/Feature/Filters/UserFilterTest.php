@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\Currencies;
+use App\Enums\Languages;
 use App\Enums\Roles;
 use App\Models\User;
 
@@ -64,4 +66,52 @@ it('falls back to the default order when the sort input is malformed', function 
     $ids = User::filter(['sort' => 'name'])->pluck('id')->all();
 
     expect($ids)->toBe(User::query()->orderByDesc('id')->pluck('id')->all());
+});
+
+it('can filter users by name', function () {
+    create(User::class, ['name' => 'Zelda Unique']);
+
+    $data = User::filter(['name' => 'zelda'])->get();
+
+    expect($data)->toHaveCount(1)
+        ->and($data->first()->name)->toBe('Zelda Unique');
+});
+
+it('can filter users by several roles at once', function () {
+    User::query()->update(['role' => Roles::USER]);
+
+    create(User::class, ['role' => Roles::ADMIN]);
+
+    expect(User::filter(['role' => [Roles::ADMIN->value, Roles::USER->value]])->get())->toHaveCount(4)
+        ->and(User::filter(['role' => [Roles::ADMIN->value]])->get())->toHaveCount(1)
+        ->and(User::filter(['role' => Roles::USER->value])->get())->toHaveCount(3);
+});
+
+it('can filter users by language and currency', function () {
+    User::query()->update(['language' => Languages::ES, 'currency' => Currencies::EURO]);
+
+    create(User::class, ['language' => Languages::EN, 'currency' => Currencies::DOLLAR]);
+
+    expect(User::filter(['language' => Languages::EN->value])->get())->toHaveCount(1)
+        ->and(User::filter(['currency' => Currencies::DOLLAR->value])->get())->toHaveCount(1)
+        ->and(User::filter(['language' => Languages::ES->value])->get())->toHaveCount(3);
+});
+
+it('combines the filters of users', function () {
+    create(User::class, ['name' => 'Zelda Admin', 'role' => Roles::ADMIN]);
+    create(User::class, ['name' => 'Zelda User', 'role' => Roles::USER]);
+
+    $data = User::filter(['name' => 'Zelda', 'role' => [Roles::ADMIN->value]])->get();
+
+    expect($data)->toHaveCount(1)
+        ->and($data->first()->name)->toBe('Zelda Admin');
+});
+
+it('can filter users by ranges of their id and creation date', function () {
+    $oldest = create(User::class, ['created_at' => now()->subYear()]);
+    $newest = create(User::class, ['created_at' => now()]);
+
+    expect(User::filter(['min_id' => $newest->id, 'max_id' => $newest->id])->get())->toHaveCount(1)
+        ->and(User::filter(['max_created_at' => now()->subMonths(6)->toDateString()])->get()->pluck('id')->all())->toBe([$oldest->id])
+        ->and(User::filter(['min_created_at' => now()->subMonths(6)->toDateString()])->get())->toHaveCount(4);
 });

@@ -3,6 +3,7 @@ import useInput from '@/composables/useInput'
 import { ref, toRefs, watch } from 'vue'
 import useSelect from '@/composables/useSelect'
 import { Utils } from '@/objects/Utils'
+import MultiSelect from 'primevue/multiselect'
 import Select from 'primevue/select'
 import InputLayout from '@/Layouts/InputLayout.vue'
 import { OptionItem, SelectInputProps } from '@/types/input'
@@ -34,7 +35,25 @@ defineExpose({
 </script>
 <template>
   <InputLayout v-bind="$props">
+    <MultiSelect
+      v-if="multiple"
+      v-model="iValue"
+      :options="items || []"
+      :option-label="getItemTitle"
+      :option-value="(item) => item.id"
+      :placeholder="placeholder"
+      :required="required"
+      :class="{ required }"
+      :show-clear="clearable"
+      :name="iName"
+      :disabled="disabled"
+      :fluid="fluid"
+      :filter="!!filter"
+      :show-toggle-all="false"
+      display="chip"
+    />
     <Select
+      v-else
       v-model="iValue"
       :options="items || []"
       :option-label="getItemTitle"
@@ -47,7 +66,6 @@ defineExpose({
       :disabled="disabled"
       :fluid="fluid"
       :option-value="(item) => item.id"
-      :multiple="!!multiple"
       :filter="!!filter"
       @click:clear="reset"
     />

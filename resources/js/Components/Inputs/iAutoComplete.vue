@@ -50,6 +50,7 @@ defineExpose({
       :class="{ required }"
       :name="iName"
       :show-clear="clearable"
+      @complete="search = $event.query"
     />
   </InputLayout>
 </template>

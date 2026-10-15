@@ -8,7 +8,7 @@ import { BooleanInputProps } from '@/types/input'
 
 const props = defineProps<BooleanInputProps>()
 const { iLabel, iName, iValue, reset } = useInput(toRefs(props), (value) => {
-  return value === null ? undefined : value ? 1 : 0
+  return value == null ? undefined : value ? 1 : 0
 })
 const items = computed(() => [
   {
@@ -46,7 +46,7 @@ defineExpose({
       v-model="iValue"
       :title="iLabel"
       :options="items"
-      :option-label="iLabel"
+      option-label="label"
       :placeholder="placeholder"
       :checkmark="checkmark"
       :required="required"

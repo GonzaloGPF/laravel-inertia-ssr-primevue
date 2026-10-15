@@ -171,3 +171,46 @@ test('a user without language does not render an empty language chip', function 
 
     expect($chips)->toBe('1,2'); // Role chip only, and role and language chips
 });
+
+test('the table shows which items of the total are in the page', function () {
+    User::factory(54)->create(); // 55 users in total, with the admin
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 25);
+
+    $page->assertSee('Showing [1-25] of 55 items')
+        ->click('.p-paginator-next');
+
+    expectRows($page, 25);
+
+    $page->assertSee('Showing [26-50] of 55 items')
+        ->click('.p-paginator-next');
+
+    expectRows($page, 5);
+
+    $page->assertSee('Showing [51-55] of 55 items')
+        ->assertNoJavaScriptErrors();
+});
+
+test('the shown items follow the page size and the filters', function () {
+    User::factory(30)->create(['name' => 'Extra Person']);
+
+    $page = visit(route('users.index', ['perPage' => 10, 'name' => 'Extra'], false));
+
+    expectRows($page, 10);
+
+    $page->assertSee('Showing [1-10] of 30 items')
+        ->assertNoJavaScriptErrors();
+});
+
+test('the shown items are translated', function () {
+    $this->admin->update(['language' => Languages::ES]);
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 1);
+
+    $page->assertSee('Mostrando [1-1] de 1 elementos')
+        ->assertNoJavaScriptErrors();
+});

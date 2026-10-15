@@ -1,95 +1,118 @@
-import { computed, nextTick, type Ref } from 'vue'
-import { Filter } from '@/objects/Filter'
-import { Utils } from '@/objects/Utils'
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  toValue,
+  watch,
+  type MaybeRefOrGetter,
+} from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
+import { debounce, isEqual, omit, pick } from 'lodash-es'
+import { Filter, type FilterInput } from '@/objects/Filter'
+import { QueryString, type SearchValues } from '@/objects/QueryString'
 import { Translator } from '@/objects/Translator'
-import { router } from '@inertiajs/vue3'
-import { QueryString } from '@/objects/QueryString'
-import { uniq } from 'lodash-es'
-import type { FilterField } from '@/types/filter'
-import { FormDataConvertible } from '@inertiajs/core'
-import useForm from '@/composables/useForm'
-import { QueryParams } from '@/types/input'
+import type { FilterField, FilterFormValues, FilterValue } from '@/types/filter'
 
-type FilterInput = {
-  name: string
-  value: unknown
-  label?: string | null | (() => string)
-  reset?: () => void
-}
+const DEBOUNCE_MS = 400
 
-type FilterForm = Record<string, FormDataConvertible>
+/**
+ * State of a filters form. The url query is the source of truth: the form is
+ * initialised from it, and every change in the form (debounced) is written back
+ * to it, resetting the pagination. When the url changes (i.e. browser back and
+ * forward) the form follows it.
+ *
+ * `onInput` is called, with the values written in the url, after each change.
+ */
+export default function useFilterForm(
+  fields: MaybeRefOrGetter<FilterField[]>,
+  onInput?: (values: SearchValues) => void
+) {
+  const page = usePage()
+  const path = computed(() => page.url.split('?')[0])
+  const search = computed(() => QueryString.parseSearch(page.url.split('?')[1]))
 
-export default function useFilterForm(fields: Ref<FilterField[]>) {
-  const query = QueryString.parse(window.location.search.replace('?', ''))
+  const inputs = computed(() => Filter.processFields(toValue(fields)))
+  const ownedKeys = computed(() => inputs.value.flatMap(Filter.keys))
 
-  const inputs = computed<FilterInput[]>(() =>
-    Filter.processFields(fields.value, query)
+  const form = ref<FilterFormValues>(Filter.toForm(inputs.value, search.value))
+  const values = computed(() => Filter.serialize(inputs.value, form.value))
+
+  const filterText = computed(() =>
+    inputs.value
+      .filter((input) => Filter.keys(input).some((key) => key in values.value))
+      .map(getLabel)
+      .join(', ')
   )
 
-  const { form } = useForm(buildFormData(inputs.value))
+  let mountedPath = ''
+  let pending = false
 
-  const filterText = computed(() => getFilterText(form.data(), inputs.value))
-  const loading = computed(() => form?.processing)
+  const updateQuery = () => {
+    pending = false
 
-  const search = (extraParams: QueryParams = {}): void => {
-    const path = window.location.pathname
-    const formData = Utils.removeEmpty(form?.data()) as Record<string, unknown>
-    const data: Partial<FormData> = {
-      ...formData,
-      ...extraParams,
+    const current = pick(search.value, ownedKeys.value)
+
+    if (path.value !== mountedPath || isEqual(values.value, current)) {
+      return
     }
 
-    router.visit(path, {
-      only: ['data'],
+    // The pagination starts over, as the filtered items are other ones
+    const rest = omit(search.value, [...ownedKeys.value, 'page'])
+
+    router.replace({
+      url: `${path.value}?${QueryString.toSearch({ ...rest, ...values.value })}`,
+      preserveState: true,
       preserveScroll: true,
-      data: data as FormData,
     })
+
+    onInput?.(values.value)
   }
 
-  function reset(inputRefs: Array<{ reset: () => void }>): void {
-    inputRefs.forEach((inputRef) => inputRef.reset())
-    // inputs.value.forEach(input => {
-    //   form[input.name] = null
-    // })
-    void nextTick(() => search())
+  const debouncedUpdateQuery = debounce(updateQuery, DEBOUNCE_MS)
+
+  const setValue = (input: FilterInput, value: FilterValue) => {
+    pending = true
+    form.value = Filter.setValue(input, form.value, value)
+    debouncedUpdateQuery()
   }
 
-  return {
-    inputs,
-    form,
-    filterText,
-    loading,
-    reset,
-    search,
+  const reset = () => {
+    debouncedUpdateQuery.cancel()
+    form.value = {}
+    updateQuery()
   }
+
+  watch(
+    () => page.url,
+    () => {
+      // A change not written yet by the user is the one that has to prevail
+      if (pending || path.value !== mountedPath) {
+        return
+      }
+
+      const fromUrl = Filter.toForm(inputs.value, search.value, false)
+
+      if (!isEqual(Filter.serialize(inputs.value, fromUrl), values.value)) {
+        form.value = fromUrl
+      }
+    }
+  )
+
+  onMounted(() => {
+    mountedPath = path.value
+    updateQuery() // Writes the preset values the url doesn't have yet
+  })
+
+  onBeforeUnmount(() => debouncedUpdateQuery.cancel())
+
+  return { inputs, form, filterText, setValue, reset }
 }
 
-function buildFormData(inputs: FilterInput[]): FilterForm {
-  const inputEntries = inputs.map((input) => [input.name, input.value])
-
-  return Object.fromEntries(inputEntries) as FilterForm
-}
-
-function getFilterText(form: FilterForm, inputs: FilterInput[]): string {
-  const labels = Object.keys(form)
-    .filter((key) => !Utils.isEmptyValue(form[key]) && key !== 'page')
-    .map((key) => getInputLabel(inputs.find((input) => input.name === key)))
-
-  return uniq(labels).join(', ')
-}
-
-function getInputLabel(input?: FilterInput): string {
-  if (!input) {
-    return ''
-  }
-
-  if (!input.label) {
-    return Translator.ta(input.name)
-  }
-
+function getLabel(input: FilterInput): string {
   if (typeof input.label === 'function') {
     return input.label()
   }
 
-  return input.label
+  return input.label ?? Translator.ta(input.name)
 }

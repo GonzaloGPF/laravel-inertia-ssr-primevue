@@ -225,6 +225,7 @@ return [
         'year' => 'año',
         'language' => 'idioma',
         'currency' => 'moneda',
+        'verified' => 'verificado',
         'email_verified_at' => 'verificado',
         'appraisal_state' => 'estado',
         'serial_number' => 'Nº de serie',

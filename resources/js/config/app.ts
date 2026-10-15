@@ -15,7 +15,7 @@ export const app = {
    * The app url is given by Laravel in the app.blade.php file
    */
   getAppURL(path = '') {
-    const baseUrl = location.protocol + '//' + window.location.hostname
+    const baseUrl = location.protocol + '//' + window.location.host
 
     if (!path) return baseUrl
 

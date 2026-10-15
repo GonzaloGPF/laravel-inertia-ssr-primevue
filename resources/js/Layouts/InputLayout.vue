@@ -10,7 +10,7 @@ type Props = InputProps & {
 defineOptions({ inheritAttrs: false })
 const props = defineProps<Props>()
 
-const { iLabel } = useInput(toRefs(props))
+const { iLabel, iName } = useInput(toRefs(props))
 
 const hintOrError = computed(() => {
   if (props.error) {
@@ -27,10 +27,10 @@ const innerContainerClasses = computed(() => ({
 <template>
   <div class="flex flex-col">
     <div :class="innerContainerClasses">
-      <label v-if="!hideLabel" :for="String(id)" v-text="iLabel" />
+      <span v-if="!hideLabel" v-text="iLabel" :aria-label="iName" />
       <slot />
     </div>
-    <div class="h-5">
+    <div v-if="!hideDetails" class="h-5">
       <small
         v-if="hintOrError"
         :id="`${id}_help`"

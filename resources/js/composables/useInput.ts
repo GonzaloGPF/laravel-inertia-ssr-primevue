@@ -61,7 +61,7 @@ export default function useInput<T extends InputValue>(
       newValue = getValue(value) as InputValue
     }
 
-    if (!force && isEqual(newValue, modelValue.value)) {
+    if (!force && isEqual(newValue, iValue.value)) {
       return
     }
 
