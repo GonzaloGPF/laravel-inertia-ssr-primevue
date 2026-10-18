@@ -5,4 +5,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | Applies to | Rule file |
 | --- | --- |
 | tests/Browser/** | .ai/rules/browser.md |
+| app/Http/Controllers/** | .ai/rules/controllers.md |
+| app/Filters/** | .ai/rules/filters.md |
 | resources/js/** | .ai/rules/frontend-vue.md |
+| resources/js/Pages/** | .ai/rules/pages.md |

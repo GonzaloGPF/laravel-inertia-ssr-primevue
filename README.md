@@ -1,66 +1,142 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel + Inertia SSR + PrimeVue boilerplate
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A starting point for admin-style web apps: Laravel on the back, a Vue 3 + TypeScript SPA with server side rendering on the front, [PrimeVue](https://primevue.org) components, and a reusable **Filter System** that powers every listing. It runs in Docker with [Laravel Sail](https://laravel.com/docs/sail).
 
-## About Laravel
+It comes with authentication (Breeze based), a profile page, English and Spanish translations and a complete users administration (list, create, edit and delete) that works as the reference for any new admin section.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| | |
+| --- | --- |
+| Backend | PHP 8.4, Laravel 13, Sanctum, [EloquentFilter](https://github.com/Tucker-Eric/EloquentFilter), [Ziggy](https://github.com/tighten/ziggy) |
+| Frontend | Inertia v3 (SSR), Vue 3, TypeScript, Pinia, [PrimeVue 4](https://primevue.org) (Aura theme), Tailwind CSS 4, Vite 8 |
+| i18n | `laravel-vue-i18n`: the Laravel `lang/` files (`es`, `en`) are shared with the frontend |
+| Tests | Pest 5, with browser tests (Playwright) |
+| Tooling | Laravel Pint, ESLint, Prettier, Stylelint, vue-tsc, Husky + lint-staged, GitHub Actions |
+| AI | Laravel Boost (guidelines, skills and MCP) and project rules in `.ai/rules` |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Getting started
 
-## Learning Laravel
+Docker is the only requirement.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```bash
+# 1. Environment. .env.example defaults to SQLite: with Sail, use the MySQL service
+cp .env.example .env
+#    DB_CONNECTION=mysql  DB_HOST=mysql  DB_PORT=3306
+#    DB_DATABASE=...  DB_USERNAME=...  DB_PASSWORD=...
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# 2. PHP dependencies, without PHP installed on your machine
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html \
+    laravelsail/php84-composer:latest composer install --ignore-platform-reqs
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# 3. Services (app, MySQL, Redis, Mailpit and Meilisearch, which the app doesn't use yet)
+vendor/bin/sail up -d
 
-## Laravel Sponsors
+# 4. Application key, database and demo data
+vendor/bin/sail artisan key:generate
+vendor/bin/sail artisan migrate --seed
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 5. Frontend dependencies and dev server
+vendor/bin/sail yarn install
+vendor/bin/sail yarn dev
+```
 
-### Premium Partners
+Every command runs through Sail, as the app lives in the containers. The seeders create an admin (`admin@mail.com`), a regular user (`test@mail.com`) and 30 random ones, all with the password `Secret123**`.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+> `migrate --seed` truncates every table before seeding. Don't run it against data you want to keep.
 
-## Contributing
+### Dev server or build?
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Laravel serves the assets from the Vite dev server when `public/hot` exists, and from `public/build` when it doesn't. The build is a snapshot: it doesn't know about your edits until you run `vendor/bin/sail yarn build` again. If you don't see a change in the browser, check that `yarn dev` is running, and that you are not looking at an old build.
 
-## Code of Conduct
+## Commands
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| | |
+| --- | --- |
+| `vendor/bin/sail artisan test --compact` | Whole suite: unit, feature and browser tests |
+| `vendor/bin/sail bin pint` | PHP code style |
+| `vendor/bin/sail yarn eslint resources/js` | JS / TS / Vue lint |
+| `vendor/bin/sail yarn prettier --check resources/js` | Frontend formatting |
+| `vendor/bin/sail yarn stylelint 'resources/css/**/*'` | CSS lint |
+| `vendor/bin/sail yarn vue-tsc --noEmit` | Type check |
+| `vendor/bin/sail yarn build` | Type check, and client and SSR production builds |
 
-## Security Vulnerabilities
+The browser tests drive a headless Chromium from PHP and run inside Sail, which already has what Chromium needs. Run them against the production build too (move `public/hot` away and run `yarn build`) when you change frontend code: some failures only show there.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+A Husky pre-commit hook runs lint-staged (Pint, ESLint and Stylelint on the staged files). GitHub Actions run the same checks, the tests with MySQL, and a production build smoke check on every push to `master` and every pull request.
+
+## Project structure
+
+```
+app/
+  Filters/             Model filters (EloquentFilter): Filter.php is the base one
+  Http/Controllers/    Thin controllers, they render Inertia pages
+  Policies/            Authorization rules
+  Traits/IsFilterable  Filtering and pagination for the models
+lang/{en,es}/          Translations, shared with the frontend
+resources/js/
+  Pages/               Inertia pages, one folder per section
+  Components/
+    Core/              App* components: AppDataTable, AppFilters, AppModal, AppButtons...
+    Inputs/            Form inputs (iText, iSelect, iSearch...), the only ones to use in forms
+    Forms/             Forms of the pages, they use AppForm and the inputs
+  composables/         useCrud, useDataTable, useFilterForm, useForm...
+  config/              columns.ts, filters.ts, inputs.ts, buttons.ts...
+.ai/rules/             Project rules for AI assistants, grouped by area
+tests/{Unit,Feature,Browser}
+```
+
+## The Filter System
+
+Every listing of entities, such as an admin table or a selector, goes through the **Filter System**. It is more than enough for listing entities: a specific endpoint for a listing is only created in very exceptional cases, when the filters cannot express it.
+
+How a listing is built:
+
+1. **Model.** Use the `IsFilterable` trait.
+2. **Filter.** Create `App\Filters\{Model}Filter`, extending `Filter`. The base class already handles ranges (`min_x`, `max_x`), exclusions (`not_x`), enum columns, `sort=attribute|asc`, pagination (`page`, `per_page`), `ids`, `with` and more. Add model specific filters as methods named after the input, and declare the columns of the global search:
+
+   ```php
+   class UserFilter extends Filter
+   {
+       protected array $searchable = ['name', 'email', 'phone'];
+
+       public function verified($value): Builder { /* ... */ }
+   }
+   ```
+
+3. **Controller.** `index` returns `$this->renderCollection('Users/UserIndex', User::class)`. The filtered and paginated `data` prop is only resolved when the table asks for it with a partial reload.
+4. **Page.** Render an `AppDataTable` with its columns and filters:
+
+   ```vue
+   <AppDataTable
+     ref="table"
+     :src="route('users.index')"
+     :columns="userColumns"
+     :filters-data="userFilters"
+     :header-actions="['create']"
+     @action="onAction"
+   />
+   ```
+
+   `useCrud('user')` gives the create / edit / delete flow (modal, confirmation and refresh) that the page connects to the table. See `resources/js/Pages/Users/UserIndex.vue`.
+
+`AppFilters` shows a global search input (it looks into the `searchable` columns, every word has to match) and an *Advanced* toggle with one input per field of `config/filters.ts`. Each field says which input to render (`text`, `select`, `auto`, `boolean`, `check`, `number`, `number_range`, `date`), plus its options, range or visibility. The filters, the page and the page size live in the url (`?search=ada&role[]=admin&page=2&perPage=25`): they can be shared, and the browser back button works.
+
+## Conventions
+
+- Forms use the components of `Components/Inputs` and `AppForm`.
+- Texts are translated: add them to `lang/en` and `lang/es`.
+- Use named routes (`route('users.index')`).
+- Add tests with every change, and verify the frontend with browser tests.
+
+## AI assistants
+
+The project is prepared for AI coding assistants with [Laravel Boost](https://laravel.com/docs/boost):
+
+- `CLAUDE.md` and `AGENTS.md` hold the Boost guidelines. They are generated: `composer dump-autoload` refreshes them.
+- `.ai/rules/index.md` maps file globs to the project rules (the Filter System, the Vue pitfalls, how to verify the UI with browser tests...). Assistants read it before planning or editing. Rules are recorded with Boost's `record-rule` tool, and they are committed.
+- `.mcp.json` starts the Boost MCP server through Sail.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
