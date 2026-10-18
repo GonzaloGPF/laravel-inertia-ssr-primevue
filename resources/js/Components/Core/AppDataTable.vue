@@ -22,7 +22,10 @@ type Props = {
   headerActions?: ActionName[]
   title?: string
   description?: string
-  detail?: Component
+  /** Component rendered in the expanded row, which adds the column to expand it. */
+  details?: Component
+  /** Name of the prop of `details` that receives the item of the row. */
+  detailsProp?: string
   filtersData?: FilterField[]
 }
 
@@ -158,7 +161,7 @@ defineExpose({ refresh })
       </div>
     </template>
 
-    <Column v-if="detail" expander class="w-12" />
+    <Column v-if="details" expander class="w-12" />
 
     <Column
       v-for="column in tableColumns"
@@ -195,8 +198,10 @@ defineExpose({ refresh })
       <AppEmpty />
     </template>
 
-    <template v-if="detail" #expansion="{ data }">
-      <component :is="detail" :item="data" />
+    <template v-if="details" #expansion="{ data }">
+      <div class="px-4 py-3">
+        <component :is="details" v-bind="{ [detailsProp ?? 'item']: data }" />
+      </div>
     </template>
   </DataTable>
 </template>

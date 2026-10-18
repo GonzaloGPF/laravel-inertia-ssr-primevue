@@ -10,7 +10,6 @@ import AppPercent from '@/Components/Core/AppPercent.vue'
 import AppButton from '@/Components/Core/AppButton.vue'
 import AppEmpty from '@/Components/Core/AppEmpty.vue'
 import { router } from '@inertiajs/vue3'
-import { Formatter } from '@/objects/Formatter'
 import { FieldType, InputValue } from '@/types/input'
 import { BaseModel } from '@/types/base-model'
 import { Translator } from '@/objects/Translator'
@@ -88,10 +87,12 @@ const dateFormat = computed(() => {
   />
 
   <AppText
-    v-else-if="!href && (type === 'text' || type === 'html')"
+    v-else-if="!href && type === 'html'"
     class="text-sm"
-    :value="Formatter.ucFirst(value)"
+    :value="value"
   />
+
+  <span v-else-if="!href && type === 'text'" class="text-sm" v-text="value" />
 
   <AppCheck
     v-else-if="type === 'boolean'"

@@ -2,6 +2,7 @@
 import AppDataTable from '@/Components/Core/AppDataTable.vue'
 import AppModal from '@/Components/Core/AppModal.vue'
 import UserForm from '@/Components/Forms/UserForm.vue'
+import UserInfo from '@/Components/Info/UserInfo.vue'
 import { userColumns } from '@/config/columns'
 import { userFilters } from '@/config/filters/userFilters'
 import useAuth from '@/composables/useAuth'
@@ -26,6 +27,8 @@ const { table, item, title, modalTitle, showModal, onAction, onSaved } =
       :src="route('users.index')"
       :columns="userColumns"
       :filters-data="userFilters"
+      :details="UserInfo"
+      details-prop="user"
       :header-actions="['create']"
       :title="title"
       @action="onAction"

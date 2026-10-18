@@ -60,7 +60,7 @@ test('the id is the first column and actions are rendered as icon only buttons',
     $page->assertSee('Actions'); // The headers are translated once the language is loaded
 
     $headers = $page->script("[...document.querySelectorAll('.p-datatable-column-title')].map(e => e.textContent.trim()).join(',')");
-    $buttons = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr:first-child button')].map(e => e.getAttribute('aria-label') + '|' + e.textContent.trim()).join(',')");
+    $buttons = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr:first-child td:last-child button')].map(e => e.getAttribute('aria-label') + '|' + e.textContent.trim()).join(',')");
 
     expect($headers)->toBe('ID,Name,Email,Age,Role,Language,Actions')
         ->and($buttons)->toBe('View|visibility,Edit|edit,Delete|delete');
