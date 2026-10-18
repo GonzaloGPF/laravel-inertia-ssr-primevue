@@ -212,3 +212,63 @@ it('combines the age range with the global search and the rest of filters', func
     expect($data)->toHaveCount(1)
         ->and($data->first()->name)->toBe('Zyxel Old');
 });
+
+describe('sorting', function () {
+    it('sorts users by an attribute in both directions', function (string $sort, array $expected) {
+        User::query()->update(['age' => 99]);
+
+        create(User::class, ['name' => 'B Person', 'age' => 30]);
+        create(User::class, ['name' => 'A Person', 'age' => 50]);
+        create(User::class, ['name' => 'C Person', 'age' => 20]);
+
+        $names = User::filter(['sort' => $sort, 'name' => 'Person'])->pluck('name')->all();
+
+        expect($names)->toBe($expected);
+    })->with([
+        'name ascending' => ['name|asc', ['A Person', 'B Person', 'C Person']],
+        'name descending' => ['name|desc', ['C Person', 'B Person', 'A Person']],
+        'age ascending' => ['age|asc', ['C Person', 'B Person', 'A Person']],
+        'age descending' => ['age|desc', ['A Person', 'B Person', 'C Person']],
+        'uppercase direction' => ['name|DESC', ['C Person', 'B Person', 'A Person']],
+    ]);
+
+    it('orders by id descending when the sorted values are repeated', function () {
+        User::query()->update(['role' => Roles::USER]);
+
+        $first = create(User::class, ['role' => Roles::ADMIN]);
+        $second = create(User::class, ['role' => Roles::ADMIN]);
+
+        $ids = User::filter(['sort' => 'role|asc'])->pluck('id')->all();
+
+        expect(array_slice($ids, 0, 2))->toBe([$second->id, $first->id]);
+    });
+
+    it('can sort by id', function () {
+        $ids = User::filter(['sort' => 'id|asc'])->pluck('id')->all();
+
+        expect($ids)->toBe(User::query()->orderBy('id')->pluck('id')->all());
+    });
+
+    it('ignores a sort that is not valid', function (mixed $sort) {
+        $ids = User::filter(['sort' => $sort])->pluck('id')->all();
+
+        expect($ids)->toBe(User::query()->orderByDesc('id')->pluck('id')->all()); // The default order
+    })->with([
+        'unknown column' => ['nope|asc'],
+        'unknown direction' => ['name|sideways'],
+        'empty direction' => ['name|'],
+        'empty attribute' => ['|asc'],
+        'a column with an injection' => ['name; drop table users|asc'],
+        'not a string' => [['name|asc']],
+    ]);
+
+    it('keeps the filters and the pagination when sorting', function () {
+        create(User::class, ['name' => 'Zyxel B', 'age' => 40]);
+        create(User::class, ['name' => 'Zyxel A', 'age' => 60]);
+
+        $page = User::filter(['search' => 'zyxel', 'sort' => 'age|desc'])->paginate(1, ['*'], 'page', 1);
+
+        expect($page->total())->toBe(2)
+            ->and($page->items()[0]->name)->toBe('Zyxel A');
+    });
+});

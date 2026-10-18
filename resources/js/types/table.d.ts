@@ -8,6 +8,8 @@ export type TableColumn<T extends object = object> = {
   field: string
   /** Translation key of the header. Defaults to the `field`. */
   header?: string
+  /** Columns are sortable (by the backend) unless this is set. */
+  without_sort?: boolean
   /** Component rendered inside the cell instead of the plain value. */
   component?: Component
   /**

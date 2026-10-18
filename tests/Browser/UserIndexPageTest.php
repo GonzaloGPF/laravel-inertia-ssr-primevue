@@ -146,7 +146,7 @@ test('the row actions are squared, separated and neutral icon only buttons', fun
                 gaps: rects.slice(1).map((rect, i) => rect.left - rects[i].right),
                 backgrounds: buttons.map((button) => getComputedStyle(button).backgroundColor),
                 createRatio: (() => {
-                    const rect = document.querySelector('.p-datatable-header button').getBoundingClientRect()
+                    const rect = document.querySelector('.p-datatable-header button[aria-label="Create"]').getBoundingClientRect()
                     return rect.width / rect.height
                 })(),
             })

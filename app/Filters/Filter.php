@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use EloquentFilter\ModelFilter;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class Filter extends ModelFilter
@@ -195,26 +196,64 @@ class Filter extends ModelFilter
      * Orders by a 'sort' string if it's present in request
      * This sort string must be with the format 'attribute|orderDirection'
      * for example: a string 'name|asc' means: ordering by 'name' in 'ascending' order.
-     * By default, it will order by id and updated_at, both descending
+     * The attribute has to be a column of the table, and the direction 'asc' or 'desc'. If it is not
+     * valid, it is ignored. By default, it will order by id and updated_at, both descending
      */
     private function applySorting(): void
     {
         $table = $this->query->getModel()->getTable();
-        $sortString = $this->input[self::SORT] ?? null;
+        $sort = $this->parseSort($table);
 
         if ($this->input[self::RANDOMIZE] ?? false) {
             $this->query->inRandomOrder();
-        } elseif ($sortString && str_contains($sortString, '|')) {
+        } elseif ($sort) {
+            [$attribute, $direction] = $sort;
+
             $this->query->getQuery()->orders = []; // clean up any previous ordering
 
-            [$attribute, $direction] = explode('|', $sortString);
-
             $this->query->orderBy("$table.$attribute", $direction);
+
+            if ($attribute !== 'id') {
+                $this->query->orderByDesc("$table.id"); // Keeps the pages stable when the attribute has repeated values
+            }
         } else {
             $this->query
                 ->orderByDesc("$table.id")
                 ->orderByDesc("$table.updated_at"); // default ordering
         }
+    }
+
+    /**
+     * The attribute and the direction of the 'sort' input, if it is valid.
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    private function parseSort(string $table): ?array
+    {
+        $sort = $this->input[self::SORT] ?? null;
+
+        if (! is_string($sort) || ! str_contains($sort, '|')) {
+            return null;
+        }
+
+        [$attribute, $direction] = explode('|', $sort);
+        $direction = strtolower($direction);
+
+        if (! in_array($direction, ['asc', 'desc'], true) || ! in_array($attribute, $this->columnsOf($table), true)) {
+            return null;
+        }
+
+        return [$attribute, $direction];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function columnsOf(string $table): array
+    {
+        static $columns = [];
+
+        return $columns[$table] ??= Schema::getColumnListing($table);
     }
 
     /**

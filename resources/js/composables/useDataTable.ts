@@ -7,12 +7,14 @@ import {
   type MaybeRefOrGetter,
 } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
+import { omit } from 'lodash-es'
 import useHttp from '@/composables/useHttp'
 import { QueryString } from '@/objects/QueryString'
 import { PaginationData } from '@/types/api'
 
 const PAGE = 'page'
 const DEFAULT_PER_PAGE = 25
+const SORT = 'sort'
 const PER_PAGE = 'perPage' // Query string name, the backend expects `per_page`
 
 /**
@@ -36,6 +38,13 @@ export default function useDataTable<T extends object>(
   const perPage = computed(
     () =>
       Number(query.value[PER_PAGE]) || responsePerPage.value || DEFAULT_PER_PAGE
+  )
+
+  // The sort is written as `field|asc` or `field|desc`, as the backend expects it
+  const sort = computed(() => parseSort(query.value[SORT]))
+  const sortField = computed(() => sort.value?.field)
+  const sortOrder = computed(() =>
+    sort.value ? (sort.value.direction === 'asc' ? 1 : -1) : undefined
   )
 
   let lastRequest = 0
@@ -100,6 +109,24 @@ export default function useDataTable<T extends object>(
     }
   }
 
+  /**
+   * Sorts by a field, or removes the sort if there is no order. The pagination starts over.
+   */
+  const sortBy = (field?: string | null, order?: number | null) => {
+    const values = {
+      ...omit(query.value, [SORT, PAGE]),
+      ...(field && order
+        ? { [SORT]: `${field}|${order === 1 ? 'asc' : 'desc'}` }
+        : {}),
+    }
+
+    router.replace({
+      url: `${path.value}?${QueryString.toSearch(values)}`,
+      preserveState: true,
+      preserveScroll: true,
+    })
+  }
+
   onMounted(() => {
     mountedPath = path.value
     void fetchItems()
@@ -126,7 +153,18 @@ export default function useDataTable<T extends object>(
     loading,
     currentPage,
     perPage,
+    sortField,
+    sortOrder,
     goTo,
+    sortBy,
     refresh: fetchItems,
   }
+}
+
+function parseSort(raw?: string | string[]) {
+  const [field, direction] = typeof raw === 'string' ? raw.split('|') : []
+
+  return field && (direction === 'asc' || direction === 'desc')
+    ? { field, direction }
+    : undefined
 }

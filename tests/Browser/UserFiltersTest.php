@@ -666,3 +666,16 @@ test('the advanced filters fade in and out instead of appearing at once', functi
 
     expect($animations())->toContain('animate-fadeout');
 });
+
+test('the filters are inside the header of the table, below its title', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    $page->assertPresent('.p-datatable-header [role="search"]')
+        ->assertPresent('.p-datatable-header [role="search"] input[name="search"]');
+
+    $titleBeforeFilters = $page->script("(() => { const header = document.querySelector('.p-datatable-header'); const title = header.querySelector('h2'); const filters = header.querySelector('[role=search]'); return !!(title.compareDocumentPosition(filters) & Node.DOCUMENT_POSITION_FOLLOWING) && title.getBoundingClientRect().bottom <= filters.getBoundingClientRect().top })()");
+
+    expect($titleBeforeFilters)->toBeTrue();
+});

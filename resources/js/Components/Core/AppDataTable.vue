@@ -1,6 +1,9 @@
 <script setup lang="ts" generic="T extends object">
 import Column from 'primevue/column'
-import DataTable, { type DataTablePageEvent } from 'primevue/datatable'
+import DataTable, {
+  type DataTablePageEvent,
+  type DataTableSortEvent,
+} from 'primevue/datatable'
 import { computed, ref, toRef } from 'vue'
 import type { Component } from 'vue'
 import AppButtons from '@/Components/Core/AppButtons.vue'
@@ -29,8 +32,18 @@ const PAGINATOR_TEMPLATE =
 
 const props = defineProps<Props>()
 const emit = defineEmits<{ action: [action: ActionName, item?: T] }>()
-const { items, total, loading, currentPage, perPage, goTo, refresh } =
-  useDataTable<T>(toRef(props, 'src'))
+const {
+  items,
+  total,
+  loading,
+  currentPage,
+  perPage,
+  sortField,
+  sortOrder,
+  goTo,
+  sortBy,
+  refresh,
+} = useDataTable<T>(toRef(props, 'src'))
 const expandedRows = ref({})
 
 const first = computed(() => (currentPage.value - 1) * perPage.value)
@@ -54,7 +67,13 @@ const hasActions = computed(
   () => !(Array.isArray(props.actions) && props.actions.length === 0)
 )
 const hasHeader = computed(
-  () => !!(props.title || props.description || props.headerActions?.length)
+  () =>
+    !!(
+      props.title ||
+      props.description ||
+      props.headerActions?.length ||
+      props.filtersData?.length
+    )
 )
 
 const getHeader = (column: TableColumn<T>) =>
@@ -87,36 +106,38 @@ const getActions = (item: T): ActionName[] => {
 
 const onPage = (event: DataTablePageEvent) => goTo(event.page + 1, event.rows)
 
+const onSort = (event: DataTableSortEvent) =>
+  sortBy(event.sortField as string | undefined, event.sortOrder)
+
 defineExpose({ refresh })
 </script>
 <template>
-  <div class="flex flex-col gap-4">
-    <!-- The table requests the items again when the url query changes, so there is no need to listen to the filters `input` -->
-    <AppFilters
-      v-if="filtersData?.length"
-      :filters-data="filtersData"
-      @refresh="refresh"
-    />
-
-    <DataTable
-      v-model:expanded-rows="expandedRows"
-      class="min-w-0 flex-1"
-      :value="items"
-      :loading="loading"
-      :first="first"
-      :rows="perPage"
-      :total-records="total"
-      :rows-per-page-options="ROWS_PER_PAGE_OPTIONS"
-      :current-page-report-template="pageReport"
-      :paginator-template="PAGINATOR_TEMPLATE"
-      paginator-position="both"
-      data-key="id"
-      lazy
-      paginator
-      @page="onPage"
-    >
-      <template v-if="hasHeader" #header>
-        <div class="flex items-center justify-between gap-4">
+  <DataTable
+    v-model:expanded-rows="expandedRows"
+    :value="items"
+    :loading="loading"
+    :first="first"
+    :rows="perPage"
+    :total-records="total"
+    :rows-per-page-options="ROWS_PER_PAGE_OPTIONS"
+    :current-page-report-template="pageReport"
+    :paginator-template="PAGINATOR_TEMPLATE"
+    paginator-position="both"
+    data-key="id"
+    lazy
+    paginator
+    :sort-field="sortField"
+    :sort-order="sortOrder"
+    removable-sort
+    @page="onPage"
+    @sort="onSort"
+  >
+    <template v-if="hasHeader" #header>
+      <div class="flex flex-col gap-4">
+        <div
+          v-if="title || description || headerActions?.length"
+          class="flex items-center justify-between gap-4"
+        >
           <div>
             <h2 v-if="title" class="text-xl font-semibold" v-text="title" />
             <p v-if="description" class="text-sm" v-text="description" />
@@ -127,49 +148,57 @@ defineExpose({ refresh })
             @click="emit('action', $event)"
           />
         </div>
+
+        <!-- The table requests the items again when the url query changes, so there is no need to listen to the filters `input` -->
+        <AppFilters
+          v-if="filtersData?.length"
+          :filters-data="filtersData"
+          @refresh="refresh"
+        />
+      </div>
+    </template>
+
+    <Column v-if="detail" expander class="w-12" />
+
+    <Column
+      v-for="column in tableColumns"
+      :key="column.field"
+      :field="column.field"
+      :header="getHeader(column)"
+      :sortable="!column.without_sort"
+    >
+      <template #body="{ data }">
+        <component
+          :is="column.component"
+          v-if="column.component"
+          v-bind="getCellProps(column, data)"
+        />
+        <template v-else>{{ getValue(data, column.field) }}</template>
       </template>
+    </Column>
 
-      <Column v-if="detail" expander class="w-12" />
-
-      <Column
-        v-for="column in tableColumns"
-        :key="column.field"
-        :field="column.field"
-        :header="getHeader(column)"
-      >
-        <template #body="{ data }">
-          <component
-            :is="column.component"
-            v-if="column.component"
-            v-bind="getCellProps(column, data)"
-          />
-          <template v-else>{{ getValue(data, column.field) }}</template>
-        </template>
-      </Column>
-
-      <Column v-if="hasActions" :header="Translator.tl('actions')">
-        <template #body="{ data }">
-          <AppButtons
-            :actions="getActions(data)"
-            class="gap-1"
-            icon-only
-            size="small"
-            severity="secondary"
-            text
-            @click="emit('action', $event, data)"
-          />
-        </template>
-      </Column>
-
-      <template #empty>
-        <AppEmpty />
+    <Column v-if="hasActions" :header="Translator.tl('actions')">
+      <template #body="{ data }">
+        <AppButtons
+          :actions="getActions(data)"
+          class="gap-1"
+          icon-only
+          size="small"
+          severity="secondary"
+          text
+          @click="emit('action', $event, data)"
+        />
       </template>
+    </Column>
 
-      <template v-if="detail" #expansion="{ data }">
-        <component :is="detail" :item="data" />
-      </template>
-    </DataTable>
-  </div>
+    <template #empty>
+      <AppEmpty />
+    </template>
+
+    <template v-if="detail" #expansion="{ data }">
+      <component :is="detail" :item="data" />
+    </template>
+  </DataTable>
 </template>
 <style>
 .p-paginator-content {

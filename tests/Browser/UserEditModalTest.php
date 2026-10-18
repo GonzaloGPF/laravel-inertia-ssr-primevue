@@ -122,7 +122,7 @@ test('the create modal opens empty after editing a user', function () {
         ->assertValue(EDIT_DIALOG.' input[name="name"]', 'Grace Hopper')
         ->click(EDIT_DIALOG.' button[aria-label="Cancel"]')
         ->assertDontSee('Edit User')
-        ->click('.p-datatable-header button')
+        ->click('.p-datatable-header button[aria-label="Create"]')
         ->assertSee('Create User')
         ->assertValue(EDIT_DIALOG.' input[name="name"]', '')
         ->assertPresent(EDIT_DIALOG.' button[type="submit"][aria-label="Create"]')

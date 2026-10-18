@@ -109,3 +109,20 @@ it('searches the users with the global search of the table', function () {
         ->assertJsonCount(1, 'props.data.data')
         ->assertJsonPath('props.data.data.0.name', 'Zelda Unique');
 });
+
+it('sorts the users of the table with the sort input', function () {
+    User::factory()->create(['name' => 'Zelda Unique']);
+    User::factory()->create(['name' => 'Aaron First']);
+
+    usersData(['sort' => 'name|asc', 'per_page' => 2])
+        ->assertSuccessful()
+        ->assertJsonPath('props.data.data.0.name', 'Aaron First');
+
+    usersData(['sort' => 'name|desc', 'per_page' => 2])
+        ->assertJsonPath('props.data.data.0.name', 'Zelda Unique');
+});
+
+it('does not fail with a sort that cannot be applied', function () {
+    usersData(['sort' => 'nope|asc'])->assertSuccessful();
+    usersData(['sort' => 'name|sideways'])->assertSuccessful();
+});
