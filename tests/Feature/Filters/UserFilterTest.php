@@ -108,6 +108,8 @@ it('combines the filters of users', function () {
 });
 
 it('can filter users by ranges of their id and creation date', function () {
+    User::query()->update(['created_at' => now()]); // The factory creates them in any date of the last year
+
     $oldest = create(User::class, ['created_at' => now()->subYear()]);
     $newest = create(User::class, ['created_at' => now()]);
 
@@ -186,4 +188,27 @@ describe('global search', function () {
 
         expect($users->pluck('name')->all())->toBe(['Zyxel Third', 'Zyxel Lovelace']);
     });
+});
+
+it('can filter users by a range of ages', function () {
+    User::query()->update(['age' => 50]);
+
+    create(User::class, ['age' => 18]);
+    create(User::class, ['age' => 30]);
+    create(User::class, ['age' => 65]);
+
+    expect(User::filter(['min_age' => '30'])->get())->toHaveCount(5) // The 3 extra ones, 30 and 65
+        ->and(User::filter(['max_age' => '30'])->get())->toHaveCount(2) // 18 and 30
+        ->and(User::filter(['min_age' => '18', 'max_age' => '30'])->get()->pluck('age')->sort()->values()->all())->toBe([18, 30])
+        ->and(User::filter(['min_age' => '31', 'max_age' => '49'])->get())->toHaveCount(0);
+});
+
+it('combines the age range with the global search and the rest of filters', function () {
+    create(User::class, ['name' => 'Zyxel Young', 'age' => 20, 'role' => Roles::USER]);
+    create(User::class, ['name' => 'Zyxel Old', 'age' => 80, 'role' => Roles::USER]);
+
+    $data = User::filter(['search' => 'zyxel', 'min_age' => '50', 'role' => [Roles::USER->value]])->get();
+
+    expect($data)->toHaveCount(1)
+        ->and($data->first()->name)->toBe('Zyxel Old');
 });

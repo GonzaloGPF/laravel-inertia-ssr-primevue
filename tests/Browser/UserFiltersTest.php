@@ -487,3 +487,182 @@ test('the global search follows the url when going back in the browser', functio
     $page->assertValue(FILTERS.' input[name="search"]', 'Extra')
         ->assertNoJavaScriptErrors();
 });
+
+describe('range filters', function () {
+    beforeEach(function () {
+        // Ada is 50, Bob 30 and Cara 20. Bob was created in 2020, the rest now
+        $this->admin->forceFill(['age' => 50])->saveQuietly();
+        $this->bob->forceFill(['age' => 30, 'created_at' => '2020-06-15 12:00:00'])->saveQuietly();
+        $this->cara->forceFill(['age' => 20])->saveQuietly();
+    });
+
+    test('the age and creation date ranges are advanced filters', function () {
+        $page = visit(route('users.index', absolute: false));
+
+        expectRows($page, 3);
+
+        $page->assertMissing(FILTERS.' input[name="min_age"]');
+
+        openAdvanced($page);
+
+        $page->assertPresent(FILTERS.' input[name="min_age"][placeholder="Min"]')
+            ->assertPresent(FILTERS.' input[name="max_age"][placeholder="Max"]')
+            ->assertPresent(FILTERS.' .p-datepicker input')
+            ->assertSee('Age')
+            ->assertSee('Created At')
+            ->assertNoJavaScriptErrors();
+    });
+
+    test('the age range filters by its min and max', function () {
+        $page = visit(route('users.index', absolute: false));
+
+        expectRows($page, 3);
+
+        openAdvanced($page);
+
+        $page->type(FILTERS.' input[name="min_age"]', '25')
+            ->assertQueryStringHas('min_age', '25')
+            ->assertQueryStringMissing('max_age');
+
+        expectRows($page, 2); // Ada and Bob
+
+        $page->type(FILTERS.' input[name="max_age"]', '40')
+            ->assertQueryStringHas('max_age', '40');
+
+        expectRows($page, 1);
+
+        $page->assertSee('Bob Regular')
+            ->assertSee('Filtering by Age')
+            ->assertNoJavaScriptErrors();
+
+        expect(urlSearch($page))->toBe('min_age=25&max_age=40');
+    });
+
+    test('the age range is initialised from the url query', function () {
+        $page = visit(route('users.index', ['min_age' => 25, 'max_age' => 40], false));
+
+        expectRows($page, 1);
+
+        $page->assertSee('Bob Regular')
+            ->assertValue(FILTERS.' input[name="min_age"]', '25') // The advanced filters are open
+            ->assertValue(FILTERS.' input[name="max_age"]', '40')
+            ->assertNoJavaScriptErrors();
+    });
+
+    test('the creation date range filters by its dates and shows them', function () {
+        $page = visit(route('users.index', ['min_created_at' => '2020-01-01', 'max_created_at' => '2020-12-31'], false));
+
+        expectRows($page, 1);
+
+        $page->assertSee('Bob Regular')
+            ->assertValue(FILTERS.' .p-datepicker input', '2020-01-01 - 2020-12-31')
+            ->assertNoJavaScriptErrors();
+    });
+
+    test('picking dates in the calendar writes the creation date range in the url', function () {
+        $page = visit(route('users.index', absolute: false));
+
+        expectRows($page, 3);
+
+        openAdvanced($page);
+
+        $page->click(FILTERS.' .p-datepicker input');
+
+        $clickDay = fn (int $position) => $page->script("[...document.querySelectorAll('.p-datepicker-day')].filter(day => ! day.closest('td').classList.contains('p-datepicker-other-month'))[$position].click()");
+
+        $clickDay(4);
+        $clickDay(11);
+
+        $page->assertQueryStringHas('min_created_at')
+            ->assertQueryStringHas('max_created_at')
+            ->assertNoJavaScriptErrors();
+
+        expect(urlSearch($page))->toMatch('/^min_created_at=\d{4}-\d{2}-\d{2}&max_created_at=\d{4}-\d{2}-\d{2}$/');
+    });
+
+    test('the erase button clears the ranges', function () {
+        $page = visit(route('users.index', [
+            'min_age' => 25,
+            'max_age' => 40,
+            'min_created_at' => '2020-01-01',
+            'max_created_at' => '2020-12-31',
+        ], false));
+
+        expectRows($page, 1);
+
+        $page->click(FILTERS.' button[aria-label="Erase"]')
+            ->assertQueryStringMissing('min_age')
+            ->assertQueryStringMissing('max_age')
+            ->assertQueryStringMissing('min_created_at')
+            ->assertQueryStringMissing('max_created_at')
+            ->assertValue(FILTERS.' input[name="min_age"]', '')
+            ->assertValue(FILTERS.' input[name="max_age"]', '')
+            ->assertValue(FILTERS.' .p-datepicker input', '')
+            ->assertNoJavaScriptErrors();
+
+        expectRows($page, 3);
+    });
+
+    test('the ranges follow the url when going back in the browser', function () {
+        User::factory(30)->create(['age' => 60]);
+
+        $page = visit(route('users.index', ['min_age' => 25], false));
+
+        expectRows($page, 25);
+
+        $page->click('.p-datatable-paginator-bottom .p-paginator-next')
+            ->assertQueryStringHas('page', '2');
+
+        expectRows($page, 7); // Ada, Bob and the 30 new ones are 32
+
+        $page->fill(FILTERS.' input[name="min_age"]', '55') // Replaces this entry, going back to the first page
+            ->assertQueryStringHas('min_age', '55');
+
+        expectRows($page, 25);
+
+        // Back to the previous entry, which was filtered by 25
+        $page->script('window.history.back()');
+
+        expectRows($page, 25);
+
+        $page->assertValue(FILTERS.' input[name="min_age"]', '25')
+            ->assertQueryStringHas('min_age', '25')
+            ->assertNoJavaScriptErrors();
+    });
+});
+
+test('an age range with a zero is shown, as zero is a value', function () {
+    $page = visit(route('users.index', ['min_age' => 0, 'max_age' => 200], false));
+
+    expectRows($page, 3);
+
+    $page->assertValue(FILTERS.' input[name="min_age"]', '0')
+        ->assertValue(FILTERS.' input[name="max_age"]', '200')
+        ->assertNoJavaScriptErrors();
+});
+
+test('the advanced filters fade in and out instead of appearing at once', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    // Records every animation class given to something inside the filters
+    $page->script("window.__animations = []; new MutationObserver(mutations => mutations.forEach(mutation => { const classes = mutation.target.className || ''; if (typeof classes === 'string' && classes.includes('animate-')) { window.__animations.push(classes) } })).observe(document.querySelector('[role=\"search\"]'), { attributes: true, subtree: true })");
+
+    $animations = fn () => (string) $page->script("window.__animations.join(' | ')");
+
+    openAdvanced($page);
+
+    $page->assertPresent(FILTERS.' input[name="name"]');
+
+    expect($animations())->toContain('animate-fadein')
+        ->and($animations())->not->toContain('animate-fadeout');
+
+    openAdvanced($page);
+
+    $page->assertMissing(FILTERS.' input[name="name"]') // Removed once it has faded out
+        ->assertPresent(FILTERS.' input[name="search"]')
+        ->assertNoJavaScriptErrors();
+
+    expect($animations())->toContain('animate-fadeout');
+});

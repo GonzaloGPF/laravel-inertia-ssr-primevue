@@ -129,3 +129,41 @@ it('will not let a regular user create users', function () {
 
     expect(User::firstWhere('email', 'some@email.com'))->toBeNull();
 });
+
+it('stores the age of the created user', function () {
+    $this->post(route('users.store'), [
+        'name' => 'Some Name',
+        'email' => 'some@email.com',
+        'role' => Roles::USER->value,
+        'age' => 42,
+    ])->assertSessionHasNoErrors();
+
+    expect(User::firstWhere('email', 'some@email.com')->age)->toBe(42);
+});
+
+it('lets create users without age', function (mixed $age) {
+    $this->post(route('users.store'), [
+        'name' => 'Some Name',
+        'email' => 'some@email.com',
+        'role' => Roles::USER->value,
+        'age' => $age,
+    ])->assertSessionHasNoErrors();
+
+    expect(User::firstWhere('email', 'some@email.com')->age)->toBeNull();
+})->with(['empty' => [''], 'null' => [null]]);
+
+it('validates the age to create users', function (mixed $age) {
+    $this->post(route('users.store'), [
+        'name' => 'Some Name',
+        'email' => 'some@email.com',
+        'role' => Roles::USER->value,
+        'age' => $age,
+    ])->assertSessionHasErrors('age');
+
+    expect(User::firstWhere('email', 'some@email.com'))->toBeNull();
+})->with([
+    'not a number' => ['abc'],
+    'negative' => [-1],
+    'decimal' => [30.5],
+    'too old' => [151],
+]);

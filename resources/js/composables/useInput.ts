@@ -1,6 +1,7 @@
 import { computed, ref, watch, type ComputedRef, type Ref } from 'vue'
 import { Translator } from '@/objects/Translator'
 import { Formatter } from '@/objects/Formatter'
+import { Utils } from '@/objects/Utils'
 import { isEqual } from 'lodash-es'
 import type { InputValue } from '@/types/input'
 
@@ -50,7 +51,8 @@ export default function useInput<T extends InputValue>(
 
     if (valueParser) {
       value = valueParser(value)
-    } else if (!value) {
+    } else if (Utils.isEmptyValue(value)) {
+      // Only what is empty, as 0 and false are values
       value = multiple?.value ? [] : undefined
     }
 
@@ -61,7 +63,12 @@ export default function useInput<T extends InputValue>(
       newValue = getValue(value) as InputValue
     }
 
-    if (!force && isEqual(newValue, iValue.value)) {
+    // An empty input is already empty: it must not be turned into another empty
+    // value (i.e. '' into undefined), as that is not what the user typed
+    const bothEmpty =
+      Utils.isEmptyValue(newValue) && Utils.isEmptyValue(iValue.value)
+
+    if (!force && (bothEmpty || isEqual(newValue, iValue.value))) {
       return
     }
 

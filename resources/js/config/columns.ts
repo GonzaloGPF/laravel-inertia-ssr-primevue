@@ -6,6 +6,7 @@ import { TableColumn } from '@/types/table'
 export const userColumns: TableColumn<User>[] = [
   { field: 'name' },
   { field: 'email' },
+  { field: 'age' },
   {
     field: 'role',
     component: AppChip,

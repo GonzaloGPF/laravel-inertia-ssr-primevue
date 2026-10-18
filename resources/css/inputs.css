@@ -1,0 +1,10 @@
+/* Number inputs without the browser spin buttons */
+input[type='number'] {
+  appearance: textfield; /* Firefox */
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  appearance: none; /* Chrome and Safari */
+  margin: 0;
+}

@@ -30,6 +30,7 @@ test('the users table lists the users with translated headers and values', funct
         ->assertSee('Name')
         ->assertSee('Email')
         ->assertSee('Role')
+        ->assertSee('Age')
         ->assertSee('Language')
         ->assertSee('Actions')
         ->assertSee('Spanish')
@@ -61,7 +62,7 @@ test('the id is the first column and actions are rendered as icon only buttons',
     $headers = $page->script("[...document.querySelectorAll('.p-datatable-column-title')].map(e => e.textContent.trim()).join(',')");
     $buttons = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr:first-child button')].map(e => e.getAttribute('aria-label') + '|' + e.textContent.trim()).join(',')");
 
-    expect($headers)->toBe('ID,Name,Email,Role,Language,Actions')
+    expect($headers)->toBe('ID,Name,Email,Age,Role,Language,Actions')
         ->and($buttons)->toBe('View|visibility,Edit|edit,Delete|delete');
 });
 

@@ -25,6 +25,8 @@ return [
     'empty' => 'Sin datos',
     'actions' => 'Acciones',
     'warning' => 'Advertencia',
+    'min' => 'Mín',
+    'max' => 'Máx',
     'advanced' => 'Avanzado',
     'filters' => 'Filtros',
     'showing_items' => 'Mostrando [:first-:last] de :total elementos',

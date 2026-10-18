@@ -34,6 +34,7 @@ class UserRequest extends FormRequest
                 'email' => 'required|email|max:255|unique:users',
                 'role' => ['required', new Enum(Roles::class)],
                 'phone' => 'nullable|string|max:255',
+                'age' => 'nullable|integer|min:0|max:150',
                 'language' => ['nullable', new Enum(Languages::class)],
                 'currency' => ['nullable', new Enum(Currencies::class)],
             ];
@@ -43,6 +44,7 @@ class UserRequest extends FormRequest
                 'email' => ['email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('user')->id)],
                 'role' => [new Enum(Roles::class)],
                 'phone' => 'nullable|string|max:255',
+                'age' => 'nullable|integer|min:0|max:150',
                 'language' => ['nullable', new Enum(Languages::class)],
                 'currency' => ['nullable', new Enum(Currencies::class)],
             ];

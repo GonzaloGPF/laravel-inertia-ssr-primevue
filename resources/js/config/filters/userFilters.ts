@@ -8,4 +8,6 @@ export const userFilters: FilterField[] = [
   { name: 'language', input: 'select', src: 'languages' },
   { name: 'currency', input: 'select', src: 'currencies' },
   { name: 'verified', input: 'boolean' },
+  { name: 'age', input: 'number_range', range: true },
+  { name: 'created_at', input: 'date', range: true },
 ]

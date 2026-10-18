@@ -19,6 +19,7 @@ beforeEach(function () {
         'name' => 'Grace Hopper',
         'email' => 'grace@example.com',
         'phone' => '666666666',
+        'age' => 35,
         'role' => Roles::USER,
         'language' => Languages::ES,
         'currency' => Currencies::DOLLAR,
@@ -36,6 +37,7 @@ test('the edit action opens the modal with the data of its row', function () {
         ->assertValue(EDIT_DIALOG.' input[name="name"]', 'Grace Hopper')
         ->assertValue(EDIT_DIALOG.' input[name="email"]', 'grace@example.com')
         ->assertValue(EDIT_DIALOG.' input[name="phone"]', '666666666')
+        ->assertValue(EDIT_DIALOG.' input[name="age"]', '35')
         ->assertSeeIn(EDIT_DIALOG.' [name="role"]', 'User')
         ->assertSeeIn(EDIT_DIALOG.' [name="language"]', 'Spanish')
         ->assertSeeIn(EDIT_DIALOG.' [name="currency"]', 'Dollar')
@@ -125,4 +127,53 @@ test('the create modal opens empty after editing a user', function () {
         ->assertValue(EDIT_DIALOG.' input[name="name"]', '')
         ->assertPresent(EDIT_DIALOG.' button[type="submit"][aria-label="Create"]')
         ->assertNoJavaScriptErrors();
+});
+
+test('the age of a user can be changed and removed', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->assertSee('Grace Hopper')
+        ->click(rowAction(1, 'Edit'))
+        ->fill(EDIT_DIALOG.' input[name="age"]', '36')
+        ->click(EDIT_DIALOG.' button[type="submit"]')
+        ->assertDontSee('Edit User')
+        ->assertNoJavaScriptErrors();
+
+    expect($this->grace->fresh()->age)->toBe(36);
+
+    $page->click(rowAction(1, 'Edit'))
+        ->fill(EDIT_DIALOG.' input[name="age"]', '')
+        ->click(EDIT_DIALOG.' button[type="submit"]')
+        ->assertDontSee('Edit User')
+        ->assertNoJavaScriptErrors();
+
+    expect($this->grace->fresh()->age)->toBeNull();
+});
+
+test('an optional text field of a user can be cleared', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->assertSee('Grace Hopper')
+        ->click(rowAction(1, 'Edit'))
+        ->fill(EDIT_DIALOG.' input[name="phone"]', '')
+        ->click(EDIT_DIALOG.' button[type="submit"]')
+        ->assertDontSee('Edit User')
+        ->assertNoJavaScriptErrors();
+
+    expect($this->grace->fresh()->phone)->toBeNull();
+});
+
+test('an age of zero is a value, not an empty field', function () {
+    $this->grace->forceFill(['age' => 0])->saveQuietly();
+
+    $page = visit(route('users.index', absolute: false));
+
+    $page->assertSee('Grace Hopper')
+        ->click(rowAction(1, 'Edit'))
+        ->assertValue(EDIT_DIALOG.' input[name="age"]', '0')
+        ->click(EDIT_DIALOG.' button[type="submit"]')
+        ->assertDontSee('Edit User')
+        ->assertNoJavaScriptErrors();
+
+    expect($this->grace->fresh()->age)->toBe(0);
 });

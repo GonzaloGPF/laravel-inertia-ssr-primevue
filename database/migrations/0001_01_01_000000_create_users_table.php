@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default(Roles::USER->value);
+            $table->integer('age')->nullable();
             $table->string('language')->nullable()->default(Languages::ES->value);
             $table->string('currency')->nullable()->default(Currencies::EURO->value);
             $table->softDeletes();

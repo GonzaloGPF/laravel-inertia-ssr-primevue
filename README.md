@@ -81,7 +81,7 @@ resources/js/
     Inputs/            Form inputs (iText, iSelect, iSearch...), the only ones to use in forms
     Forms/             Forms of the pages, they use AppForm and the inputs
   composables/         useCrud, useDataTable, useFilterForm, useForm...
-  config/              columns.ts, filters.ts, inputs.ts, buttons.ts...
+  config/              columns.ts, inputs.ts, buttons.ts... and filters/ (one file per entity)
 .ai/rules/             Project rules for AI assistants, grouped by area
 tests/{Unit,Feature,Browser}
 ```
@@ -120,7 +120,7 @@ How a listing is built:
 
    `useCrud('user')` gives the create / edit / delete flow (modal, confirmation and refresh) that the page connects to the table. See `resources/js/Pages/Users/UserIndex.vue`.
 
-`AppFilters` shows a global search input (it looks into the `searchable` columns, every word has to match) and an *Advanced* toggle with one input per field of `config/filters.ts`. Each field says which input to render (`text`, `select`, `auto`, `boolean`, `check`, `number`, `number_range`, `date`), plus its options, range or visibility. The filters, the page and the page size live in the url (`?search=ada&role[]=admin&page=2&perPage=25`): they can be shared, and the browser back button works.
+`AppFilters` shows a global search input (it looks into the `searchable` columns, every word has to match) and an *Advanced* toggle with one input per field of the entity's filters file (`config/filters/userFilters.ts`, one file per entity). Each field says which input to render (`text`, `select`, `auto`, `boolean`, `check`, `number`, `number_range`, `date`), plus its options or visibility. A range is a field with `range: true` (`{ name: 'age', input: 'number_range', range: true }`, or `input: 'date'`), sent as `min_age` and `max_age`. The filters, the page and the page size live in the url (`?search=ada&role[]=admin&page=2&perPage=25`): they can be shared, and the browser back button works.
 
 ## Conventions
 

@@ -26,6 +26,8 @@ class UserFactory extends Factory
             'role' => randomConstant(Roles::class),
             'password' => config('app.default_password'),
             'remember_token' => Str::random(10),
+            'age' => fake()->numberBetween(18, 100),
+            'created_at' => fake()->dateTimeBetween('-1 year', 'now'),
         ];
     }
 

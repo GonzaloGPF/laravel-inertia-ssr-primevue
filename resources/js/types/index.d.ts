@@ -7,6 +7,7 @@ export interface User {
   email_verified_at?: string
   role?: string
   phone?: string
+  age?: number | null
   password?: string
   currency?: string
   language?: string

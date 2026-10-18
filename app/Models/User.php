@@ -38,6 +38,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         'password',
         'currency',
         'language',
+        'age',
     ];
 
     protected $hidden = [
@@ -64,6 +65,7 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
             'role' => Roles::class,
             'language' => Languages::class,
             'currency' => Currencies::class,
+            'age' => 'integer',
         ];
     }
 

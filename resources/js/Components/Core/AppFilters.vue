@@ -78,11 +78,16 @@ const onAction = (action: ActionName) => {
       v-text="Translator.tl('filtering_by', { value: filterText })"
     />
 
-    <AppFiltersForm
-      v-if="showAdvanced && inputs.length"
-      :inputs="inputs"
-      :values="form"
-      @change="setValue"
-    />
+    <Transition
+      enter-active-class="animate-fadein animate-duration-300 motion-reduce:animate-none"
+      leave-active-class="animate-fadeout animate-duration-200 animate-fill-forwards motion-reduce:animate-none"
+    >
+      <AppFiltersForm
+        v-if="showAdvanced && inputs.length"
+        :inputs="inputs"
+        :values="form"
+        @change="setValue"
+      />
+    </Transition>
   </div>
 </template>

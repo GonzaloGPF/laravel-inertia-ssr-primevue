@@ -122,3 +122,35 @@ it('will not let a regular user update users', function () {
 
     expect($user->fresh()->name)->toBe('Some Name');
 });
+
+it('lets update the age of a user', function () {
+    $user = User::factory()->create(['age' => 30]);
+
+    $this->put(route('users.update', $user), ['age' => 31])
+        ->assertSessionHasNoErrors();
+
+    expect($user->fresh()->age)->toBe(31);
+});
+
+it('lets remove the age of a user', function () {
+    $user = User::factory()->create(['age' => 30]);
+
+    $this->put(route('users.update', $user), ['age' => ''])
+        ->assertSessionHasNoErrors();
+
+    expect($user->fresh()->age)->toBeNull();
+});
+
+it('validates the age to update users', function (mixed $age) {
+    $user = User::factory()->create(['age' => 30]);
+
+    $this->put(route('users.update', $user), ['age' => $age])
+        ->assertSessionHasErrors('age');
+
+    expect($user->fresh()->age)->toBe(30);
+})->with([
+    'not a number' => ['abc'],
+    'negative' => [-1],
+    'decimal' => [30.5],
+    'too old' => [151],
+]);

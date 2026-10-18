@@ -1,0 +1,9 @@
+/* Icon only buttons are always squared, whatever their size or variant */
+.p-button-icon-only {
+  aspect-ratio: 1;
+  padding-block: 0;
+}
+
+.p-button-sm .material-symbols-outlined {
+  font-size: 1.25rem;
+}

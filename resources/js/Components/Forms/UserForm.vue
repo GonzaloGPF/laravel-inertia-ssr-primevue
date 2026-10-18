@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppForm from '@/Components/Core/AppForm.vue'
+import iNumber from '@/Components/Inputs/iNumber.vue'
 import iSelect from '@/Components/Inputs/iSelect.vue'
 import iText from '@/Components/Inputs/iText.vue'
 import useForm from '@/composables/useForm'
@@ -13,6 +14,7 @@ const { form } = useForm({
   name: props.user?.name ?? '',
   email: props.user?.email ?? '',
   phone: props.user?.phone ?? '',
+  age: props.user?.age ?? (undefined as number | string | undefined),
   role: props.user?.role ?? 'user',
   language: props.user?.language ?? (undefined as string | undefined),
   currency: props.user?.currency ?? (undefined as string | undefined),
@@ -66,6 +68,14 @@ const onSubmit = () => {
       :error="form.errors.phone"
       name="phone"
       type="tel"
+      fluid
+    />
+    <iNumber
+      v-model="form.age"
+      :error="form.errors.age"
+      name="age"
+      :min="0"
+      :max="150"
       fluid
     />
     <iSelect

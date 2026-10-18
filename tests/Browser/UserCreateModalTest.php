@@ -26,6 +26,7 @@ test('the create button opens a modal with all the user inputs', function () {
         ->assertPresent(DIALOG.' input[name="name"]')
         ->assertPresent(DIALOG.' input[name="email"]')
         ->assertPresent(DIALOG.' input[name="phone"]')
+        ->assertPresent(DIALOG.' input[name="age"]')
         ->assertPresent(DIALOG.' [name="role"]')
         ->assertPresent(DIALOG.' [name="language"]')
         ->assertPresent(DIALOG.' [name="currency"]')
@@ -143,4 +144,53 @@ test('the modal can be used again after a creation', function () {
         ->assertSee('Create User')
         ->assertValue(DIALOG.' input[name="name"]', '')
         ->assertNoJavaScriptErrors();
+});
+
+test('the age is sent to create the user and shown in the list', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->click('Create')
+        ->type(DIALOG.' input[name="name"]', 'Grace Hopper')
+        ->type(DIALOG.' input[name="email"]', 'grace@example.com')
+        ->type(DIALOG.' input[name="age"]', '85')
+        ->click(DIALOG.' button[type="submit"]')
+        ->assertDontSee('Create User')
+        ->assertSee('Grace Hopper')
+        ->assertNoJavaScriptErrors();
+
+    expect(User::firstWhere('email', 'grace@example.com')->age)->toBe(85);
+
+    $age = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[3].textContent.trim())[0]");
+
+    expect($age)->toBe('85');
+});
+
+test('the age is optional to create a user', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->click('Create')
+        ->type(DIALOG.' input[name="name"]', 'Grace Hopper')
+        ->type(DIALOG.' input[name="email"]', 'grace@example.com')
+        ->click(DIALOG.' button[type="submit"]')
+        ->assertDontSee('Create User')
+        ->assertSee('grace@example.com')
+        ->assertNoJavaScriptErrors();
+
+    expect(User::firstWhere('email', 'grace@example.com')->age)->toBeNull();
+});
+
+test('the number inputs have no spin buttons', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    $page->click('Create')
+        ->assertPresent(DIALOG.' input[name="age"]');
+
+    $styles = $page->script("(() => { const input = document.querySelector('[data-pc-name=\"dialog\"] input[name=\"age\"]'); return JSON.stringify({ input: getComputedStyle(input).appearance, inner: getComputedStyle(input, '::-webkit-inner-spin-button').appearance, outer: getComputedStyle(input, '::-webkit-outer-spin-button').appearance }) })()");
+
+    $styles = json_decode($styles, true);
+
+    // `textfield` is what hides them in Firefox, and in Chrome and Safari they have no appearance
+    expect($styles['input'])->toBe('textfield')
+        ->and($styles['inner'])->toBeIn(['none', 'textfield'])
+        ->and($styles['outer'])->toBeIn(['none', 'textfield']);
 });
