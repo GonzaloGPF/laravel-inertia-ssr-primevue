@@ -15,7 +15,7 @@ type Options<T> = {
 
 /**
  * Common logic of the admin views: an `AppDataTable` of models, a modal to
- * create or edit them, and the confirmation to delete them. `table` must be
+ * create or edit them, the page of their details and the confirmation to delete them. `table` must be
  * bound to the table with `ref="table"`.
  *
  * The modal edits the `item` of the row whose `edit` action was clicked, or
@@ -79,6 +79,10 @@ export default function useCrud<T extends { id?: number | string }>(
     if (action === 'edit' && row) {
       item.value = row
       showModal.value = true
+    }
+
+    if (action === 'view' && row) {
+      router.visit(route(`${resource}.show`, row.id))
     }
 
     if (action === 'delete' && row) {

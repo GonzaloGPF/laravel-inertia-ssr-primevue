@@ -16,8 +16,29 @@ it('let admin user view all users', function () {
 });
 
 it('let admin user view specific user', function () {
-    $this->get(route('users.show', User::factory()->create()))
-        ->assertSuccessful();
+    $user = User::factory()->create(['name' => 'Ada Lovelace', 'age' => 36]);
+
+    $this->get(route('users.show', $user))
+        ->assertSuccessful()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Users/UserShow', false)
+            ->where('user.id', $user->id)
+            ->where('user.name', $user->name)
+            ->where('user.age', 36)
+            ->missing('user.password'));
+});
+
+it('wont show a deleted user', function () {
+    $user = User::factory()->create();
+    $user->delete();
+
+    $this->get(route('users.show', $user))
+        ->assertNotFound();
+});
+
+it('wont show a user that does not exist', function () {
+    $this->get(route('users.show', 999999))
+        ->assertNotFound();
 });
 
 it('wont let a user view all users', function () {

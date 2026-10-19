@@ -70,3 +70,11 @@ function rowAction(int $row, string $action): string
 {
     return ".p-datatable-tbody > tr:nth-child($row) button[aria-label=\"$action\"]";
 }
+
+/**
+ * The text of the information shown in a container (by default, the expanded rows of the table), as 'Label|Value' pairs.
+ */
+function infoPairs($page, int $position = 0, string $container = '.p-datatable-row-expansion'): string
+{
+    return (string) $page->script("[...document.querySelectorAll('$container')][$position]?.innerText.split('\\n').map(line => line.trim()).filter(Boolean).join('|')");
+}

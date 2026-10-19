@@ -119,7 +119,7 @@ How a listing is built:
    />
    ```
 
-   `useCrud('user')` gives the create / edit / delete flow (modal, confirmation and refresh) that the page connects to the table. See `resources/js/Pages/Users/UserIndex.vue`.
+   `useCrud('user')` gives the create / edit / delete flow (modal, confirmation and refresh) that the page connects to the table, and the `view` action, which opens the detail page of the row (`Pages/Users/UserShow.vue`). That page keeps the user the backend gives in the `currentUser` of `stores/userStore.ts` and shows it with `UserInfo`. See `resources/js/Pages/Users/UserIndex.vue`.
 
 `AppFilters` shows a global search input (it looks into the `searchable` columns, every word has to match) and an *Advanced* toggle with one input per field of the entity's filters file (`config/filters/userFilters.ts`, one file per entity). Each field says which input to render (`text`, `select`, `auto`, `boolean`, `check`, `number`, `number_range`, `date`), plus its options or visibility. A range is a field with `range: true` (`{ name: 'age', input: 'number_range', range: true }`, or `input: 'date'`), sent as `min_age` and `max_age`. The filters, the sort, the page and the page size live in the url (`?search=ada&role[]=admin&sort=name|asc&page=2&perPage=25`): they can be shared, and the browser back button works.
 

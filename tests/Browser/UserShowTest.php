@@ -15,14 +15,6 @@ function toggleRow($page, int $position): void
     $page->click(".p-datatable-row-toggle-button >> nth=$position");
 }
 
-/**
- * The text of the information shown in the expanded rows, as 'Label|Value' pairs.
- */
-function infoPairs($page, int $expansion = 0): string
-{
-    return (string) $page->script("[...document.querySelectorAll('.p-datatable-row-expansion')][$expansion]?.innerText.split('\\n').map(line => line.trim()).filter(Boolean).join('|')");
-}
-
 function expansions($page): int
 {
     return (int) $page->script("document.querySelectorAll('.p-datatable-row-expansion').length");
