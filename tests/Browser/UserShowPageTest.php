@@ -137,3 +137,37 @@ test('a regular user cannot open the detail of a user', function () {
     $page->assertPathIs('/')
         ->assertDontSee('cara@example.com');
 });
+
+test('the detail sets the title of the page with the name of the user', function () {
+    $page = visit(route('users.show', $this->bob, false));
+
+    $page->assertPresent(INFO_CARD)
+        ->assertTitleContains('Bob Regular')
+        ->assertNoJavaScriptErrors();
+});
+
+test('the back button is placed before the title, in the toolbar of the card', function () {
+    $page = visit(route('users.show', $this->bob, false));
+
+    $page->assertPresent(INFO_CARD);
+
+    $positions = $page->script("(() => { const card = document.querySelector('.p-card-title'); const back = card.querySelector('button').getBoundingClientRect(); const title = [...card.querySelectorAll('div')].find(div => div.textContent.trim() === 'Bob Regular').getBoundingClientRect(); return JSON.stringify({ backFirst: back.right <= title.left + 1, sameLine: Math.abs((back.top + back.bottom) / 2 - (title.top + title.bottom) / 2) < 12 }) })()");
+
+    expect(json_decode($positions, true))->toBe(['backFirst' => true, 'sameLine' => true]);
+});
+
+test('the actions of the toolbar are icon only buttons by default', function () {
+    $page = visit(route('users.show', $this->bob, false));
+
+    $page->assertPresent(INFO_CARD);
+
+    $back = $page->script("(() => { const button = document.querySelector('.p-card-title button'); const rect = button.getBoundingClientRect(); return JSON.stringify({ iconOnly: button.classList.contains('p-button-icon-only'), label: button.querySelectorAll('.p-button-label').length, title: button.getAttribute('title'), ariaLabel: button.getAttribute('aria-label'), squared: Math.abs(rect.width - rect.height) < 0.5 }) })()");
+
+    expect(json_decode($back, true))->toBe([
+        'iconOnly' => true,
+        'label' => 0,
+        'title' => 'Back',
+        'ariaLabel' => 'Back',
+        'squared' => true,
+    ]);
+});

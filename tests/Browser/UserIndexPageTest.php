@@ -215,3 +215,47 @@ test('the shown items are translated', function () {
     $page->assertSee('Mostrando [1-1] de 1 elementos')
         ->assertNoJavaScriptErrors();
 });
+
+test('the new rows of the table fade in', function () {
+    User::factory(30)->create(); // 31 users in total, so there is a second page
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 25);
+
+    // Records the rows that are added to the table, with their classes
+    $page->script("window.__rows = []; new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => { if (node.tagName === 'TR' && node.className.includes('p-row-')) { window.__rows.push(node.className) } }))).observe(document.querySelector('.p-datatable-tbody'), { childList: true })");
+
+    $page->click('.p-datatable-paginator-bottom .p-paginator-next')
+        ->assertQueryStringHas('page', '2');
+
+    expectRows($page, 6);
+
+    $rows = json_decode($page->script('JSON.stringify(window.__rows)'), true);
+
+    expect($rows)->not->toBeEmpty()
+        ->and(collect($rows)->every(fn (string $classes) => str_contains($classes, 'animate-fadein')))->toBeTrue();
+
+    $animation = $page->script("(() => { const style = getComputedStyle(document.querySelector('.p-datatable-tbody > tr')); return style.animationName + ' ' + style.animationDuration })()");
+
+    expect($animation)->toBe('fadein 0.3s');
+});
+
+test('refreshing the table does not replay the fade of the rows that are still there', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    // Waits for the user to be listed: the row of a table without data is a row too
+    for ($attempt = 0; $attempt < 50 && $page->script("document.querySelectorAll('.p-datatable-tbody > tr[class*=\"p-row-\"]').length") !== 1; $attempt++) {
+        usleep(100_000);
+    }
+
+    $page->script("window.__rows = 0; new MutationObserver(mutations => mutations.forEach(mutation => mutation.addedNodes.forEach(node => { if (node.tagName === 'TR' && node.className.includes('p-row-')) { window.__rows++ } }))).observe(document.querySelector('.p-datatable-tbody'), { childList: true })");
+
+    $page->click('[role="search"] button[aria-label="Refresh"]');
+
+    usleep(1_000_000); // The same users are loaded again
+
+    expectRows($page, 1);
+
+    expect($page->script('window.__rows'))->toBe(0);
+});

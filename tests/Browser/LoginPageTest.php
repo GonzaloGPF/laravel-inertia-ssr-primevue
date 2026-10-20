@@ -61,3 +61,10 @@ test('the login form exposes stable name and autocomplete attributes', function 
     $page->assertAttribute('input[name="email"]', 'autocomplete', 'username')
         ->assertAttribute('input[name="password"]', 'autocomplete', 'current-password');
 });
+
+test('the login page sets the title of the page', function () {
+    $page = visit('/login');
+
+    $page->assertTitleContains('Login')
+        ->assertNoJavaScriptErrors();
+});

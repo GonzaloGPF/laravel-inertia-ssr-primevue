@@ -3,7 +3,7 @@ import AppAlert from '@/Components/Core/AppAlert.vue'
 import AppToolbar from '@/Components/Core/AppToolbar.vue'
 import Card from 'primevue/card'
 import { Head } from '@inertiajs/vue3'
-import { ButtonProps } from '@/types/buttons'
+import { ActionName } from '@/types/actions'
 
 type Props = {
   title?: string
@@ -12,22 +12,25 @@ type Props = {
   alert?: string
   alertType?: string
   withoutHead?: boolean
-  buttons?: ButtonProps[]
-  prependButtons?: ButtonProps[]
+  actions?: ActionName[]
+  prependActions?: ActionName[]
+  iconOnly?: boolean
 }
 
 defineEmits(['view', 'create', 'edit', 'delete', 'restore', 'download', 'back'])
-defineProps<Props>()
+withDefaults(defineProps<Props>(), { iconOnly: true })
 </script>
 <template>
   <Card>
-    <Head v-if="!withoutHead" :title="title" />
     <template #title>
+      <Head v-if="!withoutHead" :title="title" />
       <AppToolbar
         :title="title"
-        :buttons="buttons"
-        :prepend-buttons="prependButtons"
+        :actions="actions"
+        :prepend-actions="prependActions"
+        :icon-only="iconOnly"
         @click="$emit($event)"
+        class="p-2"
       />
     </template>
     <template #content>

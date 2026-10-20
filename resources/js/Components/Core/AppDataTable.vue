@@ -107,6 +107,13 @@ const getActions = (item: T): ActionName[] => {
   return ['view', 'edit', isDeleted ? 'restore' : 'delete']
 }
 
+// The rows fade in when they appear (the loaded ones, a new page, the new results of a filter...)
+const pt = {
+  bodyRow: {
+    class: 'animate-fadein animate-duration-300 motion-reduce:animate-none',
+  },
+}
+
 const onPage = (event: DataTablePageEvent) => goTo(event.page + 1, event.rows)
 
 const onSort = (event: DataTableSortEvent) =>
@@ -132,6 +139,7 @@ defineExpose({ refresh })
     :sort-field="sortField"
     :sort-order="sortOrder"
     removable-sort
+    :pt="pt"
     @page="onPage"
     @sort="onSort"
   >
