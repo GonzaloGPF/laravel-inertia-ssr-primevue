@@ -34,6 +34,8 @@ return [
     'create' => 'Crear',
     'login' => 'Iniciar Sesión',
     'register' => 'Registrarse',
+    'expand' => 'Expandir',
+    'collapse' => 'Contraer',
     'edit' => 'Editar',
     'delete' => 'Borrar',
     'back' => 'Regresar',

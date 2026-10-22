@@ -20,6 +20,26 @@ function expansions($page): int
     return (int) $page->script("document.querySelectorAll('.p-datatable-row-expansion').length");
 }
 
+/**
+ * Waits for the given amount of rows to be expanded, as the closing of a row is animated.
+ */
+function expectExpansions($page, int $expected): void
+{
+    $count = -1;
+
+    for ($attempt = 0; $attempt < 30; $attempt++) {
+        $count = expansions($page);
+
+        if ($count === $expected) {
+            break;
+        }
+
+        usleep(100_000);
+    }
+
+    expect($count)->toBe($expected);
+}
+
 beforeEach(function () {
     $this->admin = User::factory()->admin()->create([
         'name' => 'Ada Admin',
@@ -100,7 +120,7 @@ test('each row expands on its own', function () {
 
     toggleRow($page, 1); // Collapses Cara, the second one is now the row of Bob
 
-    expect(expansions($page))->toBe(1);
+    expectExpansions($page, 1);
 });
 
 test('the empty values are shown with a dash', function () {
@@ -162,3 +182,93 @@ function infoRole(User $user): string
 {
     return $user->role === Roles::ADMIN ? 'Admin' : 'User';
 }
+
+test('an expanded row opens growing its height, as it fades in', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    // Samples, frame by frame, the height and the opacity of the row while it opens
+    $samples = json_decode($page->script("new Promise(resolve => { const samples = []; const start = performance.now(); document.querySelector('.p-datatable-row-toggle-button').click(); const tick = () => { const row = document.querySelector('.p-datatable-row-expansion'); if (row) { samples.push({ height: row.getBoundingClientRect().height, opacity: Number(getComputedStyle(row.querySelector('.animate-expand')).opacity) }) } if (performance.now() - start < 700) { requestAnimationFrame(tick) } else { resolve(JSON.stringify(samples)) } }; requestAnimationFrame(tick) })"), true);
+
+    $heights = array_column($samples, 'height');
+    $opacities = array_column($samples, 'opacity');
+    $natural = end($heights);
+
+    expect($samples)->not->toBeEmpty()
+        ->and($heights[0])->toBeLessThan($natural / 2) // It starts almost closed
+        ->and($heights)->toBe(collect($heights)->sort()->values()->all()) // And only grows
+        ->and(count(array_unique($heights)))->toBeGreaterThan(3) // Through several heights, not at once
+        ->and($opacities[0])->toBeLessThan(1)
+        ->and(end($opacities))->toEqual(1);
+});
+
+test('an expanded row closes shrinking its height, as it fades out, and is then removed', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    toggleRow($page, 0);
+
+    $page->assertPresent(INFO);
+
+    usleep(600_000); // Its opening has ended
+
+    $samples = json_decode($page->script("new Promise(resolve => { const samples = []; const start = performance.now(); document.querySelector('.p-datatable-row-toggle-button').click(); const tick = () => { const row = document.querySelector('.p-datatable-row-expansion'); samples.push(row ? { height: row.getBoundingClientRect().height, opacity: Number(getComputedStyle(row.querySelector('.animate-collapse')).opacity) } : null); if (performance.now() - start < 700) { requestAnimationFrame(tick) } else { resolve(JSON.stringify(samples)) } }; requestAnimationFrame(tick) })"), true);
+
+    $closing = array_values(array_filter($samples));
+    $heights = array_column($closing, 'height');
+    $opacities = array_column($closing, 'opacity');
+
+    expect($closing)->not->toBeEmpty()
+        ->and(max($heights))->toBeGreaterThan(80) // It starts open
+        ->and($heights)->toBe(collect($heights)->sortDesc()->values()->all()) // And only shrinks
+        ->and(count(array_unique($heights)))->toBeGreaterThan(3) // Through several heights, not at once
+        ->and($opacities)->toBe(collect($opacities)->sortDesc()->values()->all())
+        ->and(min($heights))->toBeLessThan(max($heights) / 2) // Until it is almost closed, depending on the frames drawn
+        ->and(end($samples))->toBeNull(); // And then the row is removed
+
+    expect(expansions($page))->toBe(0);
+});
+
+test('the toggle says what it does and a closed row can be opened again', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    $state = fn () => (string) $page->script("(() => { const button = document.querySelector('.p-datatable-row-toggle-button'); return button.getAttribute('aria-label') + ':' + button.getAttribute('aria-expanded') })()");
+
+    expect($state())->toBe('Expand:false');
+
+    toggleRow($page, 0);
+
+    $page->assertPresent(INFO);
+
+    expect($state())->toBe('Collapse:true');
+
+    toggleRow($page, 0);
+    expectExpansions($page, 0);
+
+    expect($state())->toBe('Expand:false');
+
+    toggleRow($page, 0);
+
+    $page->assertPresent(INFO)
+        ->assertNoJavaScriptErrors();
+});
+
+test('clicking a row that is closing does not reopen it', function () {
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 3);
+
+    toggleRow($page, 0);
+
+    $page->assertPresent(INFO);
+
+    usleep(600_000);
+
+    $page->script("(() => { const button = document.querySelector('.p-datatable-row-toggle-button'); button.click(); button.click() })()");
+
+    expectExpansions($page, 0);
+});

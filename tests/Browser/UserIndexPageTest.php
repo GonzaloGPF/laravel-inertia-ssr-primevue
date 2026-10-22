@@ -259,3 +259,19 @@ test('refreshing the table does not replay the fade of the rows that are still t
 
     expect($page->script('window.__rows'))->toBe(0);
 });
+
+test('the rows fade in one after the other, up to a limit', function () {
+    User::factory(30)->create(); // 31 users in total
+
+    $page = visit(route('users.index', absolute: false));
+
+    expectRows($page, 25);
+
+    $delays = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr[class*=p-row-]')].map(row => getComputedStyle(row).animationDelay).join(' ')");
+    $fill = $page->script("getComputedStyle(document.querySelector('.p-datatable-tbody > tr[class*=p-row-]')).animationFillMode");
+
+    expect(explode(' ', $delays))->toHaveCount(25)
+        ->and(array_slice(explode(' ', $delays), 0, 4))->toBe(['0s', '0.035s', '0.07s', '0.105s'])
+        ->and(array_slice(explode(' ', $delays), 14))->each->toBe('0.49s') // The rows from the 15th fade in together
+        ->and($fill)->toBe('backwards'); // So they are hidden until their turn
+});

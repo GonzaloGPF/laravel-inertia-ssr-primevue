@@ -6,7 +6,10 @@ import { useFlashMessages } from '@/stores/flashMessages'
 import { Translator } from '@/objects/Translator'
 import { ActionName } from '@/types/actions'
 
-type TableInstance = { refresh: () => void }
+type TableInstance = {
+  refresh: () => void
+  removeRow: (id: number | string) => Promise<void>
+}
 
 type Options<T> = {
   /** Returns the reason why a row can't be deleted, if there is any. */
@@ -65,7 +68,7 @@ export default function useCrud<T extends { id?: number | string }>(
       preserveState: true,
       preserveScroll: true,
       onStart: () => (deleting.value = true),
-      onSuccess: () => table.value?.refresh(),
+      onSuccess: () => table.value?.removeRow(row.id as number | string),
       onFinish: () => (deleting.value = false),
     })
   }

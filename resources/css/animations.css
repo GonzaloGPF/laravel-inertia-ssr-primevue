@@ -1,0 +1,33 @@
+/*
+ * The content grows from nothing to its own height, as it fades in (`expand`), and the other way
+ * round (`collapse`). They are for a `grid` that has a child with `overflow-hidden` and `min-h-0`:
+ * the height of the row of the grid is what moves. `collapse` keeps the end, to wait to be removed.
+ */
+@theme {
+  --animate-expand: expand 0.25s ease-out;
+  --animate-collapse: collapse 0.25s ease-in forwards;
+
+  @keyframes expand {
+    from {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+
+    to {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+  }
+
+  @keyframes collapse {
+    from {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    to {
+      grid-template-rows: 0fr;
+      opacity: 0;
+    }
+  }
+}

@@ -34,6 +34,8 @@ return [
     'create' => 'Create',
     'login' => 'Login',
     'register' => 'Register',
+    'expand' => 'Expand',
+    'collapse' => 'Collapse',
     'edit' => 'Edit',
     'delete' => 'Delete',
     'back' => 'Back',

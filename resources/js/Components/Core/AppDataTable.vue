@@ -1,9 +1,13 @@
 <script setup lang="ts" generic="T extends object">
+import Button from 'primevue/button'
 import Column from 'primevue/column'
 import DataTable, {
   type DataTablePageEvent,
   type DataTableSortEvent,
 } from 'primevue/datatable'
+import ChevronDownIcon from '@primevue/icons/chevrondown'
+import ChevronRightIcon from '@primevue/icons/chevronright'
+import { omit } from 'lodash-es'
 import { computed, ref, toRef } from 'vue'
 import type { Component } from 'vue'
 import AppButtons from '@/Components/Core/AppButtons.vue'
@@ -30,6 +34,10 @@ type Props = {
 }
 
 const ROWS_PER_PAGE_OPTIONS = [10, 25, 50, 100]
+const COLLAPSE_MS = 300 // A bit more than the animation of the closing of a row
+const LEAVE_MS = 300 // The animation of a row that leaves
+const STAGGER_MS = 35 // Delay between the fade of one row and the next one
+const STAGGER_ROWS = 14 // The rows from this one on fade in together
 const PAGINATOR_TEMPLATE =
   'CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink RowsPerPageDropdown'
 
@@ -47,7 +55,9 @@ const {
   sortBy,
   refresh,
 } = useDataTable<T>(toRef(props, 'src'))
-const expandedRows = ref({})
+const expandedRows = ref<Record<string, boolean>>({})
+const closingRows = ref<Record<string, boolean>>({}) // Rows that are closing, still expanded until it ends
+const leavingRows = ref<Record<string, boolean>>({}) // Rows that were deleted, leaving until the items are loaded again
 
 const first = computed(() => (currentPage.value - 1) * perPage.value)
 
@@ -107,11 +117,106 @@ const getActions = (item: T): ActionName[] => {
   return ['view', 'edit', isDeleted ? 'restore' : 'delete']
 }
 
-// The rows fade in when they appear (the loaded ones, a new page, the new results of a filter...)
+// The rows fade in when they appear (the loaded ones, a new page, the new results of a filter...),
+// one after the other: the delay grows with the position of the row, up to a limit
 const pt = {
-  bodyRow: {
-    class: 'animate-fadein animate-duration-300 motion-reduce:animate-none',
-  },
+  rowExpansionCell: { class: '!p-0' }, // The padding is in the content, so the row can start with no height
+  bodyRow: ({ context }: { context: { index: number } }) =>
+    isLeaving(context.index)
+      ? {
+          class:
+            'animate-fadeoutright animate-duration-300 animate-fill-forwards motion-reduce:animate-none',
+          style: { animationDelay: '0ms' },
+        }
+      : {
+          class:
+            'animate-fadein animate-duration-300 animate-fill-backwards motion-reduce:animate-none',
+          style: {
+            animationDelay: `${Math.min(context.index, STAGGER_ROWS) * STAGGER_MS}ms`,
+          },
+        },
+}
+
+const getRowId = (item: object) => String((item as Record<string, unknown>).id)
+
+// An expanded row that is not closing
+const isOpen = (item: T) =>
+  !!expandedRows.value[getRowId(item)] && !closingRows.value[getRowId(item)]
+
+const isLeaving = (index: number) => {
+  const item = items.value[index]
+
+  return !!item && !!leavingRows.value[getRowId(item)]
+}
+
+const isClosing = (item: T) => !!closingRows.value[getRowId(item)]
+
+const prefersReducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+const collapse = (id: string) => {
+  expandedRows.value = omit(expandedRows.value, id)
+  closingRows.value = omit(closingRows.value, id)
+}
+
+// The row of PrimeVue is removed as soon as it is collapsed, so it is collapsed
+// when its closing animation ends, or after a while if that is never notified
+const closeRow = (id: string) => {
+  if (prefersReducedMotion()) {
+    return collapse(id)
+  }
+
+  closingRows.value = { ...closingRows.value, [id]: true }
+  window.setTimeout(() => collapse(id), COLLAPSE_MS)
+}
+
+const toggleRow = (item: T) => {
+  const id = getRowId(item)
+
+  if (isClosing(item)) {
+    return
+  }
+
+  if (expandedRows.value[id]) {
+    return closeRow(id)
+  }
+
+  expandedRows.value = { ...expandedRows.value, [id]: true }
+}
+
+/**
+ * Removes a row that has been deleted: it leaves with an animation, it is taken out of the
+ * table right away, and the items are loaded again to know what takes its place.
+ * It does not delete anything by itself.
+ */
+const removeRow = async (id: number | string) => {
+  const key = String(id)
+
+  if (!items.value.some((item) => getRowId(item) === key)) {
+    return refresh()
+  }
+
+  if (expandedRows.value[key]) {
+    closeRow(key)
+  }
+
+  leavingRows.value = { ...leavingRows.value, [key]: true }
+
+  if (!prefersReducedMotion()) {
+    await new Promise((resolve) => window.setTimeout(resolve, LEAVE_MS))
+  }
+
+  items.value = items.value.filter((item) => getRowId(item) !== key)
+  total.value = Math.max(total.value - 1, 0)
+  leavingRows.value = omit(leavingRows.value, key)
+
+  await refresh()
+}
+
+const onDetailsAnimationEnd = (item: T) => {
+  if (isClosing(item)) {
+    collapse(getRowId(item))
+  }
 }
 
 const onPage = (event: DataTablePageEvent) => goTo(event.page + 1, event.rows)
@@ -119,11 +224,11 @@ const onPage = (event: DataTablePageEvent) => goTo(event.page + 1, event.rows)
 const onSort = (event: DataTableSortEvent) =>
   sortBy(event.sortField as string | undefined, event.sortOrder)
 
-defineExpose({ refresh })
+defineExpose({ refresh, removeRow })
 </script>
 <template>
   <DataTable
-    v-model:expanded-rows="expandedRows"
+    :expanded-rows="expandedRows"
     :value="items"
     :loading="loading"
     :first="first"
@@ -169,7 +274,26 @@ defineExpose({ refresh })
       </div>
     </template>
 
-    <Column v-if="details" expander class="w-12" />
+    <Column v-if="details" class="w-12">
+      <template #body="{ data }">
+        <Button
+          :aria-label="
+            Translator.actionTitle(isOpen(data) ? 'collapse' : 'expand')
+          "
+          :aria-expanded="isOpen(data)"
+          class="p-datatable-row-toggle-button"
+          severity="secondary"
+          text
+          rounded
+          @click="toggleRow(data)"
+        >
+          <template #icon>
+            <ChevronDownIcon v-if="isOpen(data)" />
+            <ChevronRightIcon v-else />
+          </template>
+        </Button>
+      </template>
+    </Column>
 
     <Column
       v-for="column in tableColumns"
@@ -207,8 +331,20 @@ defineExpose({ refresh })
     </template>
 
     <template v-if="details" #expansion="{ data }">
-      <div class="px-4 py-3">
-        <component :is="details" v-bind="{ [detailsProp ?? 'item']: data }" />
+      <!-- The row opens as its content grows: a row can't animate its height, but this grid can -->
+      <div
+        :class="isClosing(data) ? 'animate-collapse' : 'animate-expand'"
+        class="grid motion-reduce:animate-none"
+        @animationend="onDetailsAnimationEnd(data)"
+      >
+        <div class="min-h-0 overflow-hidden">
+          <div class="px-4 py-3">
+            <component
+              :is="details"
+              v-bind="{ [detailsProp ?? 'item']: data }"
+            />
+          </div>
+        </div>
       </div>
     </template>
   </DataTable>
