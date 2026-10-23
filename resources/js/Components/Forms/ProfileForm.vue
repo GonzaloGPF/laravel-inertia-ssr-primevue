@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppForm from '@/Components/Core/AppForm.vue'
+import iImage from '@/Components/Inputs/iImage.vue'
 import iSelect from '@/Components/Inputs/iSelect.vue'
 import iText from '@/Components/Inputs/iText.vue'
 import useForm from '@/composables/useForm.js'
@@ -9,6 +10,8 @@ import AppField from '@/Components/Core/AppField.vue'
 
 // TODO: use this
 defineProps<{ mustVerifyEmail?: boolean }>()
+const AVATAR_TYPES = 'image/jpeg,image/png,image/webp'
+
 const { user } = useAuth()
 
 const { form } = useForm({
@@ -16,14 +19,20 @@ const { form } = useForm({
   email: user.value?.email,
   language: user.value?.language,
   currency: user.value?.currency,
+  avatar: null as File | null,
+  remove_avatar: false,
 })
 const onSubmit = () => {
-  form.put(route('profile.update'), {
-    onSuccess: ({ props }) => {
-      form.defaults(props.auth.user)
-      Translator.setLocale(props.auth.user.language)
-    },
-  })
+  // A file cannot go in a PUT request: it is sent as a POST that Laravel handles as a PUT
+  form
+    .transform((data) => ({ ...data, _method: 'put' }))
+    .post(route('profile.update'), {
+      onSuccess: ({ props }) => {
+        form.defaults(props.auth.user)
+        form.reset('avatar', 'remove_avatar')
+        Translator.setLocale(props.auth.user.language)
+      },
+    })
 }
 </script>
 <template>
@@ -35,6 +44,15 @@ const onSubmit = () => {
     <AppField
       :label="Translator.tl('profile_info')"
       :value="Translator.t('help.profile_info')"
+    />
+    <iImage
+      v-model="form.avatar"
+      v-model:removed="form.remove_avatar"
+      :current="user?.avatar_url"
+      :fallback="user?.name"
+      :error="form.errors.avatar"
+      :accept="AVATAR_TYPES"
+      name="avatar"
     />
     <iText
       v-model="form.name"

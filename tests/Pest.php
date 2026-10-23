@@ -73,8 +73,77 @@ function rowAction(int $row, string $action): string
 
 /**
  * The text of the information shown in a container (by default, the expanded rows of the table), as 'Label|Value' pairs.
+ * The initials of an avatar without image are not information, so they are left out.
  */
 function infoPairs($page, int $position = 0, string $container = '.p-datatable-row-expansion'): string
 {
-    return (string) $page->script("[...document.querySelectorAll('$container')][$position]?.innerText.split('\\n').map(line => line.trim()).filter(Boolean).join('|')");
+    return (string) $page->script(<<<JS
+        (() => {
+            const element = [...document.querySelectorAll('$container')][$position]
+            const initials = element?.querySelector('.p-avatar')?.innerText.trim()
+            const lines = element?.innerText.split('\\n').map(line => line.trim()).filter(Boolean) ?? []
+
+            return (initials && lines[0] === initials ? lines.slice(1) : lines).join('|')
+        })()
+    JS);
+}
+
+/**
+ * An image in a file the browser can upload, named as the user would have it.
+ */
+function imageToUpload(string $name = 'avatar.png'): string
+{
+    $path = sys_get_temp_dir().'/'.$name;
+
+    imagepng(imagecreatetruecolor(64, 64), $path);
+
+    return $path;
+}
+
+/**
+ * Starts to record the requests the page sends. The server of the browser tests does not read multipart
+ * requests, so what the files do in the backend is tested in the feature tests, and here what the page sends.
+ */
+function recordRequests($page): void
+{
+    $page->script(<<<'JS'
+        (() => {
+            window.__requests = []
+            const open = XMLHttpRequest.prototype.open
+            const send = XMLHttpRequest.prototype.send
+            XMLHttpRequest.prototype.open = function (method, url) {
+                this.__info = { method, url }
+                return open.apply(this, arguments)
+            }
+            XMLHttpRequest.prototype.send = function (body) {
+                const fields = body instanceof FormData
+                    ? Object.fromEntries([...body.entries()].map(([key, value]) => [key, value instanceof File ? 'file:' + value.name : value]))
+                    : body
+                window.__requests.push({ ...this.__info, body: fields })
+                return send.apply(this, arguments)
+            }
+        })()
+    JS);
+}
+
+/**
+ * The first request recorded that is not a GET, waiting for the page to send it.
+ */
+function sentRequest($page): array
+{
+    $requests = [];
+
+    for ($attempt = 0; $attempt < 50; $attempt++) {
+        $requests = json_decode($page->script("JSON.stringify(window.__requests.filter(request => request.method !== 'GET'))"), true);
+
+        if ($requests) {
+            break;
+        }
+
+        usleep(100_000);
+    }
+
+    expect($requests)->not->toBeEmpty();
+
+    return $requests[0];
 }

@@ -1,10 +1,19 @@
+import AppAvatar from '@/Components/Core/AppAvatar.vue'
 import AppChip from '@/Components/Core/AppChip.vue'
 import { Translator } from '@/objects/Translator'
 import { User } from '@/types'
 import { TableColumn } from '@/types/table'
 
 export const userColumns: TableColumn<User>[] = [
-  { field: 'name' },
+  {
+    field: 'name',
+    component: AppAvatar,
+    props: (user) => ({
+      src: user.avatar_url,
+      name: user.name,
+      showName: true,
+    }),
+  },
   { field: 'email' },
   { field: 'age' },
   {

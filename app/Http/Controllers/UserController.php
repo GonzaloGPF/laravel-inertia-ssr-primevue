@@ -12,6 +12,8 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
+    private const AVATAR_FIELDS = ['avatar', 'remove_avatar'];
+
     public function show(User $user): Response
     {
         return Inertia::render('Users/UserShow', ['user' => $user]);
@@ -29,9 +31,11 @@ class UserController extends Controller
 
     public function store(UserRequest $request): RedirectResponse
     {
-        User::create(array_merge($request->validated(), [
+        $user = User::create(array_merge($request->safe()->except(self::AVATAR_FIELDS), [
             'password' => config('app.default_password'),
         ]));
+
+        $user->syncFile('avatar', $request->file('avatar'), $request->boolean('remove_avatar'));
 
         $this->flashMessage(tAction('created', 'user'));
 
@@ -47,7 +51,9 @@ class UserController extends Controller
 
     public function update(User $user, UserRequest $request): RedirectResponse
     {
-        $user->update($request->validated());
+        $user->update($request->safe()->except(self::AVATAR_FIELDS));
+
+        $user->syncFile('avatar', $request->file('avatar'), $request->boolean('remove_avatar'));
 
         $this->flashMessage(tAction('updated', 'user'));
 

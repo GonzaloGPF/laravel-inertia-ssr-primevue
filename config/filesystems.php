@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Files Disk
+    |--------------------------------------------------------------------------
+    |
+    | The disk where the models with files (the HasFiles trait) keep them. It is
+    | "public" locally, "s3" in production and "testing" when running the tests.
+    | Each File remembers the disk it was saved in, so this can change safely.
+    |
+    */
+
+    'files_disk' => env('FILES_DISK', 'public'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |
@@ -40,6 +53,14 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'testing' => [
+            'driver' => 'local',
+            'root' => storage_path('framework/testing/disks/testing'),
+            'url' => env('APP_URL').'/storage-testing',
             'visibility' => 'public',
             'throw' => false,
         ],

@@ -11,6 +11,7 @@ export interface User {
   password?: string
   currency?: string
   language?: string
+  avatar_url?: string | null
 }
 
 export type PageProps<

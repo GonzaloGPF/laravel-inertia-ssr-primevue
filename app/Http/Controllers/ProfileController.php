@@ -29,13 +29,15 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $request->user()->fill($request->safe()->except(['avatar', 'remove_avatar']));
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
         $request->user()->save();
+
+        $request->user()->syncFile('avatar', $request->file('avatar'), $request->boolean('remove_avatar'));
 
         $this->flashMessage(tAction('updated', 'user'));
 

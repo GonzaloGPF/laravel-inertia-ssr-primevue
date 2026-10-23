@@ -3,7 +3,7 @@ import { onBeforeUnmount, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import UserInfo from '@/Components/Info/UserInfo.vue'
 import ShowLayout from '@/Layouts/ShowLayout.vue'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/models/userStore'
 import { User } from '@/types'
 
 const props = defineProps<{ user: User }>()

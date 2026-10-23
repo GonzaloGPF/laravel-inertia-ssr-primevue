@@ -152,6 +152,7 @@ return [
         'amount' => 'amount',
         'area' => 'area',
         'available' => 'available',
+        'avatar' => 'avatar',
         'birthday' => 'birthday',
         'body' => 'body',
         'city' => 'city',

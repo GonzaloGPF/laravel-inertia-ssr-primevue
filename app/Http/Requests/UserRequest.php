@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\Currencies;
 use App\Enums\Languages;
 use App\Enums\Roles;
+use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -37,6 +38,8 @@ class UserRequest extends FormRequest
                 'age' => 'nullable|integer|min:0|max:150',
                 'language' => ['nullable', new Enum(Languages::class)],
                 'currency' => ['nullable', new Enum(Currencies::class)],
+                'avatar' => User::fileRules('avatar'),
+                'remove_avatar' => 'boolean',
             ];
         } else {
             return [
@@ -47,6 +50,8 @@ class UserRequest extends FormRequest
                 'age' => 'nullable|integer|min:0|max:150',
                 'language' => ['nullable', new Enum(Languages::class)],
                 'currency' => ['nullable', new Enum(Currencies::class)],
+                'avatar' => User::fileRules('avatar'),
+                'remove_avatar' => 'boolean',
             ];
         }
     }

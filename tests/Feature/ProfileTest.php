@@ -3,6 +3,8 @@
 use App\Enums\Currencies;
 use App\Enums\Languages;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
@@ -121,4 +123,72 @@ test('correct password must be provided to delete account', function () {
         ->assertRedirect('/profile');
 
     expect($user->fresh())->not->toBeNull();
+});
+
+test('the avatar can be changed with a post that is handled as a put, as the form sends the files', function () {
+    Storage::fake('testing');
+    $user = User::factory()->create();
+    $previous = $user->saveFile(UploadedFile::fake()->image('old.png'), 'avatar');
+
+    $this->actingAs($user)
+        ->post('/profile', [
+            '_method' => 'put',
+            'name' => 'Test User',
+            'email' => $user->email,
+            'avatar' => UploadedFile::fake()->image('new.png'),
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect('/profile');
+
+    $avatar = $user->fresh()->avatar;
+
+    expect($avatar->name)->toBe('new.png')
+        ->and($user->files()->count())->toBe(1);
+
+    Storage::disk('testing')->assertMissing($previous->path);
+    Storage::disk('testing')->assertExists($avatar->path);
+});
+
+test('the avatar is kept when the profile is updated without one', function () {
+    Storage::fake('testing');
+    $user = User::factory()->create();
+    $avatar = $user->saveFile(UploadedFile::fake()->image('me.png'), 'avatar');
+
+    $this->actingAs($user)
+        ->put('/profile', ['name' => 'Test User', 'email' => $user->email])
+        ->assertSessionHasNoErrors();
+
+    expect($user->fresh()->avatar->is($avatar))->toBeTrue();
+});
+
+test('the avatar can be removed', function () {
+    Storage::fake('testing');
+    $user = User::factory()->create();
+    $avatar = $user->saveFile(UploadedFile::fake()->image('me.png'), 'avatar');
+
+    $this->actingAs($user)
+        ->put('/profile', ['name' => 'Test User', 'email' => $user->email, 'remove_avatar' => true])
+        ->assertSessionHasNoErrors();
+
+    expect($user->fresh()->avatar)->toBeNull();
+
+    Storage::disk('testing')->assertMissing($avatar->path);
+});
+
+test('the avatar must be an image', function () {
+    Storage::fake('testing');
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post('/profile', [
+            '_method' => 'put',
+            'name' => 'Test User',
+            'email' => $user->email,
+            'avatar' => UploadedFile::fake()->create('avatar.pdf', 10, 'application/pdf'),
+        ])
+        ->assertSessionHasErrors('avatar');
+
+    expect($user->fresh()->avatar)->toBeNull();
+
+    Storage::disk('testing')->assertDirectoryEmpty('/');
 });

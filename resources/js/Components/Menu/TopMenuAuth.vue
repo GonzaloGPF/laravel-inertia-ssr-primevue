@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { MenuItem } from 'primevue/menuitem'
+import AppAvatar from '@/Components/Core/AppAvatar.vue'
 import AppButton from '@/Components/Core/AppButton.vue'
 import useAuth from '@/composables/useAuth'
 import { Translator } from '@/objects/Translator'
@@ -57,9 +58,12 @@ const menuItems = computed<MenuItem[]>(() =>
 )
 </script>
 <template>
-  <AppButton
-    :label="isLogged ? user?.name : Translator.actionTitle('enter')"
-    :menu-items="menuItems"
-    text
-  />
+  <div class="flex items-center gap-1">
+    <AppAvatar v-if="isLogged" :src="user?.avatar_url" :name="user?.name" />
+    <AppButton
+      :label="isLogged ? user?.name : Translator.actionTitle('enter')"
+      :menu-items="menuItems"
+      text
+    />
+  </div>
 </template>

@@ -17,7 +17,7 @@ function sortHeader(int $column): string
  */
 function listedNames($page): string
 {
-    return (string) $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[2].textContent.trim()).join(',')");
+    return (string) $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[2].querySelector(':scope > div > span').textContent.trim()).join(',')");
 }
 
 /**

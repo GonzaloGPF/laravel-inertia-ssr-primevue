@@ -72,7 +72,9 @@ app/
   Filters/             Model filters (EloquentFilter): Filter.php is the base one
   Http/Controllers/    Thin controllers, they render Inertia pages
   Policies/            Authorization rules
+  Services/            FileService: saves and deletes the files of the models
   Traits/IsFilterable  Filtering and pagination for the models
+  Traits/HasFiles      Files (avatars...) for the models
 lang/{en,es}/          Translations, shared with the frontend
 resources/js/
   Pages/               Inertia pages, one folder per section
@@ -127,6 +129,35 @@ How a listing is built:
 A table can also expand its rows with `:details="UserInfo"` (an Info component, `details-prop` names the prop that receives the row, `item` by default): the column to expand them only exists when `details` is given.
 
 The columns are sortable by the backend: click a header to sort ascending, again for descending, and a third time to remove the sort. A column that must not be sortable declares `without_sort: true` in `config/columns.ts`.
+
+## Files
+
+Any model can own files with the `HasFiles` trait (and `HasFilesInterface`). The files are rows of the polymorphic `files` table that hold only the `path` and the `disk` where they were saved: the `url` is calculated, and the physical files live in the disk of `config('filesystems.files_disk')` (`FILES_DISK`: `public` locally, `s3` in production, and a temporary folder in the tests). With the `public` disk, run `vendor/bin/sail artisan storage:link` once.
+
+The model declares its collections of files, and the `FileService` (which the trait reaches) saves them, replaces them and deletes them, physical files included:
+
+```php
+class User extends Authenticatable implements HasFilesInterface
+{
+    use HasFiles;
+
+    public function fileCollections(): array
+    {
+        return ['avatar' => ['single' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'webp'], 'max' => 2048]];
+    }
+
+    public function avatar(): MorphOne
+    {
+        return $this->fileOf('avatar');
+    }
+}
+
+$user->saveFile($request->file('avatar'), 'avatar'); // saves it, or replaces the previous one of a single file collection
+$user->deleteFile('avatar');
+$request->validate(['avatar' => User::fileRules('avatar')]); // the rules come from the collection
+```
+
+The files of a model are deleted with it (a soft deleted model keeps them until it is force deleted). `$user->syncFile('avatar', $upload, $remove)` is what the forms use (saves the upload, or deletes the file when asked). The user's avatar is chosen in the users form and in the profile with the `iImage` input and shown with `AppAvatar`, which falls back to the initials of the name. As a file cannot go in a PUT request, a form that uploads a file to an update sends a POST with `_method: 'put'`.
 
 ## Conventions
 

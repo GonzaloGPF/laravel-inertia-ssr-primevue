@@ -3,6 +3,9 @@
 use App\Enums\Roles;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -146,4 +149,40 @@ it('sorts the users of the table with the sort input', function () {
 it('does not fail with a sort that cannot be applied', function () {
     usersData(['sort' => 'nope|asc'])->assertSuccessful();
     usersData(['sort' => 'name|sideways'])->assertSuccessful();
+});
+
+it('shows the url of the avatar of the user, if there is one', function () {
+    Storage::fake('testing');
+    $user = User::factory()->create();
+    $withoutAvatar = User::factory()->create();
+    $avatar = $user->saveFile(UploadedFile::fake()->image('me.png'), 'avatar');
+
+    $this->get(route('users.show', $user))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('user.avatar_url', $avatar->url)
+            ->missing('user.avatar'));
+
+    $this->get(route('users.show', $withoutAvatar))
+        ->assertInertia(fn (Assert $page) => $page->where('user.avatar_url', null));
+});
+
+it('shows the avatar of the logged user in the shared props', function () {
+    Storage::fake('testing');
+    $avatar = $this->user->saveFile(UploadedFile::fake()->image('me.png'), 'avatar');
+
+    $this->get(route('users.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('auth.user.avatar_url', $avatar->url));
+});
+
+it('lists the users with their avatars without a query for each one', function () {
+    Storage::fake('testing');
+    User::factory(3)->create()->each->saveFile(UploadedFile::fake()->image('me.png'), 'avatar');
+
+    DB::enableQueryLog();
+
+    usersData()->assertSuccessful();
+
+    $queries = collect(DB::getQueryLog())->filter(fn (array $query) => str_contains($query['query'], 'from `files`'));
+
+    expect($queries)->toHaveCount(1);
 });

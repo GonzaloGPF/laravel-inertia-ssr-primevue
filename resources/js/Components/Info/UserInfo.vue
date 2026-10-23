@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import AppAvatar from '@/Components/Core/AppAvatar.vue'
 import AppField from '@/Components/Core/AppField.vue'
 import { Translator } from '@/objects/Translator'
 import { User } from '@/types'
@@ -33,13 +34,18 @@ const getValue = (value?: InputValue | null) =>
   value === undefined || value === null || value === '' ? EMPTY : value
 </script>
 <template>
-  <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
-    <AppField
-      v-for="field in fields"
-      :key="field.name"
-      :label="Translator.translate(field.name)"
-      :value="getValue(field.value)"
-      class="flex flex-col [&>span:first-child]:text-xs [&>span:first-child]:opacity-70"
-    />
+  <div class="flex items-start gap-6">
+    <AppAvatar :src="user.avatar_url" :name="user.name" size="xlarge" />
+    <div
+      class="grid flex-1 grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4"
+    >
+      <AppField
+        v-for="field in fields"
+        :key="field.name"
+        :label="Translator.translate(field.name)"
+        :value="getValue(field.value)"
+        class="flex flex-col [&>span:first-child]:text-xs [&>span:first-child]:opacity-70"
+      />
+    </div>
   </div>
 </template>

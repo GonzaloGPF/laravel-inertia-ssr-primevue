@@ -152,6 +152,7 @@ return [
         'amount' => 'cantidad',
         'area' => 'área',
         'available' => 'disponible',
+        'avatar' => 'avatar',
         'birthday' => 'cumpleaños',
         'body' => 'contenido',
         'city' => 'ciudad',

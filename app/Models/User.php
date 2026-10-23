@@ -6,13 +6,16 @@ namespace App\Models;
 use App\Enums\Currencies;
 use App\Enums\Languages;
 use App\Enums\Roles;
+use App\Interfaces\HasFilesInterface;
 use App\Notifications\ResetPassword;
+use App\Traits\HasFiles;
 use App\Traits\IsFilterable;
 use App\Traits\NameFormatter;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,9 +25,10 @@ use Illuminate\Support\Str;
 /**
  * @mixin IdeHelperUser
  */
-class User extends Authenticatable implements HasLocalePreference, MustVerifyEmail
+class User extends Authenticatable implements HasFilesInterface, HasLocalePreference, MustVerifyEmail
 {
     use HasFactory,
+        HasFiles,
         IsFilterable,
         NameFormatter,
         Notifiable,
@@ -44,6 +48,18 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected $hidden = [
         'password',
         'remember_token',
+        'avatar',
+    ];
+
+    protected $appends = [
+        'avatar_url',
+    ];
+
+    /**
+     * The avatar is shown wherever the user is: in the lists and in the menu of the logged one.
+     */
+    protected $with = [
+        'avatar',
     ];
 
     /**
@@ -69,6 +85,18 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
         ];
     }
 
+    public function fileCollections(): array
+    {
+        return [
+            'avatar' => ['single' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'webp'], 'max' => 2048],
+        ];
+    }
+
+    public function avatar(): MorphOne
+    {
+        return $this->fileOf('avatar');
+    }
+
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPassword($token));
@@ -82,6 +110,11 @@ class User extends Authenticatable implements HasLocalePreference, MustVerifyEma
     protected function password(): Attribute
     {
         return Attribute::set(fn ($value) => Hash::make($value));
+    }
+
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::get(fn () => $this->avatar?->url);
     }
 
     protected function email(): Attribute
