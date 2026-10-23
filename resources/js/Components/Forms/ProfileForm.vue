@@ -6,7 +6,6 @@ import iText from '@/Components/Inputs/iText.vue'
 import useForm from '@/composables/useForm.js'
 import useAuth from '@/composables/useAuth'
 import { Translator } from '@/objects/Translator'
-import AppField from '@/Components/Core/AppField.vue'
 
 // TODO: use this
 defineProps<{ mustVerifyEmail?: boolean }>()
@@ -41,10 +40,6 @@ const onSubmit = () => {
     :loading="form.processing"
     @submit="onSubmit"
   >
-    <AppField
-      :label="Translator.tl('profile_info')"
-      :value="Translator.t('help.profile_info')"
-    />
     <iImage
       v-model="form.avatar"
       v-model:removed="form.remove_avatar"

@@ -11,4 +11,5 @@ return [
     'verify_email_sent' => 'Se ha enviado un nuevo enlace de verificación a la dirección de correo electrónico que proporcionó durante el registro.',
     'profile_info' => 'Actualiza tu cuenta y tu dirección de correo',
     'update_password' => 'Asegúrese de que su cuenta esté usando una contraseña larga y aleatoria para mantenerse seguro.',
+    'danger_zone' => 'Eliminar tu cuenta es permanente y no se puede deshacer. Procede con precaución.',
 ];

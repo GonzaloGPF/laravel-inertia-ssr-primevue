@@ -13,6 +13,7 @@ return [
     'forgot_password' => '¿Olvidó su contraseña?',
     'new_password' => 'Nueva Contraseña',
     'profile_info' => 'Información de Perfil',
+    'danger_zone' => 'Zona Peligrosa',
     'profile' => 'Perfil',
     'update_password' => 'Actualizar Contraseña',
     'confirm_password' => 'Confirmar Contraseña',

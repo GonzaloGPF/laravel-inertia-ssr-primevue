@@ -11,4 +11,5 @@ return [
     'verify_email_sent' => 'A new verification link has been sent to the email address you provided during registration.',
     'profile_info' => 'Update your account\'s profile information and email address.',
     'update_password' => 'Ensure your account is using a long, random password to stay secure.',
+    'danger_zone' => 'Deleting your account is permanent and cannot be undone. Proceed with caution.',
 ];

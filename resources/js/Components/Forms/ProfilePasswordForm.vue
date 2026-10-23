@@ -4,7 +4,6 @@ import useForm from '@/composables/useForm.js'
 import { Translator } from '@/objects/Translator'
 import iPassword from '@/Components/Inputs/iPassword.vue'
 import { useTemplateRef } from 'vue'
-import AppField from '@/Components/Core/AppField.vue'
 
 const passwordInput = useTemplateRef<HTMLInputElement>('passwordInput')
 const currentPasswordInput = useTemplateRef<HTMLInputElement>(
@@ -38,10 +37,6 @@ const submit = () => {
     :loading="form.processing"
     @submit="submit"
   >
-    <AppField
-      :label="Translator.tl('update_password')"
-      :value="Translator.t('help.update_password')"
-    />
     <iPassword
       ref="currentPasswordInput"
       v-model="form.current_password"

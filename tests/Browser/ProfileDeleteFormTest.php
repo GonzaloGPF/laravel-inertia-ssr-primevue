@@ -9,7 +9,7 @@ test('clicking delete opens a confirmation dialog with a password field', functi
 
     $page = visit('/profile');
 
-    $page->click('button[aria-label="Delete"]')
+    $page->click('button[aria-label="Delete User"]')
         ->assertSee('Are you sure you want to delete your account?')
         ->assertSee('Once your account is deleted, all of its resources and data will be permanently deleted.')
         ->assertNoJavaScriptErrors();
@@ -22,7 +22,7 @@ test('cancelling the dialog does not delete the account', function () {
 
     $page = visit('/profile');
 
-    $page->click('button[aria-label="Delete"]')
+    $page->click('button[aria-label="Delete User"]')
         ->click('button[aria-label="Cancel"]')
         ->assertDontSee('Are you sure you want to delete your account?')
         ->assertNoJavaScriptErrors();
@@ -37,7 +37,7 @@ test('a user can delete their account with the correct password', function () {
 
     $page = visit('/profile');
 
-    $page->click('button[aria-label="Delete"]')
+    $page->click('button[aria-label="Delete User"]')
         ->type('[data-pc-name="dialog"] input[name="password"]', 'Secret123**')
         ->click('[data-pc-name="dialog"] button[aria-label="Delete"]')
         ->assertRoute('login')
@@ -55,7 +55,7 @@ test('the delete dialog shows a visible error for an incorrect password', functi
 
     $page = visit('/profile');
 
-    $page->click('button[aria-label="Delete"]')
+    $page->click('button[aria-label="Delete User"]')
         ->type('[data-pc-name="dialog"] input[name="password"]', 'WrongPassword**')
         ->click('[data-pc-name="dialog"] button[aria-label="Delete"]')
         ->assertSee('The password is incorrect.')

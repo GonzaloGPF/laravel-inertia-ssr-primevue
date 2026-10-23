@@ -43,7 +43,7 @@ const closeModal = () => {
 
 <template>
   <AppButton
-    :label="Translator.actionTitle('delete')"
+    :label="Translator.actionTitle('delete', 'user')"
     :modal="modal"
     severity="danger"
     @click="openModal = true"

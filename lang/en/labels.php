@@ -13,6 +13,7 @@ return [
     'forgot_password' => 'Forgot Password?',
     'new_password' => 'New Password',
     'profile_info' => 'Profile Information',
+    'danger_zone' => 'Danger Zone',
     'profile' => 'Profile',
     'update_password' => 'Update Password',
     'confirm_password' => 'Confirm Password',

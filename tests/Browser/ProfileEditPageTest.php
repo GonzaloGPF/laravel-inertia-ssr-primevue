@@ -163,3 +163,67 @@ test('a user can remove their avatar from the profile', function () {
 
     Storage::disk('testing')->assertMissing($avatar->path);
 });
+
+test('each section of the profile is in its own card', function () {
+    $user = User::factory()->create(['language' => 'en']);
+    $this->actingAs($user);
+
+    $page = visit('/profile');
+
+    $page->assertPresent('.p-card');
+
+    $cards = json_decode($page->script("JSON.stringify([...document.querySelectorAll('.p-card')].map(card => ({ title: card.querySelector('.p-card-title').innerText.trim(), name: !!card.querySelector('input[name=\"name\"]'), currentPassword: !!card.querySelector('input[name=\"current_password\"]'), delete: !!card.querySelector('button[aria-label=\"Delete User\"]') })))"), true);
+
+    expect($cards)->toHaveCount(3)
+        ->and($cards[0])->toMatchArray(['name' => true, 'currentPassword' => false, 'delete' => false])
+        ->and($cards[0]['title'])->toContain('Profile Information')
+        ->and($cards[1])->toMatchArray(['name' => false, 'currentPassword' => true, 'delete' => false])
+        ->and($cards[1]['title'])->toContain('Update Password')
+        ->and($cards[2])->toMatchArray(['name' => false, 'currentPassword' => false, 'delete' => true]);
+
+    $page->assertNoJavaScriptErrors();
+});
+
+test('the account deletion is in a danger zone, a card with a red outline', function () {
+    $user = User::factory()->create(['language' => 'en']);
+    $this->actingAs($user);
+
+    $page = visit('/profile');
+
+    $page->assertSee('Danger Zone')
+        ->assertSee('Deleting your account is permanent and cannot be undone.');
+
+    // The colors of the page are not rgb, so they go through a canvas to read their rgb
+    $outlines = json_decode($page->script(<<<'JS'
+        JSON.stringify([...document.querySelectorAll('.p-card')].map(card => {
+            const style = getComputedStyle(card)
+            const context = document.createElement('canvas').getContext('2d')
+            context.fillStyle = style.borderTopColor
+            context.fillRect(0, 0, 1, 1)
+            const [red, green, blue] = context.getImageData(0, 0, 1, 1).data
+
+            return { width: parseFloat(style.borderTopWidth), red, green, blue, danger: !!card.querySelector('button[aria-label="Delete User"]') }
+        }))
+    JS), true);
+
+    [$profile, $password, $danger] = $outlines;
+
+    expect($profile['width'])->toEqual(0)
+        ->and($password['width'])->toEqual(0)
+        ->and($danger['danger'])->toBeTrue()
+        ->and($danger['width'])->toBeGreaterThan(0.0)
+        ->and($danger['red'])->toBeGreaterThan(200)
+        ->and($danger['green'])->toBeLessThan(100)
+        ->and($danger['blue'])->toBeLessThan(100);
+});
+
+test('the danger zone is translated', function () {
+    $user = User::factory()->create(['language' => 'es']);
+    $this->actingAs($user);
+
+    $page = visit('/profile');
+
+    $page->assertSee('Zona Peligrosa')
+        ->assertSee('Eliminar tu cuenta es permanente y no se puede deshacer.')
+        ->assertNoJavaScriptErrors();
+});
