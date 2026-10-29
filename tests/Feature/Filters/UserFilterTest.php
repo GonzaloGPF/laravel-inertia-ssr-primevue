@@ -107,14 +107,13 @@ it('combines the filters of users', function () {
         ->and($data->first()->name)->toBe('Zelda Admin');
 });
 
-it('can filter users by ranges of their id and creation date', function () {
+it('can filter users by ranges of their creation date', function () {
     User::query()->update(['created_at' => now()]); // The factory creates them in any date of the last year
 
     $oldest = create(User::class, ['created_at' => now()->subYear()]);
-    $newest = create(User::class, ['created_at' => now()]);
+    create(User::class, ['created_at' => now()]);
 
-    expect(User::filter(['min_id' => $newest->id, 'max_id' => $newest->id])->get())->toHaveCount(1)
-        ->and(User::filter(['max_created_at' => now()->subMonths(6)->toDateString()])->get()->pluck('id')->all())->toBe([$oldest->id])
+    expect(User::filter(['max_created_at' => now()->subMonths(6)->toDateString()])->get()->pluck('id')->all())->toBe([$oldest->id])
         ->and(User::filter(['min_created_at' => now()->subMonths(6)->toDateString()])->get())->toHaveCount(4);
 });
 

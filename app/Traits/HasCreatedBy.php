@@ -11,11 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 trait HasCreatedBy
 {
-    public function initializeHasCreatedBy(): void
-    {
-        $this->casts += ['created_by' => 'int'];
-    }
-
     public static function bootHasCreatedBy(): void
     {
         static::creating(function (HasCreatedByInterface $model) {

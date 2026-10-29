@@ -159,6 +159,16 @@ $request->validate(['avatar' => User::fileRules('avatar')]); // the rules come f
 
 The files of a model are deleted with it (a soft deleted model keeps them until it is force deleted). `$user->syncFile('avatar', $upload, $remove)` is what the forms use (saves the upload, or deletes the file when asked). The user's avatar is chosen in the users form and in the profile with the `iImage` input and shown with `AppAvatar`, which falls back to the initials of the name. As a file cannot go in a PUT request, a form that uploads a file to an update sends a POST with `_method: 'put'`.
 
+## Ids
+
+The models have a **ulid** as their primary key, named `id` as always: it can be exposed in the urls, the props and the filters, but nobody can count or walk through the records, as it happens with the sequential numbers. It is sortable by creation date, so the lists keep showing the newest first.
+
+- A table declares it with `$table->ulid('id')->primary()` and the foreign keys to it with `foreignUlid()` (`ulidMorphs()` for the polymorphic ones). The model uses `HasUlids`.
+- `route('users.show', $user)` and the route bindings use it (`/admin/users/01kdrxgzd049frv51hjbnbjv58`). Anything that is not a ulid is a 404.
+- The files of a model are saved in a folder named after its id (`users/{id}/avatar`).
+
+This is not an access control: every endpoint still goes through its policy.
+
 ## Conventions
 
 - Forms use the components of `Components/Inputs` and `AppForm`.

@@ -49,7 +49,7 @@ test('the view action opens the detail of the user of its row', function () {
         ->assertSee('Cara Regular')
         ->assertNoJavaScriptErrors();
 
-    expect(infoPairs($page, 0, INFO_CARD))->toBe('Name|Cara Regular|Email|cara@example.com|Phone|655443322|Age|20|Role|User|Language|Spanish|Currency|Dollar');
+    expect(infoPairs($page, 0, INFO_CARD))->toBe('ID|'.$this->cara->id.'|Name|Cara Regular|Email|cara@example.com|Phone|655443322|Age|20|Role|User|Language|Spanish|Currency|Dollar');
 });
 
 test('each row opens its own user', function () {
@@ -84,7 +84,7 @@ test('the detail is translated', function () {
         ->assertPresent(DETAIL.' button[aria-label="Regresar"]')
         ->assertNoJavaScriptErrors();
 
-    expect(infoPairs($page, 0, INFO_CARD))->toBe('Nombre|Cara Regular|Correo Electrónico|cara@example.com|Teléfono|655443322|Edad|20|Rol|Usuario|Lenguaje|Español|Moneda|Dólar');
+    expect(infoPairs($page, 0, INFO_CARD))->toBe('ID|'.$this->cara->id.'|Nombre|Cara Regular|Correo Electrónico|cara@example.com|Teléfono|655443322|Edad|20|Rol|Usuario|Lenguaje|Español|Moneda|Dólar');
 });
 
 test('the back button goes to the list of users', function () {
@@ -115,7 +115,7 @@ test('going from one user to another never shows the data of the previous one', 
         ->assertDontSee('cara@example.com')
         ->assertNoJavaScriptErrors();
 
-    expect(infoPairs($page, 0, INFO_CARD))->toContain('Name|Bob Regular|Email|bob@example.com');
+    expect(infoPairs($page, 0, INFO_CARD))->toContain('ID|'.$this->bob->id.'|Name|Bob Regular|Email|bob@example.com');
 });
 
 test('a user without optional data is shown with dashes', function () {

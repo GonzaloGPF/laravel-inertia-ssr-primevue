@@ -15,6 +15,7 @@ const EMPTY = '-'
 const props = defineProps<Props>()
 
 const fields = computed<{ name: string; value?: InputValue | null }[]>(() => [
+  { name: 'id', value: props.user.id },
   { name: 'name', value: props.user.name },
   { name: 'email', value: props.user.email },
   { name: 'phone', value: props.user.phone },

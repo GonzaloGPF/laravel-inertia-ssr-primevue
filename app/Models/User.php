@@ -14,6 +14,7 @@ use App\Traits\NameFormatter;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +30,7 @@ class User extends Authenticatable implements HasFilesInterface, HasLocalePrefer
 {
     use HasFactory,
         HasFiles,
+        HasUlids,
         IsFilterable,
         NameFormatter,
         Notifiable,

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('files', function (Blueprint $table) {
-            $table->id();
-            $table->morphs('fileable');
+            $table->ulid('id')->primary();
+            $table->ulidMorphs('fileable');
             $table->string('collection');
             $table->string('disk');
             $table->string('path');

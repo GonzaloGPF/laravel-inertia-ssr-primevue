@@ -12,8 +12,13 @@ type Props = {
   severity?: Severity
 }
 
+type CardStyle = {
+  card: string
+  title: string
+}
+
 // Complete class names, so Tailwind can find them
-const SEVERITY_STYLES: Record<Severity, { card: string; title: string }> = {
+const SEVERITY_STYLES: Record<Severity, CardStyle> = {
   secondary: {
     card: 'border border-surface-400',
     title: 'text-surface-600 dark:text-surface-300',

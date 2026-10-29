@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -186,3 +187,18 @@ it('lists the users with their avatars without a query for each one', function (
 
     expect($queries)->toHaveCount(1);
 });
+
+it('identifies the users by a ulid', function () {
+    $user = User::factory()->create();
+
+    expect(Str::isUlid($user->id))->toBeTrue()
+        ->and($user->id)->toBe(strtolower($user->id));
+
+    $rows = usersData()->assertSuccessful()->json('props.data.data');
+
+    expect(collect($rows)->every(fn (array $row) => Str::isUlid($row['id'])))->toBeTrue();
+});
+
+it('does not find a user by something that is not a ulid', function (string $id) {
+    $this->get(route('users.show', $id))->assertNotFound();
+})->with(['a number' => '1', 'a text' => 'not-a-ulid']);

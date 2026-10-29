@@ -70,12 +70,6 @@ const pageReport = computed(() =>
   })
 )
 
-const idColumn: TableColumn<T> = { field: 'id' }
-const tableColumns = computed(() => [
-  props.columns.find((column) => column.field === 'id') ?? idColumn,
-  ...props.columns.filter((column) => column.field !== 'id'),
-])
-
 const hasActions = computed(
   () => !(Array.isArray(props.actions) && props.actions.length === 0)
 )
@@ -296,7 +290,7 @@ defineExpose({ refresh, removeRow })
     </Column>
 
     <Column
-      v-for="column in tableColumns"
+      v-for="column in columns"
       :key="column.field"
       :field="column.field"
       :header="getHeader(column)"

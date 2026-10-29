@@ -5,7 +5,7 @@ use App\Enums\Roles;
 use App\Models\User;
 
 /**
- * Selector of the header of a column of the table, by its position: the expander, ID, Name, Email, Age, Role, Language and Actions.
+ * Selector of the header of a column of the table, by its position: the expander, Name, Email, Age, Role, Language and Actions.
  */
 function sortHeader(int $column): string
 {
@@ -17,7 +17,7 @@ function sortHeader(int $column): string
  */
 function listedNames($page): string
 {
-    return (string) $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[2].querySelector(':scope > div > span').textContent.trim()).join(',')");
+    return (string) $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[1].querySelector(':scope > div > span').textContent.trim()).join(',')");
 }
 
 /**
@@ -45,10 +45,10 @@ function urlSort($page): string
     return (string) $page->script('decodeURIComponent(location.search.slice(1))');
 }
 
-const NAME = 3;
-const AGE = 5;
-const ROLE = 6;
-const ACTIONS = 8;
+const NAME = 2;
+const AGE = 4;
+const ROLE = 5;
+const ACTIONS = 7;
 
 beforeEach(function () {
     $this->admin = User::factory()->admin()->create([
@@ -72,7 +72,7 @@ test('every column with a field is sortable, but the actions', function () {
     $sortable = $page->script("document.querySelectorAll('.p-datatable-thead th[data-p-sortable-column=\"true\"]').length");
     $actionsSortable = $page->script("document.querySelector('.p-datatable-thead th:nth-child(".ACTIONS.")').getAttribute('data-p-sortable-column')");
 
-    expect($sortable)->toBe(6)
+    expect($sortable)->toBe(5)
         ->and($actionsSortable)->not->toBe('true');
 });
 

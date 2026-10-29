@@ -62,14 +62,14 @@ beforeEach(function () {
     $this->actingAs($this->admin);
 });
 
-test('the rows have a column to expand them, before the id', function () {
+test('the rows have a column to expand them, before the name', function () {
     $page = visit(route('users.index', absolute: false));
 
     expectRows($page, 3);
 
     $columns = $page->script("(() => { const headers = [...document.querySelectorAll('.p-datatable-thead th')]; return JSON.stringify({ total: headers.length, first: headers[0].innerText.trim(), second: headers[1].innerText.trim(), toggles: document.querySelectorAll('.p-datatable-row-toggle-button').length }) })()");
 
-    expect(json_decode($columns, true))->toBe(['total' => 8, 'first' => '', 'second' => 'ID', 'toggles' => 3]);
+    expect(json_decode($columns, true))->toBe(['total' => 7, 'first' => '', 'second' => 'Name', 'toggles' => 3]);
 
     expect(expansions($page))->toBe(0);
 });
@@ -84,7 +84,7 @@ test('expanding a row shows all the information of its user', function () {
     $page->assertPresent(INFO)
         ->assertNoJavaScriptErrors();
 
-    expect(infoPairs($page))->toBe('Name|Cara Regular|Email|cara@example.com|Phone|655443322|Age|20|Role|User|Language|Spanish|Currency|Dollar');
+    expect(infoPairs($page))->toBe('ID|'.$this->cara->id.'|Name|Cara Regular|Email|cara@example.com|Phone|655443322|Age|20|Role|User|Language|Spanish|Currency|Dollar');
 });
 
 test('the information is translated', function () {
@@ -98,7 +98,7 @@ test('the information is translated', function () {
 
     $page->assertPresent(INFO);
 
-    expect(infoPairs($page))->toBe('Nombre|Cara Regular|Correo Electrónico|cara@example.com|Teléfono|655443322|Edad|20|Rol|Usuario|Lenguaje|Español|Moneda|Dólar');
+    expect(infoPairs($page))->toBe('ID|'.$this->cara->id.'|Nombre|Cara Regular|Correo Electrónico|cara@example.com|Teléfono|655443322|Edad|20|Rol|Usuario|Lenguaje|Español|Moneda|Dólar');
 });
 
 test('each row expands on its own', function () {
@@ -111,7 +111,7 @@ test('each row expands on its own', function () {
     $page->assertPresent(INFO);
 
     expect(expansions($page))->toBe(1)
-        ->and(infoPairs($page))->toContain('Bob Regular|Email|bob@example.com')
+        ->and(infoPairs($page))->toContain('ID|'.$this->bob->id.'|Name|Bob Regular|Email|bob@example.com')
         ->and(infoPairs($page))->not->toContain('Cara');
 
     toggleRow($page, 0); // Cara, with Bob still expanded
@@ -134,7 +134,7 @@ test('the empty values are shown with a dash', function () {
 
     $page->assertPresent(INFO);
 
-    expect(infoPairs($page))->toBe('Name|Bob Regular|Email|bob@example.com|Phone|-|Age|-|Role|'.infoRole($this->bob).'|Language|-|Currency|-');
+    expect(infoPairs($page))->toBe('ID|'.$this->bob->id.'|Name|Bob Regular|Email|bob@example.com|Phone|-|Age|-|Role|'.infoRole($this->bob).'|Language|-|Currency|-');
 });
 
 test('the values are shown as text, never as html', function () {

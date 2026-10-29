@@ -160,7 +160,7 @@ test('the age is sent to create the user and shown in the list', function () {
 
     expect(User::firstWhere('email', 'grace@example.com')->age)->toBe(85);
 
-    $age = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[4].textContent.trim())[0]");
+    $age = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr')].map(row => row.children[3].textContent.trim())[0]");
 
     expect($age)->toBe('85');
 });

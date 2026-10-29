@@ -26,7 +26,6 @@ test('the users table lists the users with translated headers and values', funct
     $page->assertSee('Ada Admin')
         ->assertSee('ada@example.com')
         ->assertSee('Bob Regular')
-        ->assertSee('ID')
         ->assertSee('Name')
         ->assertSee('Email')
         ->assertSee('Role')
@@ -52,7 +51,7 @@ test('the users table headers are translated to the language of the user', funct
         ->assertNoJavaScriptErrors();
 });
 
-test('the id is the first column and actions are rendered as icon only buttons', function () {
+test('the table has the columns of the page, with no id, and the actions are rendered as icon only buttons', function () {
     $page = visit(route('users.index', absolute: false));
 
     expectRows($page, 1);
@@ -62,7 +61,7 @@ test('the id is the first column and actions are rendered as icon only buttons',
     $headers = $page->script("[...document.querySelectorAll('.p-datatable-column-title')].map(e => e.textContent.trim()).join(',')");
     $buttons = $page->script("[...document.querySelectorAll('.p-datatable-tbody > tr:first-child td:last-child button')].map(e => e.getAttribute('aria-label') + '|' + e.textContent.trim()).join(',')");
 
-    expect($headers)->toBe('ID,Name,Email,Age,Role,Language,Actions')
+    expect($headers)->toBe('Name,Email,Age,Role,Language,Actions')
         ->and($buttons)->toBe('View|visibility,Edit|edit,Delete|delete');
 });
 

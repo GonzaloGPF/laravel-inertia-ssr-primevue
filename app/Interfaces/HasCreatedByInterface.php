@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Interface HasCreatedByInterface
  *
- * @property int created_by
+ * @property string created_by
  * @property int payment_state
  * @property User createdBy
  */

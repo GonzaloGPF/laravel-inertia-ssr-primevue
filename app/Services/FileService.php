@@ -111,7 +111,7 @@ class FileService
     }
 
     /**
-     * Where the files of a collection are saved: users/1/avatar (the model is named by its morph alias).
+     * Where the files of a collection are saved: users/{ulid}/avatar (the model is named by its morph alias).
      */
     public function directory(Model $model, string $collection): string
     {
