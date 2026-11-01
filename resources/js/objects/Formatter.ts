@@ -169,6 +169,10 @@ export const Formatter = {
     return `${value}%`
   },
 
+  /** A number as the language of the user writes it: 1,234.5 or 1234,5 */
+  number: (value?: InputValue): string =>
+    new Intl.NumberFormat(Translator.getLocale()).format(toNumber(value)),
+
   money: (value?: InputValue): string => {
     value = toNumber(value)
 

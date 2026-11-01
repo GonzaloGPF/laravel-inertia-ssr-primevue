@@ -153,6 +153,20 @@ test('the chart gives the users created in each month of the last year', functio
         ->assertNoJavaScriptErrors();
 });
 
+test('the numbers of the cards are written as the language of the user writes them', function (Languages $language, string $total) {
+    $this->admin->update(['language' => $language]);
+    User::factory(1234)->create(); // And the admin
+
+    $page = visit(route('dashboard.show', absolute: false));
+
+    expectDashboardLoaded($page);
+
+    expect(statCards($page)[0]['value'])->toBe($total);
+})->with([
+    'English' => [Languages::EN, '1,235'],
+    'Spanish' => [Languages::ES, '1235'], // Spanish only groups the thousands from the ten thousands
+]);
+
 test('the months of the chart are the last 12, named in English', function () {
     $page = visit(route('dashboard.show', absolute: false));
 

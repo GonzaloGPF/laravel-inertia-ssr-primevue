@@ -2,7 +2,7 @@
 import Skeleton from 'primevue/skeleton'
 import { computed } from 'vue'
 import AppCard from '@/Components/Core/AppCard.vue'
-import { Translator } from '@/objects/Translator'
+import { Formatter } from '@/objects/Formatter'
 
 type Props = {
   label: string
@@ -13,9 +13,7 @@ type Props = {
 
 const props = defineProps<Props>()
 
-const formatted = computed(() =>
-  new Intl.NumberFormat(Translator.getLocale()).format(props.value ?? 0)
-)
+const formatted = computed(() => Formatter.number(props.value))
 </script>
 <template>
   <AppCard :title="label" :icon="icon" data-stat-card>
