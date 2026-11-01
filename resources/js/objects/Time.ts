@@ -29,6 +29,8 @@ const dateLocales: Record<string, Locale> = {
   ru,
 }
 
+const dateLocale = (): Locale => dateLocales[locales.getLocale()] ?? enGB
+
 export const Time = {
   isAfter(dateA: InputValue, dateB: InputValue): boolean {
     const parsedDateA = Time.parse(dateA)
@@ -129,16 +131,33 @@ export const Time = {
     }
 
     const formatOptions: FormatOptions = {
-      locale: dateLocales[locales.getLocale()] ?? enGB,
+      locale: dateLocale(),
     }
 
     const distanceOptions: FormatDistanceToNowOptions = {
-      locale: dateLocales[locales.getLocale()] ?? enGB,
+      locale: dateLocale(),
       includeSeconds: true,
     }
 
     return humanize
       ? formatDistanceToNow(parsedDate, distanceOptions)
       : format(parsedDate, customFormat || locales.dateFormat, formatOptions)
+  },
+
+  /**
+   * Formats a month given as year and month (2026-11). It is a month of the calendar, not an instant, so
+   * it is not moved to the time zone of the user, as parse() does: it would be the previous month for
+   * the time zones behind UTC.
+   */
+  formatMonth(month: InputValue, customFormat?: string): string | undefined {
+    const parsedMonth = parse(String(month), 'yyyy-MM', Time.now())
+
+    if (!isValid(parsedMonth)) {
+      return undefined
+    }
+
+    return format(parsedMonth, customFormat || locales.monthFormat, {
+      locale: dateLocale(),
+    })
   },
 }

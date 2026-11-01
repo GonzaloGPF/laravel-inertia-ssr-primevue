@@ -72,6 +72,20 @@ function chartTotals($page): array
 }
 
 /**
+ * The months of the chart, as it tells them to a screen reader, from the oldest to the current one.
+ *
+ * @return list<string>
+ */
+function chartMonths($page): array
+{
+    $description = (string) $page->script("document.querySelector('.p-chart canvas')?.getAttribute('aria-label') ?? ''");
+
+    preg_match_all('/(\p{L}+ \d{2}): \d+/u', $description, $months);
+
+    return $months[1];
+}
+
+/**
  * Waits for the statistics to be loaded: every card with its value and the chart painted.
  */
 function expectDashboardLoaded($page): void
@@ -138,6 +152,46 @@ test('the chart gives the users created in each month of the last year', functio
         ->assertSee('Last 12 months')
         ->assertNoJavaScriptErrors();
 });
+
+test('the months of the chart are the last 12, named in English', function () {
+    $page = visit(route('dashboard.show', absolute: false));
+
+    expectDashboardLoaded($page);
+
+    $expected = collect(range(11, 0))->map(fn (int $ago) => now()->startOfMonth()->subMonths($ago)->format('M y'))->all();
+
+    expect(chartMonths($page))->toBe($expected);
+});
+
+test('the months of the chart are named in the language of the user', function () {
+    $this->admin->update(['language' => Languages::ES]);
+
+    $page = visit(route('dashboard.show', absolute: false));
+
+    expectDashboardLoaded($page);
+
+    $names = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    $expected = collect(range(11, 0))->map(function (int $ago) use ($names) {
+        $month = now()->startOfMonth()->subMonths($ago);
+
+        return $names[$month->month - 1].' '.$month->format('y');
+    })->all();
+
+    expect(chartMonths($page))->toBe($expected);
+});
+
+test('the months of the chart do not change with the time zone of the browser', function (string $timezone) {
+    $page = visit(route('dashboard.show', absolute: false))->withTimezone($timezone);
+
+    expectDashboardLoaded($page);
+
+    $expected = collect(range(11, 0))->map(fn (int $ago) => now()->startOfMonth()->subMonths($ago)->format('M y'))->all();
+
+    expect(chartMonths($page))->toBe($expected);
+})->with([
+    'behind UTC' => 'America/Los_Angeles',
+    'ahead of UTC' => 'Pacific/Auckland',
+]);
 
 test('the cards are in a row in a large screen and one below the other in a small one', function () {
     $page = visit(route('dashboard.show', absolute: false))->resize(1280, 900);

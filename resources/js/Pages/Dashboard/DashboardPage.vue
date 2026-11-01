@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
-import AppCard from '@/Components/Core/AppCard.vue'
-import AppLineChart from '@/Components/Core/AppLineChart.vue'
+import AppChart from '@/Components/Core/AppChart.vue'
 import AppStatCard from '@/Components/Core/AppStatCard.vue'
 import useAuth from '@/composables/useAuth'
+import { Formatter } from '@/objects/Formatter'
 import { Translator } from '@/objects/Translator'
+import type { ChartSeries } from '@/types/chart'
 import type { DashboardStats, MonthlyTotal } from '@/types/dashboard'
 
 /** Both are deferred: they are undefined until the backend gives them, and they are never given to the users that are not admins. */
@@ -25,21 +26,17 @@ const placeholders = computed<(number | undefined)[]>(
   () => props.stats?.placeholders ?? new Array(PLACEHOLDERS).fill(undefined)
 )
 
-/** Y-m as the short month and year, in the language of the user: Nov 26 */
-const monthLabel = (month: string) => {
-  const [year, number] = month.split('-').map(Number)
-
-  return new Intl.DateTimeFormat(Translator.getLocale(), {
-    month: 'short',
-    year: '2-digit',
-  }).format(new Date(year, number - 1, 1))
-}
-
 const monthLabels = computed(() =>
-  props.usersByMonth?.map(({ month }) => monthLabel(month))
+  props.usersByMonth?.map(({ month }) => Formatter.month(month))
 )
-const monthTotals = computed(() =>
-  props.usersByMonth?.map(({ total }) => total)
+const newUsers = computed<ChartSeries[] | undefined>(
+  () =>
+    props.usersByMonth && [
+      {
+        label: Translator.tl('new_users'),
+        data: props.usersByMonth.map(({ total }) => total),
+      },
+    ]
 )
 </script>
 <template>
@@ -60,17 +57,14 @@ const monthTotals = computed(() =>
           icon="analytics"
         />
       </section>
-      <AppCard
+      <AppChart
+        type="line"
         :title="Translator.tl('new_users_per_month')"
         :description="Translator.tl('last_12_months')"
+        :labels="monthLabels"
+        :series="newUsers"
         icon="show_chart"
-      >
-        <AppLineChart
-          :labels="monthLabels"
-          :data="monthTotals"
-          :label="Translator.tl('new_users')"
-        />
-      </AppCard>
+      />
     </div>
     <p v-else>This is the dashboard</p>
   </div>
