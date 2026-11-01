@@ -135,3 +135,16 @@ it('refuses a collection that the model does not declare', function () {
     expect(Storage::disk('testing')->allFiles())->toBeEmpty()
         ->and(File::count())->toBe(0);
 });
+
+it('deletes the folders of the models from the files disk, even when the database has no rows of them', function () {
+    Storage::fake('testing');
+    $user = User::factory()->withAvatar()->create();
+    Storage::disk('testing')->put('other/keep.txt', 'something else');
+
+    File::query()->delete(); // As after dropping the database: the files are there, but nothing points at them
+
+    app(FileService::class)->deleteAllFolders();
+
+    expect(Storage::disk('testing')->exists("users/{$user->getKey()}"))->toBeFalse();
+    Storage::disk('testing')->assertExists('other/keep.txt');
+});

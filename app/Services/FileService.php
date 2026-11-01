@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\HasFilesInterface;
 use App\Models\File;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -116,10 +117,29 @@ class FileService
     public function directory(Model $model, string $collection): string
     {
         return implode('/', [
-            Str::plural($model->getMorphClass()),
+            $this->folder($model->getMorphClass()),
             $model->getKey(),
             $collection,
         ]);
+    }
+
+    /**
+     * Deletes the folder of every model from the files disk, with whatever is in them, whether the rows
+     * of those files exist or not (i.e. after dropping the database).
+     */
+    public function deleteAllFolders(): void
+    {
+        collect(Relation::morphMap())->keys()->each(
+            fn (string $alias) => Storage::disk($this->disk())->deleteDirectory($this->folder($alias))
+        );
+    }
+
+    /**
+     * The folder where the files of a model are saved, named after its morph alias.
+     */
+    private function folder(string $morphAlias): string
+    {
+        return Str::plural($morphAlias);
     }
 
     /**

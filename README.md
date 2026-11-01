@@ -41,9 +41,9 @@ vendor/bin/sail yarn install
 vendor/bin/sail yarn dev
 ```
 
-Every command runs through Sail, as the app lives in the containers. The seeders create an admin (`admin@mail.com`), a regular user (`test@mail.com`) and 30 random ones, all with the password `Secret123**`.
+Every command runs through Sail, as the app lives in the containers. The seeders create an admin (`admin@mail.com`), a regular user (`test@mail.com`) and 30 random ones, all with the password `Secret123**`. Most of them get an avatar, picked from the 10 images of `public/images/avatar`; the regular user and about a quarter of the random ones have none, to see how that looks.
 
-> `migrate --seed` truncates every table before seeding. Don't run it against data you want to keep.
+> `migrate --seed` truncates every table before seeding, and deletes the avatars of the previous seed from the files disk. Don't run it against data you want to keep.
 
 ### Dev server or build?
 
@@ -158,6 +158,8 @@ $request->validate(['avatar' => User::fileRules('avatar')]); // the rules come f
 ```
 
 The files of a model are deleted with it (a soft deleted model keeps them until it is force deleted). `$user->syncFile('avatar', $upload, $remove)` is what the forms use (saves the upload, or deletes the file when asked). The user's avatar is chosen in the users form and in the profile with the `iImage` input and shown with `AppAvatar`, which falls back to the initials of the name. As a file cannot go in a PUT request, a form that uploads a file to an update sends a POST with `_method: 'put'`.
+
+The avatars of the seeds are the "Lorelei" style of [DiceBear](https://www.dicebear.com) (by Lisa Wischofsky, [CC0](https://creativecommons.org/publicdomain/zero/1.0/)), downloaded once to `public/images/avatar/avatar-01.png` to `avatar-10.png`, so seeding makes no requests. Each seeded user gets its own copy of the image in the files disk (`User::factory()->withAvatar()`). To make them again: `https://api.dicebear.com/9.x/lorelei/png?seed={seed}&size=256&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf` with the seeds `ada grace linus margaret alan katherine dennis barbara tim hedy`, in that order.
 
 ## Ids
 

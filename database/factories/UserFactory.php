@@ -5,6 +5,8 @@ namespace Database\Factories;
 use App\Enums\Roles;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -39,6 +41,19 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'role' => Roles::ADMIN,
         ]);
+    }
+
+    /**
+     * The user gets an avatar: one of the images of public/images/avatar, or the given one.
+     * Each user keeps its own copy of the image in the files disk.
+     */
+    public function withAvatar(?string $image = null): static
+    {
+        return $this->afterCreating(function (User $user) use ($image) {
+            $image ??= Arr::random(glob(public_path('images/avatar/*.png')));
+
+            $user->saveFile(new UploadedFile($image, basename($image), 'image/png', null, true), 'avatar');
+        });
     }
 
     /**

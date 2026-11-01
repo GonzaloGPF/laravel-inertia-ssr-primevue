@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Services\FileService;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
@@ -18,6 +19,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->deleteStoredFiles();
+
         $this->truncate();
 
         Model::unguard();
@@ -25,6 +28,15 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
         ]);
+    }
+
+    /**
+     * Seeding after migrate:fresh finds no rows of files, as the table was dropped, so the physical files
+     * are deleted by their folders: they would stay in the disk with nothing pointing at them.
+     */
+    private function deleteStoredFiles(): void
+    {
+        app(FileService::class)->deleteAllFolders();
     }
 
     /**
