@@ -92,6 +92,14 @@ export const Formatter = {
     return Time.format(value, humanize, dateFormat) ?? '-'
   },
 
+  month: (value?: InputValue, format?: string): string => {
+    if (!value) {
+      return '-'
+    }
+
+    return Time.formatMonth(value, format) ?? '-'
+  },
+
   formatDiff: (initialDate: InputValue, endDate: InputValue): string => {
     const formatted = Formatter.duration(initialDate, endDate, {
       format: ['years', 'months'],
@@ -160,6 +168,10 @@ export const Formatter = {
 
     return `${value}%`
   },
+
+  /** A number as the language of the user writes it: 1,234.5 or 1234,5 */
+  number: (value?: InputValue): string =>
+    new Intl.NumberFormat(Translator.getLocale()).format(toNumber(value)),
 
   money: (value?: InputValue): string => {
     value = toNumber(value)

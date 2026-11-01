@@ -19,6 +19,12 @@ export default [
       // 'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       // 'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
       'vue/multi-word-component-names': 'off',
+      // PascalCase tags; the input components (iText, iNumber...) start with a lower case i
+      'vue/component-name-in-template-casing': [
+        'error',
+        'PascalCase',
+        { registeredComponentsOnly: false, ignores: ['/^i[A-Z]/'] },
+      ],
       'no-undef': 'off',
     },
   },

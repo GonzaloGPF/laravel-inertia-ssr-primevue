@@ -88,6 +88,7 @@ test('a regular user does not see the admin submenu', function () {
         ->assertSee('Profile')
         ->assertDontSee('Admin')
         ->assertDontSee('Personal Area')
+        ->assertDontSee('Dashboard')
         ->assertDontSee('Users')
         ->assertNoJavaScriptErrors();
 });
@@ -105,6 +106,35 @@ test('an admin sees the admin and personal area submenus', function () {
         ->assertSee('Personal Area')
         ->assertSee('Profile')
         ->assertSee('Logout')
+        ->assertNoJavaScriptErrors();
+});
+
+test('an admin has the dashboard as the first option of the admin submenu', function () {
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'en']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->assertSee('Dashboard');
+
+    $options = $page->script("[...document.querySelectorAll('.p-menu [role=\"menuitem\"]')].map(option => option.getAttribute('aria-label')).join(',')");
+
+    expect($options)->toBe('Dashboard,Users,Profile,Logout');
+});
+
+test('an admin can navigate to the dashboard from the admin submenu', function () {
+    $user = User::factory()->admin()->create(['name' => 'Jane Doe', 'language' => 'en']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    $page->click('Jane Doe')
+        ->click('li[aria-label="Dashboard"]')
+        ->assertRoute('dashboard.show')
+        ->assertSee('Total users')
         ->assertNoJavaScriptErrors();
 });
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import INumber from '@/Components/Inputs/iNumber.vue'
+import iNumber from '@/Components/Inputs/iNumber.vue'
 import InputLayout from '@/Layouts/InputLayout.vue'
 import { Translator } from '@/objects/Translator'
 import { ref, useTemplateRef, watch } from 'vue'
@@ -41,7 +41,7 @@ defineExpose({
 <template>
   <InputLayout v-bind="$props">
     <div class="flex items-center gap-2">
-      <INumber
+      <iNumber
         ref="minElement"
         v-model="iMin"
         :name="`min_${name}`"
@@ -59,7 +59,7 @@ defineExpose({
 
       <span aria-hidden="true">-</span>
 
-      <INumber
+      <iNumber
         ref="maxElement"
         v-model="iMax"
         :name="`max_${name}`"

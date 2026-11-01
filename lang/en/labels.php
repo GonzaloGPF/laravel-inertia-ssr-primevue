@@ -40,4 +40,10 @@ return [
     'admin' => 'Admin',
     'personal_area' => 'Personal Area',
     'having' => 'Having',
+    'dashboard' => 'Dashboard',
+    'total_users' => 'Total users',
+    'label' => 'Label',
+    'new_users' => 'New users',
+    'new_users_per_month' => 'New users per month',
+    'last_12_months' => 'Last 12 months',
 ];

@@ -95,6 +95,9 @@ export const locales = {
 
   dateFormat: 'yyyy-MM-dd',
 
+  /** A month and its year, short: Nov 26 */
+  monthFormat: 'MMM yy',
+
   timeFormat: 'hh:mm:ss',
 
   dateTimeFormat: 'yyyy-MM-dd HH:mm:ss',

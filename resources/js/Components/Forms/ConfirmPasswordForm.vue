@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import IPassword from '@/Components/Inputs/iPassword.vue'
+import iPassword from '@/Components/Inputs/iPassword.vue'
 import useForm from '@/composables/useForm.js'
 import { Translator } from '@/objects/Translator'
 import AppForm from '@/Components/Core/AppForm.vue'
@@ -14,7 +14,7 @@ const { form } = useForm({
     :loading="form.processing"
     @submit="form.post(route('password.confirm'))"
   >
-    <i-password
+    <iPassword
       v-model="form.password"
       :error="form.errors.password"
       name="password"

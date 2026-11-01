@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import useInput from '@/composables/useInput'
-import IText from '@/Components/Inputs/iText.vue'
+import iText from '@/Components/Inputs/iText.vue'
 import { computed, toRefs, watch } from 'vue'
 import { omit } from 'lodash-es'
 import { NumberInputProps } from '@/types/input'
@@ -27,7 +27,7 @@ defineExpose({
 })
 </script>
 <template>
-  <i-text
+  <iText
     ref="v-input"
     v-model="iValue"
     v-bind="boundProps"
