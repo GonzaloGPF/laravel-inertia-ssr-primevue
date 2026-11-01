@@ -4,6 +4,9 @@ import { ref } from 'vue'
 
 let timeout: ReturnType<typeof setTimeout> | null = null
 
+// The visits that are running: a page can ask for several at once (i.e. its deferred props, in groups)
+let visits = 0
+
 export const useLoader = defineStore('loader', () => {
   const loading = ref(false)
   const progress = ref(0)
@@ -19,8 +22,12 @@ export const useLoader = defineStore('loader', () => {
 
   const registerListeners = () => {
     router.on('start', () => {
-      timeout = setTimeout(() => {
+      visits++
+
+      // Only one timer, whatever the visits: one that is lost could not be cleared, and would show the bar for ever
+      timeout ??= setTimeout(() => {
         loading.value = true
+        timeout = null
       }, 250)
     })
 
@@ -33,6 +40,11 @@ export const useLoader = defineStore('loader', () => {
     })
 
     router.on('finish', (event) => {
+      visits = Math.max(0, visits - 1)
+
+      // The bar goes on until the last visit ends
+      if (visits > 0) return
+
       if (timeout) {
         clearTimeout(timeout)
         timeout = null

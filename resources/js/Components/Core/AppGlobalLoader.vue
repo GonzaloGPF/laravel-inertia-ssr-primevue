@@ -2,15 +2,19 @@
 import { useLoader } from '@/stores/loader.ts'
 import { storeToRefs } from 'pinia'
 import ProgressBar from 'primevue/progressbar'
+import { computed } from 'vue'
 
 const { loading, progress, i18nLoaded } = storeToRefs(useLoader())
 
 useLoader().registerListeners()
+
+const active = computed(() => loading.value || !i18nLoaded.value)
 </script>
 <template>
-  <div v-if="loading || !i18nLoaded" class="relative h-0">
+  <!-- It keeps its space when it is not shown, so the page does not move when it shows up -->
+  <div class="h-1.5">
     <ProgressBar
-      v-show="loading || !i18nLoaded"
+      :class="{ invisible: !active }"
       :value="progress"
       style="height: 6px"
     />

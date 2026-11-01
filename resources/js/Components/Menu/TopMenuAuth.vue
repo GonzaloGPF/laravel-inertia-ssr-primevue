@@ -24,6 +24,11 @@ const personalItems = computed<MenuItem[]>(() => [
 
 const adminItems = computed<MenuItem[]>(() => [
   {
+    label: Translator.tl('dashboard'),
+    icon: 'dashboard',
+    command: () => router.visit(route('dashboard.show')),
+  },
+  {
     label: Translator.modelTitle('user', true),
     icon: 'group',
     command: () => router.visit(route('users.index')),

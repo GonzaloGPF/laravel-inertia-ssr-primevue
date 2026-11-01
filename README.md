@@ -9,7 +9,7 @@ It comes with authentication (Breeze based), a profile page, English and Spanish
 | | |
 | --- | --- |
 | Backend | PHP 8.4, Laravel 13, Sanctum, [EloquentFilter](https://github.com/Tucker-Eric/EloquentFilter), [Ziggy](https://github.com/tighten/ziggy) |
-| Frontend | Inertia v3 (SSR), Vue 3, TypeScript, Pinia, [PrimeVue 4](https://primevue.org) (Aura theme), Tailwind CSS 4, Vite 8 |
+| Frontend | Inertia v3 (SSR), Vue 3, TypeScript, Pinia, [PrimeVue 4](https://primevue.org) (Aura theme), Tailwind CSS 4, [Chart.js](https://www.chartjs.org) (through the PrimeVue `Chart`), Vite 8 |
 | i18n | `laravel-vue-i18n`: the Laravel `lang/` files (`es`, `en`) are shared with the frontend |
 | Tests | Pest 5, with browser tests (Playwright) |
 | Tooling | Laravel Pint, ESLint, Prettier, Stylelint, vue-tsc, Husky + lint-staged, GitHub Actions |
@@ -72,7 +72,7 @@ app/
   Filters/             Model filters (EloquentFilter): Filter.php is the base one
   Http/Controllers/    Thin controllers, they render Inertia pages
   Policies/            Authorization rules
-  Services/            FileService: saves and deletes the files of the models
+  Services/            FileService: saves and deletes the files of the models. DashboardService: the numbers of the dashboard
   Traits/IsFilterable  Filtering and pagination for the models
   Traits/HasFiles      Files (avatars...) for the models
 lang/{en,es}/          Translations, shared with the frontend
@@ -160,6 +160,12 @@ $request->validate(['avatar' => User::fileRules('avatar')]); // the rules come f
 The files of a model are deleted with it (a soft deleted model keeps them until it is force deleted). `$user->syncFile('avatar', $upload, $remove)` is what the forms use (saves the upload, or deletes the file when asked). The user's avatar is chosen in the users form and in the profile with the `iImage` input and shown with `AppAvatar`, which falls back to the initials of the name. As a file cannot go in a PUT request, a form that uploads a file to an update sends a POST with `_method: 'put'`.
 
 The avatars of the seeds are the "Lorelei" style of [DiceBear](https://www.dicebear.com) (by Lisa Wischofsky, [CC0](https://creativecommons.org/publicdomain/zero/1.0/)), downloaded once to `public/images/avatar/avatar-01.png` to `avatar-10.png`, so seeding makes no requests. Each seeded user gets its own copy of the image in the files disk (`User::factory()->withAvatar()`). To make them again: `https://api.dicebear.com/9.x/lorelei/png?seed={seed}&size=256&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf` with the seeds `ada grace linus margaret alan katherine dennis barbara tim hedy`, in that order.
+
+## Dashboard
+
+`/dashboard` is where everybody lands after logging in, but only the admins get the statistics (and the `Dashboard` option of their menu): a row of `AppStatCard` and charts such as `AppLineChart`. `DashboardController` gives them as Inertia deferred props, in groups (`stats`, `charts`): the page is shown right away, with pulsing skeletons, and each group arrives on its own. Statistics are aggregates, not a listing of entities, so they do not go through the Filter System. To add one, add a method to `DashboardService`, a deferred prop to the controller and its card or chart to `DashboardPage.vue`.
+
+The charts are Chart.js drawn on a canvas, so they cannot read CSS variables: `useChartTheme` resolves the colors of the PrimeVue theme (light or dark, as the system says) for them. Every chart tells its values to a screen reader in the `aria-label` of its canvas. The three template cards (`Label 1` to `3`) show a random number until there is data for them.
 
 ## Ids
 

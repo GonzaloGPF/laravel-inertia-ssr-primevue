@@ -40,4 +40,10 @@ return [
     'admin' => 'Admin',
     'personal_area' => 'Área personal',
     'having' => 'Teniendo',
+    'dashboard' => 'Dashboard',
+    'total_users' => 'Usuarios totales',
+    'label' => 'Etiqueta',
+    'new_users' => 'Nuevos usuarios',
+    'new_users_per_month' => 'Nuevos usuarios por mes',
+    'last_12_months' => 'Últimos 12 meses',
 ];
