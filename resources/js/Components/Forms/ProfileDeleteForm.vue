@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import AppButton from '@/Components/Core/AppButton.vue'
 import { Translator } from '@/objects/Translator'
 import useForm from '@/composables/useForm.js'
-import IPassword from '@/Components/Inputs/iPassword.vue'
+import iPassword from '@/Components/Inputs/iPassword.vue'
 
 const openModal = ref(false)
 const passwordInput = ref(null)

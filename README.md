@@ -85,7 +85,7 @@ resources/js/
     Forms/             Forms of the pages, they use AppForm and the inputs
     Info/              Info components: they just display the values of an entity (UserInfo)
   composables/         useCrud, useDataTable, useFilterForm, useForm...
-  config/              columns.ts, inputs.ts, buttons.ts... and filters/ (one file per entity)
+  config/              userColumns.ts, inputs.ts, buttons.ts... and filters/ (one file per entity)
 .ai/rules/             Project rules for AI assistants, grouped by area
 tests/{Unit,Feature,Browser}
 ```
