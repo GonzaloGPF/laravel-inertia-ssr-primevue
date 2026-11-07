@@ -19,13 +19,19 @@ class HandleInertiaRequests extends Middleware
     protected $rootView = 'app';
 
     /**
-     * Apply the authenticated user's preferred language before the request is handled,
-     * so validation messages, flash messages, and the rendered `<html lang>` all match it.
+     * Apply the language before the request is handled, so validation messages, flash messages, and the
+     * rendered `<html lang>` all match it: the preferred one of the authenticated user or, if they are not
+     * logged, the one chosen in the session. Without any, it is the one of the application.
      */
     public function handle(Request $request, Closure $next)
     {
-        if ($request->user()) {
-            app()->setLocale($request->user()->language->value ?? Languages::ES->value);
+        $user = $request->user();
+        $language = $user
+            ? ($user->language->value ?? Languages::ES->value)
+            : $request->session()->get('language');
+
+        if ($language) {
+            app()->setLocale($language);
         }
 
         return parent::handle($request, $next);

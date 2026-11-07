@@ -178,6 +178,10 @@ Every chart goes through `AppChart`, so they all have the same structure: a card
 
 The theme is light, dark, or the one of the system (the default, which it follows when it changes), and the button next to the user menu (`TopMenuTheme`) chooses it. The choice is kept in the browser (`localStorage`), by the `useTheme` store. The dark theme is the `app-dark` class of the `html` element, and everything follows it: PrimeVue (`darkModeSelector: '.app-dark'`), the `dark:` variant of Tailwind (a `@custom-variant` in `app.css`) and the charts, which read the colors of the theme through `useChartTheme`. A script in the head of `app.blade.php` sets the class before the page is painted, so it does not flash: if the key of the storage or the class changes, it has to change there too.
 
+## Language
+
+The language is chosen with the button of the top menu (`TopMenuLanguage`), by whoever it is, logged or not. The `language.update` route keeps it in the session and, for a user, in their profile (`users.language`), and the page changes at once, as the translations are loaded by the client. `HandleInertiaRequests` applies it to every request: the language of the profile of the user, or, if they are not logged, the one of the session, or else the one of the application (`APP_LOCALE`). The ones who register get the language that was in use, not the default one of the table.
+
 ## Ids
 
 The models have a **ulid** as their primary key, named `id` as always: it can be exposed in the urls, the props and the filters, but nobody can count or walk through the records, as it happens with the sequential numbers. It is sortable by creation date, so the lists keep showing the newest first.

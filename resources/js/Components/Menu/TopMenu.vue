@@ -5,6 +5,7 @@ import AppNavLink from '@/Components/Core/AppNavLink.vue'
 import AppIcon from '@/Components/Core/AppIcon.vue'
 import AppImage from '@/Components/Core/AppImage.vue'
 import TopMenuAuth from '@/Components/Menu/TopMenuAuth.vue'
+import TopMenuLanguage from '@/Components/Menu/TopMenuLanguage.vue'
 import TopMenuTheme from '@/Components/Menu/TopMenuTheme.vue'
 
 const items = computed(() => [
@@ -36,6 +37,7 @@ const items = computed(() => [
     </template>
     <template #end>
       <div class="flex items-center gap-1">
+        <TopMenuLanguage />
         <TopMenuTheme />
         <TopMenuAuth />
       </div>

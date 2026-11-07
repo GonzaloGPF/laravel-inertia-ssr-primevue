@@ -4,7 +4,7 @@ import VerifyEmailForm from '@/Components/Forms/VerifyEmailForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 
 type Props = {
-  status: string
+  status?: string
 }
 
 defineProps<Props>()

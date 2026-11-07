@@ -8,7 +8,6 @@ import ProfileDeleteForm from '@/Components/Forms/ProfileDeleteForm.vue'
 
 type Props = {
   mustVerifyEmail: boolean
-  status: string
 }
 
 defineProps<Props>()

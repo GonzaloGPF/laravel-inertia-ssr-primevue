@@ -3,6 +3,7 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AutoCompleteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RootController;
 use App\Http\Controllers\UserController;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [RootController::class, 'show'])->name('root');
 Route::get('/about', [AboutController::class, 'show'])->name('about.show');
+Route::put('/language', [LanguageController::class, 'update'])->name('language.update');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard.show');

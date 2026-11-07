@@ -15,6 +15,24 @@ test('the profile edit page loads without javascript errors', function () {
         ->assertNoSmoke();
 });
 
+test('the profile page opened from the menu logs no Vue warnings', function () {
+    $user = User::factory()->create(['name' => 'Jane Doe', 'language' => 'en']);
+
+    $this->actingAs($user);
+
+    $page = visit('/');
+
+    // The smoke assertions only see console.log, and Vue reports its warnings (i.e. a prop of the wrong type) with warn
+    $page->script('window.__vueWarnings = []; const warn = console.warn; console.warn = (...args) => { window.__vueWarnings.push(args.join(" ")); warn(...args) }');
+
+    $page->click('Jane Doe')
+        ->click('li[aria-label="Profile"]')
+        ->assertRoute('profile.edit')
+        ->assertSee('Profile Information');
+
+    expect($page->script('window.__vueWarnings.filter(message => message.includes("Vue warn"))'))->toBe([]);
+});
+
 test('a user can update their name and email and sees a visible confirmation', function () {
     $user = User::factory()->create(['language' => 'en']);
 

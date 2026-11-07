@@ -1,6 +1,6 @@
 import '../css/app.css'
 
-import { createSSRApp, h, type DefineComponent } from 'vue'
+import { createApp, createSSRApp, h, type DefineComponent } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers'
 import { app } from '@/config/app'
@@ -23,7 +23,9 @@ createInertiaApp({
     return page
   },
   setup({ el, App, props, plugin }) {
-    const app = createSSRApp({ render: () => h(App, props) }).use(plugin)
+    // Hydrate only when the server rendered the page: without the SSR server the container is empty
+    const create = el.hasChildNodes() ? createSSRApp : createApp
+    const app = create({ render: () => h(App, props) }).use(plugin)
 
     registerPlugins(app, props)
     registerDirectives(app)

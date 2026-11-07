@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\Languages;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -41,6 +42,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
+            'language' => Languages::tryFrom(app()->getLocale())->value ?? Languages::ES->value,
         ]);
 
         event(new Registered($user));

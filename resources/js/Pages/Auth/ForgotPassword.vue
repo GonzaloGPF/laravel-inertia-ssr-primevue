@@ -4,7 +4,7 @@ import ForgotPasswordForm from '@/Components/Forms/ForgotPasswordForm.vue'
 import CardLayout from '@/Layouts/CardLayout.vue'
 
 type Props = {
-  status: string
+  status?: string
 }
 
 defineProps<Props>()

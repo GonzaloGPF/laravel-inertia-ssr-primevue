@@ -1,7 +1,6 @@
 import { router, usePage } from '@inertiajs/vue3'
 import { computed, toRefs } from 'vue'
 import { Translator } from '@/objects/Translator'
-import { useFlashMessages } from '@/stores/flashMessages.js'
 import { User } from '@/types'
 import { BaseModel } from '@/types/base-model'
 
@@ -23,23 +22,18 @@ export default function useAuth() {
     return role.includes(user.value?.role as string)
   }
 
+  /**
+   * The language is changed right away, and the backend keeps it: in the profile of a user, and in the session
+   * of the ones who are not logged.
+   */
   const updateLanguage = (language: string) => {
     Translator.setLocale(language)
 
-    if (isLogged.value) {
-      router.put(
-        route('profile.update'),
-        { language, quietly: true },
-        {
-          preserveScroll: true,
-          preserveState: true,
-          replace: true,
-          onFinish: () => {
-            useFlashMessages().pushFlashMessageAction('updated')
-          },
-        }
-      )
-    }
+    router.put(
+      route('language.update'),
+      { language },
+      { preserveScroll: true, preserveState: true, replace: true }
+    )
   }
   const createdByMe = (model?: BaseModel) =>
     model?.created_by === user.value?.id
