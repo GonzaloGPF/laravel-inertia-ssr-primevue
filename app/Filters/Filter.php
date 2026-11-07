@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use EloquentFilter\ModelFilter;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -270,6 +271,22 @@ class Filter extends ModelFilter
     {
         if ($this->query->getModel() instanceof HasCreatedByInterface) {
             $this->whereIn('created_by', $userIds);
+        }
+
+        return $this->query;
+    }
+
+    /**
+     * Lists just the deleted ones, in the models that can be soft deleted: the rest only list the ones that are not.
+     */
+    public function deleted($value): Builder
+    {
+        $model = $this->query->getModel();
+
+        if ($value && method_exists($model, 'getQualifiedDeletedAtColumn')) {
+            $this->query
+                ->withoutGlobalScope(SoftDeletingScope::class)
+                ->whereNotNull($model->getQualifiedDeletedAtColumn());
         }
 
         return $this->query;

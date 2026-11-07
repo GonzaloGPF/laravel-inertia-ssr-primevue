@@ -7,6 +7,7 @@ export type ActionName =
   | 'edit'
   | 'delete'
   | 'restore'
+  | 'force_delete'
   | 'attach'
   | 'detach'
   | 'save'

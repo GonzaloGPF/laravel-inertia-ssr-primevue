@@ -7,6 +7,7 @@ return [
     'updated' => 'Updated|Updated',
     'deleted' => 'Deleted|Deleted',
     'restored' => 'Restored|Restored',
+    'force_deleted' => 'Deleted Permanently|Deleted Permanently',
     'attached' => 'Attached|Attached',
     'detached' => 'Detached|Detached',
     'toggled' => 'Toggled|Toggled',
@@ -96,4 +97,5 @@ return [
     'sort' => 'sort',
     'import' => 'Import',
     'restore' => 'Restore',
+    'force_delete' => 'Delete Permanently',
 ];

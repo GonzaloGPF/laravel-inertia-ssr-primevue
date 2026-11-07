@@ -17,11 +17,13 @@ dataset('user actions', [
     'edit' => ['get', 'users.edit', []],
     'update' => ['put', 'users.update', ['name' => 'Other Name']],
     'destroy' => ['delete', 'users.destroy', []],
+    'restore' => ['put', 'users.restore', []],
+    'force delete' => ['delete', 'users.force-delete', []],
 ]);
 
 function callUserAction($test, string $method, string $route, array $data, User $target)
 {
-    $parameters = in_array($route, ['users.show', 'users.edit', 'users.update', 'users.destroy'], true) ? [$target] : [];
+    $parameters = in_array($route, ['users.show', 'users.edit', 'users.update', 'users.destroy', 'users.restore', 'users.force-delete'], true) ? [$target] : [];
 
     return $test->{$method}(route($route, $parameters), $data);
 }

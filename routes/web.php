@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RootController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserTrashController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [RootController::class, 'show'])->name('root');
@@ -24,6 +25,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin')
         ->group(function () {
             Route::resource('users', UserController::class);
+            Route::put('users/{user}/restore', [UserTrashController::class, 'update'])->withTrashed()->name('users.restore');
+            Route::delete('users/{user}/force', [UserTrashController::class, 'destroy'])->withTrashed()->name('users.force-delete');
         });
 });
 

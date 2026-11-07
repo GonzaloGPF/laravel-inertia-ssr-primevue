@@ -102,7 +102,7 @@ Every listing of entities, such as an admin table or a selector, goes through th
 How a listing is built:
 
 1. **Model.** Use the `IsFilterable` trait.
-2. **Filter.** Create `App\Filters\{Model}Filter`, extending `Filter`. The base class already handles ranges (`min_x`, `max_x`), exclusions (`not_x`), enum columns, `sort=attribute|asc`, pagination (`page`, `per_page`), `ids`, `with` and more. Add model specific filters as methods named after the input, and declare the columns of the global search:
+2. **Filter.** Create `App\Filters\{Model}Filter`, extending `Filter`. The base class already handles ranges (`min_x`, `max_x`), exclusions (`not_x`), enum columns, `sort=attribute|asc`, pagination (`page`, `per_page`), `ids`, `deleted` (just the soft deleted ones), `with` and more. Add model specific filters as methods named after the input, and declare the columns of the global search:
 
    ```php
    class UserFilter extends Filter
@@ -134,6 +134,8 @@ How a listing is built:
 A table can also expand its rows with `:details="UserInfo"` (an Info component, `details-prop` names the prop that receives the row, `item` by default): the column to expand them only exists when `details` is given.
 
 The columns are sortable by the backend: click a header to sort ascending, again for descending, and a third time to remove the sort. A column that must not be sortable declares `without_sort: true` in `config/columns.ts`.
+
+The users have a trash: soft deleted users are not listed, but the *Deleted* filter (`deleted=1`) lists just them, and their rows offer to restore them (`users.restore`) or to delete them for good, with their files (`users.force-delete`), after a confirmation. A user has to be in the trash to be deleted for good. They are not opened nor edited, as a deleted model is not bound in the routes: a route that has to find them says it with `->withTrashed()`.
 
 ## Files
 

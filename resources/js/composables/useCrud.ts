@@ -18,7 +18,8 @@ type Options<T> = {
 
 /**
  * Common logic of the admin views: an `AppDataTable` of models, a modal to
- * create or edit them, the page of their details and the confirmation to delete them. `table` must be
+ * create or edit them, the page of their details, the confirmation to delete them (and to delete them
+ * for good) and the restoring of the deleted ones. `table` must be
  * bound to the table with `ref="table"`.
  *
  * The modal edits the `item` of the row whose `edit` action was clicked, or
@@ -37,15 +38,29 @@ export default function useCrud<T extends { id?: number | string }>(
   const table = ref<TableInstance | null>(null)
   const showModal = ref(false)
   const item = ref<T | null>(null)
-  const deleting = ref(false)
+  const sending = ref(false)
 
   const title = computed(() => Translator.modelTitle(modelName, true))
   const modalTitle = computed(() =>
     Translator.actionTitle(item.value ? 'edit' : 'create', modelName)
   )
 
+  /**
+   * Sends the request of an action on the row. The row leaves the table when it is done: the
+   * list the table shows is not the one it belongs to any more.
+   */
+  const send = (method: 'put' | 'delete', routeName: string, row: T) =>
+    router.visit(route(`${resource}.${routeName}`, row.id), {
+      method,
+      preserveState: true,
+      preserveScroll: true,
+      onStart: () => (sending.value = true),
+      onSuccess: () => table.value?.removeRow(row.id as number | string),
+      onFinish: () => (sending.value = false),
+    })
+
   const onDelete = async (row: T) => {
-    if (deleting.value) {
+    if (sending.value) {
       return
     }
 
@@ -60,17 +75,24 @@ export default function useCrud<T extends { id?: number | string }>(
       okText: Translator.actionTitle('delete'),
     })
 
-    if (!confirmed) {
+    if (confirmed) {
+      send('delete', 'destroy', row)
+    }
+  }
+
+  const onForceDelete = async (row: T) => {
+    if (sending.value) {
       return
     }
 
-    router.delete(route(`${resource}.destroy`, row.id), {
-      preserveState: true,
-      preserveScroll: true,
-      onStart: () => (deleting.value = true),
-      onSuccess: () => table.value?.removeRow(row.id as number | string),
-      onFinish: () => (deleting.value = false),
-    })
+    const confirmed = await showConfirm(
+      Translator.t('help.force_delete_text'),
+      { okText: Translator.actionTitle('force_delete') }
+    )
+
+    if (confirmed) {
+      send('delete', 'force-delete', row)
+    }
   }
 
   const onAction = (action: ActionName, row?: T) => {
@@ -90,6 +112,14 @@ export default function useCrud<T extends { id?: number | string }>(
 
     if (action === 'delete' && row) {
       void onDelete(row)
+    }
+
+    if (action === 'restore' && row && !sending.value) {
+      send('put', 'restore', row)
+    }
+
+    if (action === 'force_delete' && row) {
+      void onForceDelete(row)
     }
   }
 

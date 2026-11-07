@@ -3,6 +3,7 @@
 return [
     'whoops' => 'Algo ha ido mal...',
     'delete_text' => '¿Está seguro de que desea eliminar?',
+    'force_delete_text' => 'Esto lo borra para siempre, con sus ficheros. ¿Está seguro?',
     'delete_account' => '¿Estás seguro de que quieres eliminar la cuenta?',
     'delete_account_warning' => 'Una vez que se elimine su cuenta, todos sus recursos y datos se eliminarán de forma permanente. Ingrese su contraseña para confirmar que desea eliminar su cuenta de forma permanente.',
     'forgot_password' => 'Háganos saber su dirección de correo electrónico y le enviaremos un enlace de restablecimiento de contraseña que le permitirá elegir una nueva.',

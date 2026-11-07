@@ -8,9 +8,14 @@ import { userFilters } from '@/config/filters/userFilters'
 import useAuth from '@/composables/useAuth'
 import useCrud from '@/composables/useCrud'
 import { Translator } from '@/objects/Translator'
+import { ActionName } from '@/types/actions'
 import { User } from '@/types'
 
 const { user: authUser } = useAuth()
+
+// A deleted user can't be opened nor edited, only taken out of the trash or deleted for good
+const rowActions = (user: User): ActionName[] =>
+  user.deleted_at ? ['restore', 'force_delete'] : ['view', 'edit', 'delete']
 
 const { table, item, title, modalTitle, showModal, onAction, onSaved } =
   useCrud<User>('user', {
@@ -27,6 +32,7 @@ const { table, item, title, modalTitle, showModal, onAction, onSaved } =
       :src="route('users.index')"
       :columns="userColumns"
       :filters-data="userFilters"
+      :actions="rowActions"
       :details="UserInfo"
       details-prop="user"
       :header-actions="['create']"

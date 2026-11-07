@@ -35,6 +35,11 @@ export const buttons: Record<ActionName, ButtonProps> = {
     title: 'restore',
     icon: 'restore_from_trash',
   },
+  force_delete: {
+    title: 'force_delete',
+    severity: 'danger',
+    icon: 'delete_forever',
+  },
   attach: {
     title: 'attach',
     icon: 'link',

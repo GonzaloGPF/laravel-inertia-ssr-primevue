@@ -12,6 +12,7 @@ export interface User {
   currency?: string
   language?: string
   avatar_url?: string | null
+  deleted_at?: string | null
 }
 
 export type PageProps<

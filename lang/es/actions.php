@@ -7,6 +7,7 @@ return [
     'updated' => 'Actualizado|Actualizada',
     'deleted' => 'Borrado|Borrada',
     'restored' => 'Restaurado|Restaurada',
+    'force_deleted' => 'Borrado definitivamente|Borrada definitivamente',
     'attached' => 'Vinculado|Vinculada',
     'detached' => 'Desvinculado|Desvinculada',
     'toggled' => 'Cambiado|Cambiada',
@@ -97,4 +98,5 @@ return [
     'sort' => 'Ordenar',
     'import' => 'Importar',
     'restore' => 'Restaurar',
+    'force_delete' => 'Borrar definitivamente',
 ];

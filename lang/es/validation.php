@@ -227,6 +227,7 @@ return [
         'language' => 'idioma',
         'currency' => 'moneda',
         'verified' => 'verificado',
+        'deleted' => 'borrado',
         'email_verified_at' => 'verificado',
         'appraisal_state' => 'estado',
         'serial_number' => 'Nº de serie',
