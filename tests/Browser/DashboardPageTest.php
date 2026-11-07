@@ -284,6 +284,28 @@ test('the chart is painted with the colors of the dark mode when the system uses
         ->and($darkLine)->not->toBe($lightLine); // The primary color is a lighter one in the dark mode
 });
 
+test('the chart follows the theme chosen in the application, as the one of the system', function () {
+    $page = visit(route('dashboard.show', absolute: false));
+
+    expectDashboardLoaded($page);
+
+    $light = chartPaint($page)['line'];
+
+    $page->click('[aria-label="Theme"]')
+        ->click('li[aria-label="Dark"]');
+
+    $dark = $light;
+
+    for ($attempt = 0; $attempt < 30 && $dark === $light; $attempt++) {
+        usleep(100_000);
+        $dark = chartPaint($page)['line'];
+    }
+
+    expect($light)->not->toBe('')
+        ->and($dark)->not->toBe('')
+        ->and($dark)->not->toBe($light); // The primary color is a lighter one in the dark theme
+});
+
 test('the dashboard is translated', function () {
     $this->admin->update(['language' => Languages::ES]);
 

@@ -174,6 +174,10 @@ The avatars of the seeds are the "Lorelei" style of [DiceBear](https://www.diceb
 
 Every chart goes through `AppChart`, so they all have the same structure: a card with its title, a skeleton while the data loads, a message when there is no data, and the values as a text for screen readers (in the `aria-label` of the canvas). There are only three kinds, the `type`: `line`, `bar` and `pie`. The data is always `labels` and `series` (`{ label, data }`; a pie takes the first one, its values are the slices), and `objects/Charts.ts` builds what Chart.js needs from them. The charts are drawn on a canvas, so they cannot read CSS variables: `useChartTheme` resolves the colors of the PrimeVue theme (light or dark, as the system says), and a palette for the series, for them. The three template cards (`Label 1` to `3`) show a random number until there is data for them.
 
+## Theme
+
+The theme is light, dark, or the one of the system (the default, which it follows when it changes), and the button next to the user menu (`TopMenuTheme`) chooses it. The choice is kept in the browser (`localStorage`), by the `useTheme` store. The dark theme is the `app-dark` class of the `html` element, and everything follows it: PrimeVue (`darkModeSelector: '.app-dark'`), the `dark:` variant of Tailwind (a `@custom-variant` in `app.css`) and the charts, which read the colors of the theme through `useChartTheme`. A script in the head of `app.blade.php` sets the class before the page is painted, so it does not flash: if the key of the storage or the class changes, it has to change there too.
+
 ## Ids
 
 The models have a **ulid** as their primary key, named `id` as always: it can be exposed in the urls, the props and the filters, but nobody can count or walk through the records, as it happens with the sequential numbers. It is sortable by creation date, so the lists keep showing the newest first.

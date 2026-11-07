@@ -1,4 +1,6 @@
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { onMounted, ref, watch } from 'vue'
+import { useTheme } from '@/stores/theme'
 import type { ChartColor, ChartTheme } from '@/types/chart'
 
 type Rgb = [number, number, number]
@@ -91,24 +93,17 @@ const readTheme = (dark: boolean): ChartTheme => ({
 })
 
 /**
- * The colors of the PrimeVue theme in use, for the charts. They follow the light and dark modes of the system.
+ * The colors of the PrimeVue theme in use, for the charts. They follow the theme of the application, light or dark.
  * Until the page is in the browser (the server cannot read them), it is the light theme.
  */
 export default function useChartTheme() {
   const theme = ref<ChartTheme>(LIGHT_THEME)
-  const darkMode =
-    typeof window === 'undefined'
-      ? undefined
-      : window.matchMedia('(prefers-color-scheme: dark)')
+  const { isDark } = storeToRefs(useTheme())
 
-  const update = () => (theme.value = readTheme(!!darkMode?.matches))
+  const update = () => (theme.value = readTheme(isDark.value))
 
-  onMounted(() => {
-    update()
-    darkMode?.addEventListener('change', update)
-  })
-
-  onBeforeUnmount(() => darkMode?.removeEventListener('change', update))
+  onMounted(update)
+  watch(isDark, update, { flush: 'post' }) // Once the class of the theme is in the page
 
   return theme
 }

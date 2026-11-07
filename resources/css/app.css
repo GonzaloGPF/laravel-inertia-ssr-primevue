@@ -4,3 +4,6 @@
 @import './animations.css';
 @import './buttons.css';
 @import './inputs.css';
+
+/* The dark variant is the theme of the application (see the theme store), not the one of the system */
+@custom-variant dark (&:where(.app-dark, .app-dark *));
