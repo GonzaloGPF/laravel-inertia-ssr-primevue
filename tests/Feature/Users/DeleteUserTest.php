@@ -27,7 +27,7 @@ it('wont allows users to delete users', function () {
     $user = User::factory()->create();
 
     $this->delete(route('users.destroy', $user))
-        ->assertRedirect();
+        ->assertForbidden();
 
     expect($user->fresh()->deleted_at)->toBeNull();
 });

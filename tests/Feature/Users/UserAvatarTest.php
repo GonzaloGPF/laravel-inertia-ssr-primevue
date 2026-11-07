@@ -150,7 +150,7 @@ it('will not let a regular user change the avatar of other users', function () {
         ->saveQuietly();
 
     $this->put(route('users.update', $user), ['avatar' => UploadedFile::fake()->image('me.png')])
-        ->assertRedirect();
+        ->assertForbidden();
 
     expect($user->fresh()->avatar)->toBeNull();
 

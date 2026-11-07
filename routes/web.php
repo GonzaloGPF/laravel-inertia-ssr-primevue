@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\AutoCompleteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RootController;
@@ -15,12 +16,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-Route::prefix('admin')
-    ->middleware('role:admin')
-    ->group(function () {
-        Route::resource('users', UserController::class);
-    });
+    // In the web group, as it needs the session of the user, but under /api
+    Route::get('/api/autocomplete/{model}', [AutoCompleteController::class, 'index'])->name('autocomplete.index');
+
+    Route::prefix('admin')
+        ->middleware('role:admin')
+        ->group(function () {
+            Route::resource('users', UserController::class);
+        });
+});
 
 require __DIR__.'/auth.php';

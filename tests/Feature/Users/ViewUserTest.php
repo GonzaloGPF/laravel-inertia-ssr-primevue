@@ -51,7 +51,7 @@ it('wont let a user view all users', function () {
         ->saveQuietly();
 
     $this->get(route('users.index'))
-        ->assertRedirect();
+        ->assertForbidden();
 });
 
 it('wont let a user view specific user', function () {
@@ -60,7 +60,7 @@ it('wont let a user view specific user', function () {
         ->saveQuietly();
 
     $this->get(route('users.show', User::factory()->create()))
-        ->assertRedirect();
+        ->assertForbidden();
 });
 
 /**
@@ -118,7 +118,7 @@ it('wont let a user list the users data', function () {
         ->forceFill(['role' => Roles::USER])
         ->saveQuietly();
 
-    usersData()->assertRedirect();
+    usersData()->assertForbidden();
 });
 
 it('searches the users with the global search of the table', function () {

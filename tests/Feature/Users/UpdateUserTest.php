@@ -13,7 +13,7 @@ it('wont let access to edit if not logged', function () {
     $this->logout();
 
     $this->getJson(route('users.edit', User::factory()->create()))
-        ->assertRedirect();
+        ->assertUnauthorized();
 });
 
 it('will not allow access to edit other user if is not an admin', function () {
@@ -22,7 +22,7 @@ it('will not allow access to edit other user if is not an admin', function () {
         ->saveQuietly();
 
     $this->getJson(route('users.edit', User::factory()->create()))
-        ->assertRedirect();
+        ->assertForbidden();
 });
 
 it('let admin update users', function () {
@@ -118,7 +118,7 @@ it('will not let a regular user update users', function () {
         ->saveQuietly();
 
     $this->put(route('users.update', $user), ['name' => 'Other Name'])
-        ->assertRedirect('/');
+        ->assertForbidden();
 
     expect($user->fresh()->name)->toBe('Some Name');
 });

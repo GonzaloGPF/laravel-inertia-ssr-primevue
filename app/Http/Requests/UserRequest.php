@@ -8,6 +8,7 @@ use App\Enums\Roles;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,11 +16,16 @@ use Symfony\Component\HttpFoundation\Request;
 class UserRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Determine if the user is authorized to make this request. It is done here, not in the controller, as
+     * the validation comes first: the ones that cannot would otherwise learn from its errors (i.e. which emails exist).
      */
     public function authorize(): bool
     {
-        return true;
+        if ($this->isMethod(Request::METHOD_POST)) {
+            return Gate::allows('create', User::class);
+        }
+
+        return Gate::allows('update', $this->route('user'));
     }
 
     /**

@@ -9,11 +9,12 @@ beforeEach(function () {
     $this->other = User::factory()->create(['role' => Roles::USER]);
 });
 
-it('lets everybody view users', function () {
+it('lets only admins view users', function () {
     expect($this->admin->can('viewAny', User::class))->toBeTrue()
-        ->and($this->regular->can('viewAny', User::class))->toBeTrue()
         ->and($this->admin->can('view', $this->other))->toBeTrue()
-        ->and($this->regular->can('view', $this->other))->toBeTrue();
+        ->and($this->regular->can('viewAny', User::class))->toBeFalse()
+        ->and($this->regular->can('view', $this->other))->toBeFalse()
+        ->and($this->regular->can('view', $this->regular))->toBeFalse(); // Themselves, in their profile
 });
 
 it('lets only admins create users', function () {
@@ -21,10 +22,10 @@ it('lets only admins create users', function () {
         ->and($this->regular->can('create', User::class))->toBeFalse();
 });
 
-it('lets admins update any user, and the rest just themselves', function () {
+it('lets only admins update users, and the rest not even themselves, as they could give themselves the role', function () {
     expect($this->admin->can('update', $this->other))->toBeTrue()
         ->and($this->admin->can('update', $this->admin))->toBeTrue()
-        ->and($this->regular->can('update', $this->regular))->toBeTrue()
+        ->and($this->regular->can('update', $this->regular))->toBeFalse()
         ->and($this->regular->can('update', $this->other))->toBeFalse();
 });
 

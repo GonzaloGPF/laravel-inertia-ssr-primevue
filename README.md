@@ -63,6 +63,8 @@ Laravel serves the assets from the Vite dev server when `public/hot` exists, and
 
 The browser tests drive a headless Chromium from PHP and run inside Sail, which already has what Chromium needs. Run them against the production build too (move `public/hot` away and run `yarn build`) when you change frontend code: some failures only show there.
 
+The dev server (`sail yarn dev`) writes `public/hot` and removes it when it stops. If it dies without stopping cleanly (the computer was turned off), the file stays behind, and the pages would ask for their assets to a server that is not there: the application ignores a hot file when nobody answers at its address, so the pages and the tests use the production build (run `yarn build` once to have it).
+
 A Husky pre-commit hook runs lint-staged (Pint, ESLint and Stylelint on the staged files). GitHub Actions run the same checks, the tests with MySQL, and a production build smoke check on every push to `master` and every pull request.
 
 ## Project structure

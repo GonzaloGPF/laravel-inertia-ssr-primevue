@@ -134,7 +134,8 @@ test('a regular user cannot open the detail of a user', function () {
 
     $page = visit(route('users.show', $this->cara, false));
 
-    $page->assertPathIs('/')
+    $page->assertPresent('[data-error-page]') // Forbidden, not sent away
+        ->assertPathIs(route('users.show', $this->cara, false))
         ->assertDontSee('cara@example.com');
 });
 

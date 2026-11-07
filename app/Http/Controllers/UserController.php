@@ -16,16 +16,22 @@ class UserController extends Controller
 
     public function show(User $user): Response
     {
+        Gate::authorize('view', $user);
+
         return Inertia::render('Users/UserShow', ['user' => $user]);
     }
 
     public function index(): Response
     {
+        Gate::authorize('viewAny', User::class);
+
         return $this->renderCollection('Users/UserIndex', User::class);
     }
 
     public function create(): Response
     {
+        Gate::authorize('create', User::class);
+
         return Inertia::render('Users/UserCreate');
     }
 
@@ -44,6 +50,8 @@ class UserController extends Controller
 
     public function edit(User $user): Response
     {
+        Gate::authorize('update', $user);
+
         return Inertia::render('Users/UserEdit', [
             'user' => fn () => $user,
         ]);

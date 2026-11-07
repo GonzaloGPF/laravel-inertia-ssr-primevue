@@ -13,7 +13,7 @@ it('wont let access to create if not logged', function () {
     $this->logout();
 
     $this->getJson(route('users.create'))
-        ->assertRedirect();
+        ->assertUnauthorized();
 });
 
 it('will not allow access to create if you are not an admin', function () {
@@ -22,7 +22,7 @@ it('will not allow access to create if you are not an admin', function () {
         ->saveQuietly();
 
     $this->get(route('users.create'))
-        ->assertRedirect();
+        ->assertForbidden();
 });
 
 it('will allow access to create if its admin', function () {
@@ -125,7 +125,7 @@ it('will not let a regular user create users', function () {
         'name' => 'Some Name',
         'email' => 'some@email.com',
         'role' => Roles::USER->value,
-    ])->assertRedirect('/');
+    ])->assertForbidden();
 
     expect(User::firstWhere('email', 'some@email.com'))->toBeNull();
 });

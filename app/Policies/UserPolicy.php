@@ -9,11 +9,12 @@ use Illuminate\Auth\Access\Response;
 class UserPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view any models. The users are for the admins: the rest only
+     * see themselves, in their profile.
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return hasRole(Roles::ADMIN, $user);
     }
 
     /**
@@ -21,7 +22,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return true;
+        return hasRole(Roles::ADMIN, $user);
     }
 
     /**
@@ -33,11 +34,12 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Determine whether the user can update the model. Only the admins, who can set the role: the rest
+     * edit themselves in their profile, which has its own endpoint and no role to give themselves.
      */
     public function update(User $user, User $model): bool
     {
-        return hasRole(Roles::ADMIN, $user) || $user->is($model);
+        return hasRole(Roles::ADMIN, $user);
     }
 
     /**

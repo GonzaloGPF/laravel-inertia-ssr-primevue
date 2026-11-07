@@ -5,6 +5,7 @@ return [
     'validation' => 'Validation Errors',
     'token_expired' => 'Expired Session',
     'session_expired' => 'Expired Session', // Csrf token
+    'page_expired' => 'The page expired. Please try again.',
     'not_found' => 'Not Found',
     'not_found_data' => ':data not Found',
     'no_relation' => 'Relation not Found [:data]',

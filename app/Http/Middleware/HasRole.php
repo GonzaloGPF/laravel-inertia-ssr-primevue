@@ -16,7 +16,7 @@ class HasRole
     public function handle(Request $request, Closure $next, string $role): Response
     {
         if (! hasRole($role)) {
-            return redirect('/');
+            abort(Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

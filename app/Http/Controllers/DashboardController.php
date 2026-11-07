@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\Roles;
 use App\Services\DashboardService;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -16,7 +16,7 @@ class DashboardController extends Controller
      */
     public function show(DashboardService $dashboard): Response
     {
-        if (! hasRole(Roles::ADMIN)) {
+        if (Gate::denies('view-statistics')) {
             return Inertia::render('Dashboard/DashboardPage');
         }
 

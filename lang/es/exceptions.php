@@ -5,6 +5,7 @@ return [
     'validation' => 'Errores de Validación',
     'token_expired' => 'Sesión Caducada',
     'session_expired' => 'Sesión Expirada', // Csrf token
+    'page_expired' => 'La página ha caducado. Por favor, inténtalo de nuevo.',
     'not_found' => 'No Encontrado',
     'not_found_data' => 'No se ha encontrado :data',
     'no_relation' => 'Relación no Encontrada [:data]',

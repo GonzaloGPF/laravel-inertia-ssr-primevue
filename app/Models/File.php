@@ -12,9 +12,12 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * A physical file, kept in a disk, that belongs to any model using the HasFiles trait.
+ *
  * Only its path is stored: the url is calculated from the disk it was saved in.
  *
  * @property-read string $url
+ *
+ * @mixin IdeHelperFile
  */
 class File extends Model
 {

@@ -2,6 +2,7 @@
 
 use App\Enums\Roles;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
@@ -63,4 +64,12 @@ it('gives the rest of the users the page without the statistics, even if they as
             ->reload(only: ['stats', 'usersByMonth'], callback: fn (Assert $reload) => $reload
                 ->missing('stats')
                 ->missing('usersByMonth')));
+});
+
+it('lets only the admins see the statistics', function () {
+    $admin = User::factory()->admin()->create();
+    $regular = User::factory()->create(['role' => Roles::USER]);
+
+    expect(Gate::forUser($admin)->allows('view-statistics'))->toBeTrue()
+        ->and(Gate::forUser($regular)->allows('view-statistics'))->toBeFalse();
 });
