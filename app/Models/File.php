@@ -56,11 +56,17 @@ class File extends Model implements HasCreatedByInterface
         ];
     }
 
+    /**
+     * @return MorphTo<Model, $this>
+     */
     public function fileable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function url(): Attribute
     {
         return Attribute::get(fn () => Storage::disk($this->disk)->url($this->path));

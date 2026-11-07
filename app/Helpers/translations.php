@@ -61,6 +61,8 @@ function tAction(string $action, ?string $model = null, bool $female = false, ?b
 
 /**
  * Translate given attribute name
+ *
+ * @param  string  $attribute
  */
 function ta($attribute): string
 {
@@ -73,6 +75,8 @@ function ta($attribute): string
 
 /**
  * Translate given label
+ *
+ * @param  string  $label
  */
 function tl($label): string
 {

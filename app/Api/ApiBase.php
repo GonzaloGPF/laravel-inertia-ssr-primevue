@@ -9,6 +9,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -19,12 +20,15 @@ abstract class ApiBase
 
     private PendingRequest $request;
 
+    /** @var array<string, mixed> */
     private array $options;
 
+    /** @var array<string, string> */
     private array $headers;
 
     private bool $active;
 
+    /** @var array<int, string> */
     private array $basicAuth;
 
     private ?string $token;
@@ -33,6 +37,7 @@ abstract class ApiBase
 
     private bool $shouldQueue;
 
+    /** @var array<int, mixed> */
     private array $attachments;
 
     public function __construct(private readonly SimpleResponse $simpleResponse)
@@ -51,8 +56,11 @@ abstract class ApiBase
         $this->init();
     }
 
-    abstract protected function init();
+    abstract protected function init(): void;
 
+    /**
+     * @return array<string, mixed>|string|float
+     */
     public function getOptions(?string $value = null): array|string|float
     {
         if ($value) {
@@ -62,6 +70,9 @@ abstract class ApiBase
         return $this->options;
     }
 
+    /**
+     * @param  array<string, mixed>  $options
+     */
     public function setOptions(array $options): ApiBase
     {
         $this->options = $options;
@@ -69,19 +80,24 @@ abstract class ApiBase
         return $this;
     }
 
-    public function setAttachments(string $fieldName, $file): ApiBase
+    public function setAttachments(string $fieldName, UploadedFile $file): ApiBase
     {
         $this->attachments = [$fieldName, file_get_contents($file), $file->getClientOriginalName()];
 
         return $this;
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function getAttachments(): array
     {
-
         return $this->attachments;
     }
 
+    /**
+     * @param  array<string, string>  $options
+     */
     public function setHeaders(array $options): ApiBase
     {
         $this->headers = array_merge($this->headers, $options);
@@ -89,11 +105,17 @@ abstract class ApiBase
         return $this;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getBasicAuth(): array
     {
         return $this->basicAuth;
@@ -154,31 +176,55 @@ abstract class ApiBase
             && ! $response->clientError();
     }
 
+    /**
+     * @param  array<string, mixed>  $options
+     * @return array<string, mixed>
+     */
     public function get(string $url, array $options = []): array
     {
         return $this->makeRequest('get', $url, $options);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public function put(string $url, array $data = []): array
     {
         return $this->makeRequest('put', $url, $data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public function patch(string $url, array $data = []): array
     {
         return $this->makeRequest('patch', $url, $data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public function post(string $url, array $data = []): array
     {
         return $this->makeRequest('post', $url, $data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     public function delete(string $url, array $data = []): array
     {
         return $this->makeRequest('delete', $url, $data);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
     private function makeRequest(string $verb, string $url, array $data = []): array
     {
         if ($this->shouldQueue) {
@@ -238,6 +284,8 @@ abstract class ApiBase
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     *
      * @throws BindingResolutionException
      */
     public function doRequest(string $verb, string $url, array $data): Response
@@ -254,6 +302,8 @@ abstract class ApiBase
      * It will log correctly depending on environments
      * If its on live, it will throw exceptions logs
      * if its local or testing, it will just log in file
+     *
+     * @param  array<string, mixed>  $data
      */
     private function doLog(string $verb, string $path, array $data = []): void
     {
@@ -277,6 +327,9 @@ abstract class ApiBase
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getConfig(): array
     {
         return [

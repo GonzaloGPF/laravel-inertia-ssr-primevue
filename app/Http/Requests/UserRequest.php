@@ -6,7 +6,6 @@ use App\Enums\Currencies;
 use App\Enums\Languages;
 use App\Enums\Roles;
 use App\Models\User;
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -31,7 +30,7 @@ class UserRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, array<int, mixed>|string>
      */
     public function rules(): array
     {
@@ -50,7 +49,7 @@ class UserRequest extends FormRequest
         } else {
             return [
                 'name' => 'string|max:255',
-                'email' => ['email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('user')->id)],
+                'email' => ['email', 'max:255', Rule::unique('users', 'email')->ignore($this->route('user'))],
                 'role' => [new Enum(Roles::class)],
                 'phone' => 'nullable|string|max:255',
                 'age' => 'nullable|integer|min:0|max:150',

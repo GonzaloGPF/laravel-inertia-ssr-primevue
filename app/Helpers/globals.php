@@ -4,6 +4,7 @@ use App\Enums\Roles;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
@@ -91,18 +92,24 @@ function hasRole(string|BackedEnum $role, ?User $user = null, bool $allowAdmin =
     return $user->role->value === $role;
 }
 
+/**
+ * @return Collection<int, Model>
+ */
 function loadModels(string $interface): Collection
 {
-    return collect(glob(app_path('Models').'/*.php'))
+    return collect(File::glob(app_path('Models').'/*.php'))
         ->each(fn (string $file) => require_once $file)
         ->map(fn (string $filePath) => 'App\\Models\\'.basename($filePath, '.php'))
         ->filter(fn (string $class) => implementsInterface($class, $interface))
         ->map(fn (string $modelString) => resolve($modelString));
 }
 
+/**
+ * @return Collection<array-key, non-falsy-string>
+ */
 function loadConstants(): Collection
 {
-    return collect(glob(app_path('Enums').'/*.php'))
+    return collect(File::glob(app_path('Enums').'/*.php'))
         ->each(fn (string $file) => require_once $file)
         ->map(fn (string $filePath) => 'App\\Enums\\'.basename($filePath, '.php'))
         ->filter(fn (string $class) => implementsInterface($class, UnitEnum::class));
@@ -110,17 +117,13 @@ function loadConstants(): Collection
 
 function implementsInterface(string $class, string $interface): bool
 {
-    try {
-        return (new ReflectionClass($class))->implementsInterface($interface);
-    } catch (ReflectionException $e) {
-        return false;
-    }
+    return is_subclass_of($class, $interface);
 }
 
 /**
- * Formats a currency value
+ * Formats a currency value, or false when it can not be formatted
  */
-function money($value): string
+function money(int|float $value): string|false
 {
     /** @var User $user */
     $user = auth()->user();
@@ -130,7 +133,7 @@ function money($value): string
     return Number::currency($value, $currency, $locale);
 }
 
-function phone($value): string
+function phone(string $value): string
 {
     return preg_replace('~\D~', '', $value);
 }

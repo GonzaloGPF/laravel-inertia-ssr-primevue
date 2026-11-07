@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Responses\SimpleResponse;
 use App\Traits\IsFilterable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Gate;
@@ -28,7 +29,7 @@ class AutoCompleteController extends Controller
 
         Gate::authorize('viewAny', $class);
 
-        /** @var LengthAwarePaginator $data */
+        /** @var LengthAwarePaginator<int, Model> $data */
         $data = resolve($class)::filter(request()->all())->getOrPaginate();
 
         return $this->response->jsonResponse(tAction('index', $class), $data->toArray());

@@ -55,7 +55,7 @@ Laravel serves the assets from the Vite dev server when `public/hot` exists, and
 | --- | --- |
 | `vendor/bin/sail artisan test --compact` | Whole suite: unit, feature and browser tests |
 | `vendor/bin/sail bin pint` | PHP code style |
-| `vendor/bin/sail composer analyse` | Static analysis of the PHP code (Larastan, level 5: `phpstan.neon`) |
+| `vendor/bin/sail composer analyse` | Static analysis of the PHP code (Larastan, level 7: `phpstan.neon`) |
 | `vendor/bin/sail yarn eslint resources/js` | JS / TS / Vue lint |
 | `vendor/bin/sail yarn prettier --check resources/js` | Frontend formatting |
 | `vendor/bin/sail yarn stylelint 'resources/css/**/*'` | CSS lint |

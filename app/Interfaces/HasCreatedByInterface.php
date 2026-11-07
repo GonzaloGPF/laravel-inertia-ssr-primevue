@@ -2,7 +2,9 @@
 
 namespace App\Interfaces;
 
+use App\Models\User;
 use App\Traits\HasCreatedBy;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -12,5 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 interface HasCreatedByInterface
 {
+    /**
+     * @return BelongsTo<User, covariant Model>
+     */
     public function createdBy(): BelongsTo;
 }

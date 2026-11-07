@@ -11,6 +11,7 @@ use App\Notifications\ResetPassword;
 use App\Traits\HasFiles;
 use App\Traits\IsFilterable;
 use App\Traits\NameFormatter;
+use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -28,6 +29,7 @@ use Illuminate\Support\Str;
  */
 class User extends Authenticatable implements HasFilesInterface, HasLocalePreference, MustVerifyEmail
 {
+    /** @use HasFactory<UserFactory> */
     use HasFactory,
         HasFiles,
         HasUlids,
@@ -112,16 +114,25 @@ class User extends Authenticatable implements HasFilesInterface, HasLocalePrefer
         return $this->language->value ?? Languages::ES->value;
     }
 
+    /**
+     * @return Attribute<never, string>
+     */
     protected function password(): Attribute
     {
         return Attribute::set(fn ($value) => Hash::make($value));
     }
 
+    /**
+     * @return Attribute<string|null, never>
+     */
     protected function avatarUrl(): Attribute
     {
         return Attribute::get(fn () => $this->avatar?->url);
     }
 
+    /**
+     * @return Attribute<never, string>
+     */
     protected function email(): Attribute
     {
         return Attribute::set(fn ($value) => Str::of($value)->trim()->lower()->value());

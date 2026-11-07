@@ -12,6 +12,8 @@ class SimpleResponse
 {
     /**
      * Builds up app's json response structure
+     *
+     * @return array{message: string, data: mixed}
      */
     public function json(string $message, mixed $data = null): array
     {
@@ -23,6 +25,8 @@ class SimpleResponse
 
     /**
      * Returns a json response that can includes specific data.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function jsonResponse(string $message, array $data = [], int $code = Response::HTTP_OK): JsonResponse
     {
@@ -51,6 +55,9 @@ class SimpleResponse
         return $this->jsonResponse(trans('help.no_content'), [], Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * @param  array<string, mixed>|null  $data
+     */
     public function exception(Exception|string $exception, int $code = Response::HTTP_FORBIDDEN, ?array $data = []): JsonResponse
     {
         if ($exception instanceof Exception) {

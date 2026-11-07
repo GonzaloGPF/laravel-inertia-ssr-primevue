@@ -8,7 +8,9 @@ use Carbon\Carbon;
 use EloquentFilter\ModelFilter;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -41,8 +43,14 @@ class Filter extends ModelFilter
      */
     protected array $searchable = [];
 
+    /** @var array<int, string> */
     private array $enumColumns;
 
+    /**
+     * @param  Builder<Model>  $query
+     * @param  array<string, mixed>  $input
+     * @param  bool  $relationsEnabled
+     */
     public function __construct($query, array $input = [], $relationsEnabled = true)
     {
         parent::__construct($query, $input, $relationsEnabled);
@@ -53,6 +61,9 @@ class Filter extends ModelFilter
             ->toArray();
     }
 
+    /**
+     * @return Builder<Model>
+     */
     public function handle(): Builder
     {
         $query = parent::handle();
@@ -94,7 +105,7 @@ class Filter extends ModelFilter
 
     private function applyWith(): void
     {
-        $relations = collect($this->input[self::WITH] ?? [])
+        $relations = collect($this->listInput(self::WITH))
             ->mapWithKeys(fn ($relation, $key) => is_numeric($key) ? [$key => Str::camel($relation)] : [Str::camel($key) => $relation])
             ->toArray();
 
@@ -103,14 +114,14 @@ class Filter extends ModelFilter
 
     private function applyHaving(): void
     {
-        collect($this->input[self::HAVING] ?? [])
+        collect($this->listInput(self::HAVING))
             ->map(fn ($relation) => Str::camel($relation))
             ->each(fn (string $relation) => $this->query->whereHas($relation));
     }
 
     private function applyDoesntHave(): void
     {
-        collect($this->input[self::DOESNT_HAVE] ?? [])
+        collect($this->listInput(self::DOESNT_HAVE))
             ->map(fn ($relation) => Str::camel($relation))
             ->each(fn (string $relation) => $this->query->whereDoesntHave($relation));
     }
@@ -131,7 +142,7 @@ class Filter extends ModelFilter
 
     private function applyCounts(): void
     {
-        $input = collect($this->input[self::COUNT] ?? [])
+        $input = collect($this->listInput(self::COUNT))
             ->map(fn ($relation) => Str::camel($relation));
 
         $rootCounts = $input
@@ -154,6 +165,19 @@ class Filter extends ModelFilter
         $this->query->withCount($rootCounts);
     }
 
+    /**
+     * The values of an input that lists them (with, having, count...), which can also come as a single one.
+     *
+     * @return array<int|string, string>
+     */
+    private function listInput(string $key): array
+    {
+        return Arr::wrap($this->input[$key] ?? []);
+    }
+
+    /**
+     * @param  mixed  $value
+     */
     private function applyRange(string $input, $value): void
     {
         // Clean up prefixes to determine the table's column name
@@ -179,6 +203,9 @@ class Filter extends ModelFilter
         }
     }
 
+    /**
+     * @param  mixed  $value
+     */
     private function applyNotFilter(string $input, $value): void
     {
         // Clean up prefixes to determine the table's column name
@@ -225,7 +252,7 @@ class Filter extends ModelFilter
     /**
      * The attribute and the direction of the 'sort' input, if it is valid.
      *
-     * @return array{0: string, 1: string}|null
+     * @return array{0: string, 1: 'asc'|'desc'}|null
      */
     private function parseSort(string $table): ?array
     {
@@ -267,6 +294,10 @@ class Filter extends ModelFilter
         }
     }
 
+    /**
+     * @param  mixed  $userIds
+     * @return Builder<Model>
+     */
     public function createdBy($userIds): Builder
     {
         if ($this->query->getModel() instanceof HasCreatedByInterface) {
@@ -278,6 +309,9 @@ class Filter extends ModelFilter
 
     /**
      * Lists just the deleted ones, in the models that can be soft deleted: the rest only list the ones that are not.
+     *
+     * @param  mixed  $value
+     * @return Builder<Model>
      */
     public function deleted($value): Builder
     {
@@ -292,6 +326,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $ids
+     * @return Builder<Model>
+     */
     public function ids($ids): Builder
     {
         $this->filterMultiple('id', $ids);
@@ -299,6 +337,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $ids
+     * @return Builder<Model>
+     */
     public function exceptIds($ids): Builder
     {
         $this->whereIn('id', $ids, 'and', true);
@@ -306,6 +348,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $id
+     * @return Builder<Model>
+     */
     public function id($id): Builder
     {
         $this->where('id', $id);
@@ -313,6 +359,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $modelType
+     * @return Builder<Model>
+     */
     protected function modelType($modelType): Builder
     {
         $model = $this->query->getModel();
@@ -325,6 +375,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $modelId
+     * @return Builder<Model>
+     */
     protected function model($modelId): Builder
     {
         $model = $this->query->getModel();
@@ -337,6 +391,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $values
+     * @return Builder<Model>
+     */
     protected function filterMultiple(string $column, $values): Builder
     {
         if (is_string($values) && str_contains($values, ',')) {
@@ -355,6 +413,7 @@ class Filter extends ModelFilter
      * @param  mixed  $values
      * @param  string  $boolean
      * @param  bool  $not
+     * @return Builder<Model>
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false): Builder
     {
@@ -379,20 +438,28 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $name
+     * @return Builder<Model>
+     */
     public function name($name): Builder
     {
-        collect($name)
-            ->each(fn ($value) => $this->where('name', 'like', "%$value%"));
+        foreach (Arr::wrap($name) as $value) {
+            $this->where('name', 'like', "%$value%");
+        }
 
         return $this->query;
     }
 
     /**
      * Global search: every word typed has to be found in any of the searchable columns.
+     *
+     * @param  mixed  $value
+     * @return Builder<Model>
      */
     public function search($value): Builder
     {
-        $words = is_string($value) ? preg_split('/\s+/', trim($value), -1, PREG_SPLIT_NO_EMPTY) : [];
+        $words = Str::of(is_string($value) ? $value : '')->trim()->split('/\s+/', -1, PREG_SPLIT_NO_EMPTY);
         $table = $this->query->getModel()->getTable();
 
         foreach ($words as $word) {
@@ -405,6 +472,10 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $value
+     * @return Builder<Model>
+     */
     public function nullable(string $column, $value): Builder
     {
         $value
@@ -414,6 +485,15 @@ class Filter extends ModelFilter
         return $this->query;
     }
 
+    /**
+     * @param  mixed  $value
+     * @return Builder<Model>
+     */
+    /**
+     * @param  mixed  $value
+     * @param  Builder<Model>|null  $customBuilder
+     * @return Builder<Model>
+     */
     public function boolean(string $column, $value, ?Builder $customBuilder = null): Builder
     {
         $builder = $customBuilder ?? $this;

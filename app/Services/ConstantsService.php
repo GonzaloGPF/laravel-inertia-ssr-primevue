@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use BackedEnum;
 use Exception;
 use Illuminate\Support\Str;
 
@@ -11,6 +10,8 @@ class ConstantsService
     public static int $DAY = 86400; // 86400 seconds = 1 day
 
     /**
+     * @return array<string, array<int, int|string>>
+     *
      * @throws Exception
      */
     public function getConstants(): array
@@ -21,12 +22,8 @@ class ConstantsService
             return loadConstants()
                 ->mapWithKeys(function (string $enum) {
                     $key = $this->getConstantKey($enum);
-                    $values = collect($enum::cases())
-                        ->map(fn (BackedEnum $enum) => $enum->value)
-                        ->values()
-                        ->toArray();
 
-                    return [$key => $values];
+                    return [$key => array_column($enum::cases(), 'value')];
                 })
                 ->toArray();
         });

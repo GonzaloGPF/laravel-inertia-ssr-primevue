@@ -7,6 +7,9 @@ use Illuminate\Support\Str;
 
 trait NameFormatter
 {
+    /**
+     * @return Attribute<string, string|null>
+     */
     public function name(): Attribute
     {
         return Attribute::make(

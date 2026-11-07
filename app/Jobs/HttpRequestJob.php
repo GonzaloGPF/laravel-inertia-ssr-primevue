@@ -14,16 +14,21 @@ class HttpRequestJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /** @var array<string, mixed> */
     private array $options;
 
     private string $verb;
 
     private string $url;
 
+    /** @var array<string, mixed> */
     private array $data;
 
     /**
      * Create a new job instance.
+     *
+     * @param  array<string, mixed>  $options
+     * @param  array<string, mixed>  $data
      */
     public function __construct(array $options, string $verb, string $url, array $data = []) // TODO: test it
     {

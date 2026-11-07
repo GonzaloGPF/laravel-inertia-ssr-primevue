@@ -9,10 +9,13 @@ use Illuminate\Support\Facades\Lang;
 
 class ResetPassword extends Notification
 {
+    /** @var string */
     public $token;
 
+    /** @var (Closure(mixed, string): string)|null */
     public static $createUrlCallback;
 
+    /** @var (Closure(mixed, string): MailMessage)|null */
     public static $toMailCallback;
 
     /**
@@ -30,7 +33,7 @@ class ResetPassword extends Notification
      * Get the notification's channels.
      *
      * @param  mixed  $notifiable
-     * @return array|string
+     * @return array<int, string>
      */
     public function via($notifiable)
     {

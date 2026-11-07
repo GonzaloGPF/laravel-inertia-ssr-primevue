@@ -22,6 +22,8 @@ abstract class Controller
     /**
      * Renders a page whose `data` prop (the filtered and paginated models) is only
      * resolved when requested through an Inertia partial reload, as async tables do.
+     *
+     * @param  array<string, mixed>  $extraFilters
      */
     protected function renderCollection(string $pageComponent, string $modelClass, array $extraFilters = []): Response
     {
