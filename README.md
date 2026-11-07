@@ -61,6 +61,8 @@ Laravel serves the assets from the Vite dev server when `public/hot` exists, and
 | `vendor/bin/sail yarn vue-tsc --noEmit` | Type check |
 | `vendor/bin/sail yarn build` | Type check, and client and SSR production builds |
 
+The architecture tests (`tests/Unit/ArchTest.php`, plus `tests/Feature/ModelConventionsTest.php`, which looks at the schema) keep the conventions of the project: the Pest presets for PHP, security and Laravel, the models with a ulid and `created_by` only with `HasCreatedBy`, the enums backed by strings, the filters and services named as such... A new class that breaks one of them fails there.
+
 The browser tests drive a headless Chromium from PHP and run inside Sail, which already has what Chromium needs. Run them against the production build too (move `public/hot` away and run `yarn build`) when you change frontend code: some failures only show there.
 
 The dev server (`sail yarn dev`) writes `public/hot` and removes it when it stops. If it dies without stopping cleanly (the computer was turned off), the file stays behind, and the pages would ask for their assets to a server that is not there: the application ignores a hot file when nobody answers at its address, so the pages and the tests use the production build (run `yarn build` once to have it).

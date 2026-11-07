@@ -1,5 +1,6 @@
 <?php
 
+use App\Traits\IsFilterable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -147,3 +148,27 @@ function sentRequest($page): array
 
     return $requests[0];
 }
+
+/**
+ * The classes of the models of the application, by their name: the ones the architecture tests are about.
+ *
+ * @return array<string, array{class-string}>
+ */
+dataset('models', function () {
+    return collect(glob(dirname(__DIR__).'/app/Models/*.php'))
+        ->mapWithKeys(fn (string $file) => [basename($file, '.php') => ['App\\Models\\'.basename($file, '.php')]])
+        ->all();
+});
+
+/**
+ * The models that can be filtered, which are the ones with a filter of their own.
+ *
+ * @return array<string, array{class-string}>
+ */
+dataset('filterable models', function () {
+    return collect(glob(dirname(__DIR__).'/app/Models/*.php'))
+        ->map(fn (string $file) => 'App\\Models\\'.basename($file, '.php'))
+        ->filter(fn (string $model) => in_array(IsFilterable::class, class_uses_recursive($model), true))
+        ->mapWithKeys(fn (string $model) => [class_basename($model) => [$model]])
+        ->all();
+});
