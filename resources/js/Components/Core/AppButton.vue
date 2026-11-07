@@ -65,7 +65,6 @@ defineExpose({
     <Menu
       v-if="!!menuItems"
       ref="menuElement"
-      id="overlay_menu"
       :model="menuItems"
       :popup="!!menuItems"
     >

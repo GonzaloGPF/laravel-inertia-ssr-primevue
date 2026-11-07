@@ -142,3 +142,25 @@ test('the language is not lost when the theme is chosen, and the other way round
 
     $page->assertNoJavaScriptErrors();
 });
+
+test('each menu of the top bar has its own id', function () {
+    config(['app.locale' => 'en']);
+
+    $page = visit('/');
+
+    $page->assertSee('Enter');
+
+    $menuId = fn () => (string) $page->script("[...document.querySelectorAll('[role=\"menu\"]')].at(-1)?.closest('[id]')?.id");
+
+    $page->click('[aria-label="Language"]');
+    $languageMenu = $menuId();
+
+    // The menu of the language is closing while the one of the theme opens
+    $page->click('[aria-label="Theme"]');
+    usleep(500_000);
+    $themeMenu = $menuId();
+
+    expect($languageMenu)->not->toBeEmpty()
+        ->and($themeMenu)->not->toBeEmpty()
+        ->and($languageMenu)->not->toBe($themeMenu);
+});
