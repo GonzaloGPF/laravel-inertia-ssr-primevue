@@ -28,6 +28,15 @@ it('lets an admin create a user with an avatar', function () {
     Storage::disk('testing')->assertExists($avatar->path);
 });
 
+it('records the admin that changed the avatar of a user', function () {
+    Storage::fake('testing');
+    $user = User::factory()->create();
+
+    $this->put(route('users.update', $user), ['avatar' => UploadedFile::fake()->image('new.png')]);
+
+    expect($user->fresh()->avatar->created_by)->toBe($this->user->id);
+});
+
 it('replaces the avatar of a user when updating it with a new one', function () {
     Storage::fake('testing');
     $user = User::factory()->create();

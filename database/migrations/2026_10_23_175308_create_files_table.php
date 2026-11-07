@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('mime');
             $table->unsignedBigInteger('size');
+            $table->foreignUlid('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

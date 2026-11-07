@@ -2,6 +2,7 @@
 
 use App\Models\File;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 it('builds the url from the disk where the file was saved', function () {
@@ -42,4 +43,44 @@ it('belongs to its model by an alias, not by its class name', function () {
 
     expect($file->fileable_type)->toBe('user')
         ->and($file->fileable->is($user))->toBeTrue();
+});
+
+it('is created by who saved it', function () {
+    Storage::fake('testing');
+    $admin = $this->signIn();
+    $user = User::factory()->create();
+
+    $file = $user->saveFile(UploadedFile::fake()->image('photo.png'), 'avatar');
+
+    expect($file->fresh()->created_by)->toBe($admin->id)
+        ->and($file->fresh()->createdBy->is($admin))->toBeTrue();
+});
+
+it('has no creator when nobody is logged, as when it is seeded', function () {
+    $file = File::factory()->for(User::factory()->create(), 'fileable')->create();
+
+    expect($file->fresh()->created_by)->toBeNull()
+        ->and($file->fresh()->createdBy)->toBeNull();
+});
+
+it('keeps the creator it is given', function () {
+    $this->signIn();
+    $other = User::factory()->create();
+
+    $file = File::factory()->for(User::factory()->create(), 'fileable')->create(['created_by' => $other->id]);
+
+    expect($file->fresh()->createdBy->is($other))->toBeTrue();
+});
+
+it('stays, without a creator, when its creator is deleted for good', function () {
+    Storage::fake('testing');
+    $creator = $this->signIn();
+    $user = User::factory()->create();
+    $file = $user->saveFile(UploadedFile::fake()->image('photo.png'), 'avatar');
+
+    $creator->forceDelete();
+
+    expect($file->fresh())->not->toBeNull()
+        ->created_by->toBeNull();
+    Storage::disk('testing')->assertExists($file->path);
 });

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Interfaces\HasCreatedByInterface;
+use App\Traits\HasCreatedBy;
 use Database\Factories\FileFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -19,10 +21,10 @@ use Illuminate\Support\Facades\Storage;
  *
  * @mixin IdeHelperFile
  */
-class File extends Model
+class File extends Model implements HasCreatedByInterface
 {
     /** @use HasFactory<FileFactory> */
-    use HasFactory, HasUlids;
+    use HasCreatedBy, HasFactory, HasUlids;
 
     protected $fillable = [
         'collection',
