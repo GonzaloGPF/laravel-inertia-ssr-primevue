@@ -94,6 +94,9 @@ class User extends Authenticatable implements HasFilesInterface, HasLocalePrefer
         ];
     }
 
+    /**
+     * @return MorphOne<File, $this>
+     */
     public function avatar(): MorphOne
     {
         return $this->fileOf('avatar');
@@ -106,7 +109,7 @@ class User extends Authenticatable implements HasFilesInterface, HasLocalePrefer
 
     public function preferredLocale(): string
     {
-        return $this->language?->value ?? Languages::ES->value;
+        return $this->language->value ?? Languages::ES->value;
     }
 
     protected function password(): Attribute

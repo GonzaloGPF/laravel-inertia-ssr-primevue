@@ -38,6 +38,8 @@ class FileService
         try {
             $previous = ($config['single'] ?? false) ? $model->filesOf($collection)->get() : collect();
 
+            // The interface does not say which model its files() are of
+            /** @var File $file */
             $file = $model->files()->create([
                 'collection' => $collection,
                 'disk' => $disk,

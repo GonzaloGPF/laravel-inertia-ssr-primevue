@@ -33,9 +33,6 @@ class UserFactory extends Factory
         ];
     }
 
-    /**
-     * @return $this
-     */
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [

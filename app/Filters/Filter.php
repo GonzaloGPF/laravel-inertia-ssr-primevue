@@ -40,8 +40,6 @@ class Filter extends ModelFilter
      */
     protected array $searchable = [];
 
-    private array $errors;
-
     private array $enumColumns;
 
     public function __construct($query, array $input = [], $relationsEnabled = true)
@@ -172,8 +170,8 @@ class Filter extends ModelFilter
                     : $date->endOfDay()->toDateTimeString();
 
                 $this->query->where($column, $operator, $dateString);
-            } catch (Exception $exception) {
-                $this->errors[$input] = trans('exceptions.wrong_format', ['value' => $value]);
+            } catch (Exception) {
+                // Not a date that can be filtered by
             }
         } else {
             $this->query->where($column, $operator, (float) $value);
@@ -339,7 +337,7 @@ class Filter extends ModelFilter
      * @param  string  $column
      * @param  mixed  $values
      * @param  string  $boolean
-     * @param  false  $not
+     * @param  bool  $not
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false): Builder
     {

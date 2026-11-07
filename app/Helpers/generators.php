@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
@@ -23,22 +23,26 @@ function randomConstant(BackedEnum|string $enum, bool $multiple = false): string
     return $result->toArray();
 }
 
+/**
+ * @param  class-string<Model>  $class
+ * @param  array<string, mixed>  $parameters
+ * @return ($count is null ? Model : Collection<int, Model>)
+ */
 function make($class, array $parameters = [], $count = null): Collection|Model
 {
-    /** @var HasFactory $model */
-    $model = resolve($class);
-
-    return $model::factory()
+    return Factory::factoryForModel($class)
         ->count($count)
         ->make($parameters);
 }
 
+/**
+ * @param  class-string<Model>  $class
+ * @param  array<string, mixed>  $parameters
+ * @return ($count is null ? Model : Collection<int, Model>)
+ */
 function create($class, array $parameters = [], $count = null): Collection|Model
 {
-    /** @var HasFactory $model */
-    $model = resolve($class);
-
-    return $model::factory()
+    return Factory::factoryForModel($class)
         ->count($count)
         ->create($parameters);
 }
@@ -51,7 +55,7 @@ function create($class, array $parameters = [], $count = null): Collection|Model
 function associateTo(string $modelClass, array $attributes = [], bool $create = false): int|string
 {
     $isMaking = collect(debug_backtrace())
-        ->filter(fn ($item) => isset($item['function']) && $item['function'] === 'make')
+        ->filter(fn ($item) => $item['function'] === 'make')
         ->filter(fn ($item) => isset($item['file']) && Str::endsWith($item['file'], 'Pest.php'))
         ->count();
 
@@ -60,14 +64,14 @@ function associateTo(string $modelClass, array $attributes = [], bool $create = 
     }
 
     if ($create) {
-        return create($modelClass, $attributes)->id;
+        return create($modelClass, $attributes)->getKey();
     }
 
     /** @var Model $model */
     $model = resolve($modelClass);
 
-    return $model::where($attributes)->inRandomOrder()->first()?->id
-        ?? create($modelClass, $attributes)->id; // call to Factory
+    return $model::where($attributes)->inRandomOrder()->first()?->getKey()
+        ?? create($modelClass, $attributes)->getKey(); // call to Factory
 }
 
 /**

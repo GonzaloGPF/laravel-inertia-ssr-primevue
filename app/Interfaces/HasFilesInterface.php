@@ -14,6 +14,13 @@ interface HasFilesInterface
 {
     public function files(): MorphMany;
 
+    public function filesOf(string $collection): MorphMany;
+
+    /**
+     * Deletes all of its files, the physical ones too.
+     */
+    public function deleteFiles(): void;
+
     /**
      * The collections of files of the model, by name:
      * - single: only one file is kept, saving another one replaces it.

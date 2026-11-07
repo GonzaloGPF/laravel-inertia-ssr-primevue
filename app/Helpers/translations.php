@@ -26,7 +26,7 @@ function constantTitle(string $model, string $value, ?bool $plural = false): str
 /**
  * Translate a Model name, useful for Constants Models.
  */
-function tConstValue(string $constant, string|BackedEnum $value): ?string
+function tConstValue(string $constant, string|BackedEnum $value): string
 {
     if ($value instanceof BackedEnum) {
         $value = $value->value;
@@ -42,8 +42,6 @@ function tConstValue(string $constant, string|BackedEnum $value): ?string
 
 /**
  * Translate an action for a Model
- *
- * @param  bool|null  $female
  */
 function tAction(string $action, ?string $model = null, bool $female = false, ?bool $plural = false): string
 {

@@ -15,7 +15,7 @@ use Illuminate\Http\UploadedFile;
  * Gives a model files, grouped in the collections it declares in fileCollections().
  * The work is done by the FileService: these methods are just a way to reach it from the model.
  *
- * To read a collection, declare a relation named as it:
+ * To read a collection, declare a relation named as it, with the type MorphOne<File, $this>:
  *
  *     public function avatar(): MorphOne
  *     {
@@ -36,16 +36,25 @@ trait HasFiles
         static::registerModelEvent($event, fn (HasFilesInterface $model) => $model->deleteFiles());
     }
 
+    /**
+     * @return MorphMany<File, $this>
+     */
     public function files(): MorphMany
     {
         return $this->morphMany(File::class, 'fileable');
     }
 
+    /**
+     * @return MorphMany<File, $this>
+     */
     public function filesOf(string $collection): MorphMany
     {
         return $this->files()->where('collection', $collection);
     }
 
+    /**
+     * @return MorphOne<File, $this>
+     */
     public function fileOf(string $collection): MorphOne
     {
         return $this->morphOne(File::class, 'fileable')
@@ -98,7 +107,7 @@ trait HasFiles
      */
     public static function fileRules(string $collection): array
     {
-        $config = app(FileService::class)->collection(new static, $collection);
+        $config = app(FileService::class)->collection(app(static::class), $collection);
 
         return array_values(array_filter([
             'nullable',

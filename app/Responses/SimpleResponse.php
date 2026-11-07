@@ -12,10 +12,8 @@ class SimpleResponse
 {
     /**
      * Builds up app's json response structure
-     *
-     * @param  null  $data
      */
-    public function json(string $message, $data = null): array
+    public function json(string $message, mixed $data = null): array
     {
         return [
             'message' => $message,
@@ -50,7 +48,7 @@ class SimpleResponse
 
     public function empty(): JsonResponse
     {
-        return $this->jsonResponse(trans('help.no_content'), null, Response::HTTP_NO_CONTENT);
+        return $this->jsonResponse(trans('help.no_content'), [], Response::HTTP_NO_CONTENT);
     }
 
     public function exception(Exception|string $exception, int $code = Response::HTTP_FORBIDDEN, ?array $data = []): JsonResponse
@@ -63,7 +61,7 @@ class SimpleResponse
         } elseif (Lang::has("exceptions.$exception")) {
             $message = trans("exceptions.$exception");
         } else {
-            $message = $exception ?? trans('exceptions.server_error');
+            $message = $exception;
         }
 
         return $this->jsonResponse($message, $data, $code);

@@ -2,15 +2,13 @@
 
 namespace App\Interfaces;
 
-use App\Models\User;
+use App\Traits\HasCreatedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Interface HasCreatedByInterface
+ * A model that records who created it, in its created_by column.
  *
- * @property string created_by
- * @property int payment_state
- * @property User createdBy
+ * @see HasCreatedBy
  */
 interface HasCreatedByInterface
 {

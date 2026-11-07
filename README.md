@@ -12,7 +12,7 @@ It comes with authentication (Breeze based), a profile page, English and Spanish
 | Frontend | Inertia v3 (SSR), Vue 3, TypeScript, Pinia, [PrimeVue 4](https://primevue.org) (Aura theme), Tailwind CSS 4, [Chart.js](https://www.chartjs.org) (through the PrimeVue `Chart`), Vite 8 |
 | i18n | `laravel-vue-i18n`: the Laravel `lang/` files (`es`, `en`) are shared with the frontend |
 | Tests | Pest 5, with browser tests (Playwright) |
-| Tooling | Laravel Pint, ESLint, Prettier, Stylelint, vue-tsc, Husky + lint-staged, GitHub Actions |
+| Tooling | Laravel Pint, Larastan, ESLint, Prettier, Stylelint, vue-tsc, Husky + lint-staged, GitHub Actions |
 | AI | Laravel Boost (guidelines, skills and MCP) and project rules in `.ai/rules` |
 
 ## Getting started
@@ -55,6 +55,7 @@ Laravel serves the assets from the Vite dev server when `public/hot` exists, and
 | --- | --- |
 | `vendor/bin/sail artisan test --compact` | Whole suite: unit, feature and browser tests |
 | `vendor/bin/sail bin pint` | PHP code style |
+| `vendor/bin/sail composer analyse` | Static analysis of the PHP code (Larastan, level 5: `phpstan.neon`) |
 | `vendor/bin/sail yarn eslint resources/js` | JS / TS / Vue lint |
 | `vendor/bin/sail yarn prettier --check resources/js` | Frontend formatting |
 | `vendor/bin/sail yarn stylelint 'resources/css/**/*'` | CSS lint |

@@ -25,7 +25,7 @@ class HandleInertiaRequests extends Middleware
     public function handle(Request $request, Closure $next)
     {
         if ($request->user()) {
-            app()->setLocale($request->user()->language?->value ?? Languages::ES->value);
+            app()->setLocale($request->user()->language->value ?? Languages::ES->value);
         }
 
         return parent::handle($request, $next);

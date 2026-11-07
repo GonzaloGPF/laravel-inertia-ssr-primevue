@@ -1,0 +1,21 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+
+    paths:
+        - app
+        - bootstrap/app.php
+        - config
+        - database
+        - routes
+
+    # Without it, the casts of a model are only known when casts() says them in its return type
+    parseModelCastsMethod: true
+
+    ignoreErrors:
+        # The mixins of the models are in the files of ide-helper, which are generated and not in the repository
+        -
+            message: '#@mixin contains unknown class App\\Models\\IdeHelper#'
+            identifier: class.notFound

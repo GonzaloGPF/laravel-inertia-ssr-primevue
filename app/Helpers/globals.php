@@ -125,7 +125,7 @@ function money($value): string
     /** @var User $user */
     $user = auth()->user();
     $currency = $user->currency?->getCurrency() ?? config('app.default_currency');
-    $locale = $user?->language ?? config('app.locale');
+    $locale = $user->language->value ?? config('app.locale');
 
     return Number::currency($value, $currency, $locale);
 }

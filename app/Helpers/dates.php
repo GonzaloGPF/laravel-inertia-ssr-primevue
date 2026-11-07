@@ -28,7 +28,7 @@ function isDateString($value): bool
  */
 function createPeriod(?string $minDate = null, ?string $maxDate = null, ?string $interval = '1 month'): Collection
 {
-    $minDate = Carbon::parse($minDate) ?? today();
+    $minDate = Carbon::parse($minDate);
 
     $maxDate = $maxDate ?? Carbon::parse($minDate)->addYear();
 

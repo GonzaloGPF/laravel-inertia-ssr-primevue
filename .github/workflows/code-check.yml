@@ -35,6 +35,37 @@ jobs:
       - name: Run Pint
         run: vendor/bin/pint --test
 
+  php-analyse:
+    name: PHP (Larastan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl
+          coverage: none
+
+      - name: Cache Composer packages
+        uses: actions/cache@v6
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run Larastan
+        run: composer analyse
+
   js-lint:
     name: Frontend (ESLint, Prettier, Stylelint, vue-tsc)
     runs-on: ubuntu-latest
