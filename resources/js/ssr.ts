@@ -12,7 +12,7 @@ createServer((page) =>
   createInertiaApp({
     page,
     render: renderToString,
-    title: (title) => app.getAppTitle(title),
+    title: (title) => app.getAppTitle(title, page.props.appName as string),
     resolve: (name) => {
       const page = resolvePageComponent(
         `./Pages/${name}.vue`,

@@ -14,7 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    'description' => 'My awesome app',
+    'description' => env('APP_DESCRIPTION', 'Larevel Boilerplate with Inertia SSR and PrimeVue'),
 
     /*
     |--------------------------------------------------------------------------

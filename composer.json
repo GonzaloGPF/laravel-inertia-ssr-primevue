@@ -50,9 +50,19 @@
     }
   },
   "scripts": {
-    "clear": "php artisan optimize:clear",
-    "helper": "composer clear && php artisan ide-helper:generate && php artisan ide-helper:models -M && php artisan ide-helper:meta",
+    "clear": "@php artisan optimize:clear",
+    "helper": [
+      "@clear",
+      "@php artisan ide-helper:generate",
+      "@php artisan ide-helper:models -M",
+      "@php artisan ide-helper:meta"
+    ],
     "analyse": "phpstan analyse --memory-limit=1G --no-progress",
+    "setup": [
+      "@php artisan key:generate --ansi",
+      "@php artisan storage:link --force --ansi",
+      "@php artisan migrate --seed --ansi"
+    ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
       "@php artisan package:discover --ansi",

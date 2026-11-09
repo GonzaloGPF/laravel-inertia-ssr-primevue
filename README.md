@@ -32,9 +32,8 @@ docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/htm
 # 3. Services (app, MySQL, Redis, Mailpit and Meilisearch, which the app doesn't use yet)
 vendor/bin/sail up -d
 
-# 4. Application key, database and demo data
-vendor/bin/sail artisan key:generate
-vendor/bin/sail artisan migrate --seed
+# 4. Application key, link to the files disk (the avatars are served from it), database and demo data
+vendor/bin/sail composer setup
 
 # 5. Frontend dependencies and dev server
 vendor/bin/sail yarn install
@@ -43,7 +42,7 @@ vendor/bin/sail yarn dev
 
 Every command runs through Sail, as the app lives in the containers. The seeders create an admin (`admin@mail.com`), a regular user (`test@mail.com`) and 30 random ones, all with the password `Secret123**`. Most of them get an avatar, picked from the 10 images of `public/images/avatar`; the regular user and about a quarter of the random ones have none, to see how that looks.
 
-> `migrate --seed` truncates every table before seeding, and deletes the avatars of the previous seed from the files disk. Don't run it against data you want to keep.
+> `composer setup` runs `key:generate`, `storage:link` and `migrate --seed`, so run it once: it replaces the application key and `migrate --seed` truncates every table before seeding, and deletes the avatars of the previous seed from the files disk. Don't run it against data you want to keep.
 
 ### Dev server or build?
 
@@ -181,6 +180,10 @@ The theme is light, dark, or the one of the system (the default, which it follow
 ## Language
 
 The language is chosen with the button of the top menu (`TopMenuLanguage`), by whoever it is, logged or not. The `language.update` route keeps it in the session and, for a user, in their profile (`users.language`), and the page changes at once, as the translations are loaded by the client. `HandleInertiaRequests` applies it to every request: the language of the profile of the user, or, if they are not logged, the one of the session, or else the one of the application (`APP_LOCALE`). The ones who register get the language that was in use, not the default one of the table.
+
+## Fonts
+
+The fonts are in `public/fonts` and declared in `resources/css/fonts.css`: Figtree (400, 500 and 600) and the Material Symbols Outlined icons, which `AppIcon` writes by name. No page asks a third party for them (`FontsTest` checks it), and `app.blade.php` preloads the ones the first paint needs. To change a font, replace its file and its `@font-face`.
 
 ## Ids
 

@@ -39,10 +39,11 @@ export const app = {
   },
 
   /**
-   * Dynamic title of the current page
+   * Dynamic title of the current page. The SSR server has no document to read the name of the app
+   * from, so it gives it (the page `appName` prop).
    */
-  getAppTitle(title = '') {
-    const appName = this.getAppName() ?? ''
+  getAppTitle(title = '', serverAppName?: string) {
+    const appName = serverAppName ?? this.getAppName() ?? ''
 
     if (title && title !== appName) {
       return `${title} - ${appName}`

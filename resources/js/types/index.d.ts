@@ -18,6 +18,8 @@ export interface User {
 export type PageProps<
   T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
+  /** The name of the app, `APP_NAME` of the .env file */
+  appName: string
   auth: {
     user: User
   }
