@@ -112,6 +112,8 @@ How a listing is built:
    }
    ```
 
+   A filter can also declare `protected array $privateColumns` (as `UserFilter` does with the email, phone, role...): the personal or secret columns that only the admins can filter or sort by. For everyone else the filters of those columns are ignored, however they come (a method named after the column, a range, an exclusion, an enum column, `sort`...), and the global search does not look into them.
+
 3. **Controller.** `index` returns `$this->renderCollection('Users/UserIndex', User::class)`. The filtered and paginated `data` prop is only resolved when the table asks for it with a partial reload.
 4. **Page.** Render an `AppDataTable` with its columns and filters:
 

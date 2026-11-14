@@ -13,6 +13,15 @@ class UserFilter extends Filter
     protected array $searchable = ['name', 'email', 'phone'];
 
     /**
+     * The personal and secret columns: only the admins can filter or sort by them.
+     *
+     * @var array<int, string>
+     */
+    protected array $privateColumns = [
+        'email', 'phone', 'role', 'age', 'language', 'currency', 'email_verified_at', 'deleted_at', 'password', 'remember_token',
+    ];
+
+    /**
      * @param  mixed  $value
      * @return Builder<Model>
      */

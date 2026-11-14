@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Enums\Roles;
 use App\Interfaces\FilterableMorph;
 use App\Interfaces\HasCreatedByInterface;
 use Carbon\Carbon;
@@ -43,6 +44,15 @@ class Filter extends ModelFilter
      */
     protected array $searchable = [];
 
+    /**
+     * Columns only the admins can filter or sort by, because they are personal or secret: the filters
+     * of any other user ignore them, whether they come as a method of the filter, a range (`min_x`),
+     * an exclusion (`not_x`), an enum column, the global search or `sort`. Each filter declares its own.
+     *
+     * @var array<int, string>
+     */
+    protected array $privateColumns = [];
+
     /** @var array<int, string> */
     private array $enumColumns;
 
@@ -59,6 +69,16 @@ class Filter extends ModelFilter
             ->filter(fn (string $cast) => Str::startsWith($cast, 'App\Enums'))
             ->keys()
             ->toArray();
+    }
+
+    /**
+     * The methods of the filter named after a private column are not called, unless it is an admin.
+     */
+    public function setup(): void
+    {
+        collect($this->privateColumns)
+            ->reject(fn (string $column) => $this->canUseColumn($column))
+            ->each(fn (string $column) => $this->blacklistMethod(Str::camel($column)));
     }
 
     /**
@@ -183,6 +203,10 @@ class Filter extends ModelFilter
         // Clean up prefixes to determine the table's column name
         $column = str_replace(self::MIN_PREFIX, '', str_replace(self::MAX_PREFIX, '', $input));
 
+        if (! $this->canUseColumn($column)) {
+            return;
+        }
+
         $operator = Str::startsWith($input, self::MIN_PREFIX)
             ? '>='
             : '<=';
@@ -210,6 +234,10 @@ class Filter extends ModelFilter
     {
         // Clean up prefixes to determine the table's column name
         $column = str_replace(self::NOT_PREFIX, '', $input);
+
+        if (! $this->canUseColumn($column)) {
+            return;
+        }
 
         if (is_array($value)) {
             $this->whereIn($column, $value, 'and', true); // Where not in
@@ -265,7 +293,7 @@ class Filter extends ModelFilter
         [$attribute, $direction] = explode('|', $sort);
         $direction = strtolower($direction);
 
-        if (! in_array($direction, ['asc', 'desc'], true) || ! in_array($attribute, $this->columnsOf($table), true)) {
+        if (! in_array($direction, ['asc', 'desc'], true) || ! in_array($attribute, $this->columnsOf($table), true) || ! $this->canUseColumn($attribute)) {
             return null;
         }
 
@@ -317,10 +345,10 @@ class Filter extends ModelFilter
     {
         $model = $this->query->getModel();
 
-        if ($value && method_exists($model, 'getQualifiedDeletedAtColumn')) {
+        if ($value && method_exists($model, 'getDeletedAtColumn') && $this->canUseColumn($model->getDeletedAtColumn())) {
             $this->query
                 ->withoutGlobalScope(SoftDeletingScope::class)
-                ->whereNotNull($model->getQualifiedDeletedAtColumn());
+                ->whereNotNull($model->qualifyColumn($model->getDeletedAtColumn()));
         }
 
         return $this->query;
@@ -466,6 +494,7 @@ class Filter extends ModelFilter
             $like = '%'.addcslashes($word, '\\%_').'%'; // The wildcards typed are searched as plain characters
 
             $this->where(fn (Builder $query) => collect($this->searchable)
+                ->filter(fn (string $column) => $this->canUseColumn($column))
                 ->each(fn (string $column) => $query->orWhere("$table.$column", 'like', $like)));
         }
 
@@ -478,6 +507,10 @@ class Filter extends ModelFilter
      */
     public function nullable(string $column, $value): Builder
     {
+        if (! $this->canUseColumn($column)) {
+            return $this->query;
+        }
+
         $value
             ? $this->whereNotNull($column)
             : $this->whereNull($column);
@@ -496,6 +529,10 @@ class Filter extends ModelFilter
      */
     public function boolean(string $column, $value, ?Builder $customBuilder = null): Builder
     {
+        if (! $this->canUseColumn($column)) {
+            return $this->query;
+        }
+
         $builder = $customBuilder ?? $this;
 
         $value
@@ -508,6 +545,12 @@ class Filter extends ModelFilter
     private function canFilterByConstant(string $column): bool
     {
         return ! method_exists($this, Str::camel($column))
-            && isset($this->input[$column]);
+            && isset($this->input[$column])
+            && $this->canUseColumn($column);
+    }
+
+    private function canUseColumn(string $column): bool
+    {
+        return ! in_array($column, $this->privateColumns, true) || hasRole(Roles::ADMIN);
     }
 }

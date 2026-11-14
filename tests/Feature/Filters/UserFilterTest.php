@@ -7,6 +7,8 @@ use App\Models\User;
 
 beforeEach(function () {
     create(User::class, [], 3); // Extra users
+
+    $this->actingAs(User::factory()->admin()->make()); // The admins can filter by any column, and they are not in the table to be counted
 });
 
 it('can filter users by role', function () {
@@ -270,4 +272,77 @@ describe('sorting', function () {
         expect($page->total())->toBe(2)
             ->and($page->items()[0]->name)->toBe('Zyxel A');
     });
+});
+
+describe('private columns', function () {
+    it('only lets the admins filter or sort by the private columns of the users', function (array $input, string $viewer) {
+        User::query()->update([
+            'role' => Roles::USER, 'language' => Languages::ES, 'currency' => Currencies::EURO, 'age' => 30, 'email_verified_at' => null,
+        ]);
+        create(User::class, [
+            'name' => 'Zz Target',
+            'email' => 'zz-private@mail.com',
+            'phone' => 'zz-phone',
+            'age' => 99,
+            'role' => Roles::ADMIN,
+            'language' => Languages::EN,
+            'currency' => Currencies::DOLLAR,
+            'email_verified_at' => today(),
+        ]);
+        create(User::class, ['name' => 'Zz Trashed'])->delete();
+        $everyone = User::filter([])->pluck('id')->all();
+
+        $viewer === 'guest'
+            ? auth()->forgetUser()
+            : $this->actingAs(User::factory()->make(['role' => Roles::USER]));
+
+        expect(User::filter($input)->pluck('id')->all())->toBe($everyone);
+
+        $this->actingAs(User::factory()->admin()->make());
+
+        expect(User::filter($input)->pluck('id')->all())->not->toBe($everyone);
+    })->with([
+        'email' => [['email' => 'zz-private']],
+        'phone' => [['phone' => 'zz-phone']],
+        'not email' => [['not_email' => 'zz-private@mail.com']],
+        'min age' => [['min_age' => '90']],
+        'max age' => [['max_age' => '40']],
+        'role' => [['role' => ['admin']]],
+        'language' => [['language' => 'en']],
+        'currency' => [['currency' => 'dollar']],
+        'verified' => [['verified' => true]],
+        'deleted' => [['deleted' => true]],
+        'sort by email' => [['sort' => 'email|asc']],
+        'sort by age' => [['sort' => 'age|asc']],
+    ])->with(['a guest' => 'guest', 'a user' => 'user']);
+
+    it('does not find the users by their private columns with the global search, unless it is an admin', function (string $viewer) {
+        create(User::class, ['name' => 'Zz Target', 'email' => 'zz-private@mail.com', 'phone' => 'zz-phone']);
+
+        $viewer === 'guest'
+            ? auth()->forgetUser()
+            : $this->actingAs(User::factory()->make(['role' => Roles::USER]));
+
+        expect(User::filter(['search' => 'zz-private'])->get())->toHaveCount(0)
+            ->and(User::filter(['search' => 'zz-phone'])->get())->toHaveCount(0)
+            ->and(User::filter(['search' => 'zz target'])->get())->toHaveCount(1); // Its name is public
+
+        $this->actingAs(User::factory()->admin()->make());
+
+        expect(User::filter(['search' => 'zz-private'])->get())->toHaveCount(1)
+            ->and(User::filter(['search' => 'zz-phone'])->get())->toHaveCount(1);
+    })->with(['a guest' => 'guest', 'a user' => 'user']);
+
+    it('lets everyone filter and sort by the public columns', function (string $viewer) {
+        create(User::class, ['name' => 'Zz Public', 'created_at' => now()->addYear()]);
+
+        $viewer === 'guest'
+            ? auth()->forgetUser()
+            : $this->actingAs(User::factory()->make(['role' => Roles::USER]));
+
+        expect(User::filter(['name' => 'Zz Public'])->get())->toHaveCount(1)
+            ->and(User::filter(['search' => 'Zz Public'])->get())->toHaveCount(1)
+            ->and(User::filter(['min_created_at' => today()->addMonths(6)->toDateString()])->get())->toHaveCount(1)
+            ->and(User::filter(['sort' => 'name|asc'])->pluck('name')->last())->toBe('Zz Public');
+    })->with(['a guest' => 'guest', 'a user' => 'user']);
 });
