@@ -95,6 +95,7 @@ test('user can delete their account', function () {
 
     $response = $this
         ->actingAs($user)
+        ->withSession(['something' => 'private'])
         ->delete('/profile', [
             'password' => config('app.default_password'),
         ]);
@@ -104,6 +105,7 @@ test('user can delete their account', function () {
         ->assertRedirect('/login');
 
     $this->assertGuest();
+    expect(session()->has('something'))->toBeFalse();
     expect($user->fresh()->deleted_at)->not->toBeNull()
         ->and(session('flash_message_data'))->toBe(['message' => 'User Deleted', 'type' => 'success']);
 });
